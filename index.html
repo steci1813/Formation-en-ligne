@@ -231,5 +231,22 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="app.js"></script>
+<script>
+  async function testDatabase() {
+    const { data, error } = await supabaseClient
+      .from("modules")
+      .select("*");
+
+    if (error) {
+      console.error("Erreur Supabase :", error);
+      return;
+    }
+
+    console.log("Modules récupérés :", data);
+  }
+
+  testDatabase();
+</script>
+  
 </body>
 </html>
