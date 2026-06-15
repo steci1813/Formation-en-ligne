@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connexion — Formation Étude de marché</title>
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #f7f1e8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1f2933;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 430px;
+      background: white;
+      border-radius: 24px;
+      padding: 36px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+    }
+
+    .logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: #0f5748;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+    }
+
+    p {
+      margin: 0 0 24px;
+      color: #667085;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px;
+      margin-bottom: 16px;
+      border-radius: 14px;
+      border: 1px solid #d0d5dd;
+      font-size: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      border: 0;
+      border-radius: 999px;
+      background: #0f5748;
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    button:hover {
+      opacity: 0.92;
+    }
+
+    #message {
+      margin-top: 16px;
+      font-size: 14px;
+      color: #b42318;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-card">
+    <div class="logo">EM</div>
+
+    <h1>Connexion</h1>
+    <p>Accède à ta formation en ligne.</p>
+
+    <label for="email">Email</label>
+    <input id="email" type="email" placeholder="exemple@email.com" />
+
+    <label for="password">Mot de passe</label>
+    <input id="password" type="password" placeholder="Mot de passe" />
+
+    <button onclick="login()">Se connecter</button>
+
+    <div id="message"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = "https://xlyhujiebervldzoxouk.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_IqLPvaAeDZoDlYKE-m_Fxw_29Zbnhh_";
+
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+    async function login() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const message = document.getElementById("message");
+
+      message.textContent = "";
+
+      if (!email || !password) {
+        message.textContent = "Entre ton email et ton mot de passe.";
+        return;
+      }
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (error) {
+        message.textContent = "Connexion impossible : " + error.message;
+        return;
+      }
+
+      window.location.href = "index.html";
+    }
+
+    async function redirectIfAlreadyConnected() {
+      const { data } = await supabaseClient.auth.getSession();
+
+      if (data.session) {
+        window.location.href = "index.html";
+      }
+    }
+
+    redirectIfAlreadyConnected();
+  </script>
+</body>
+</html>
