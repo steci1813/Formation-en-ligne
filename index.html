@@ -229,6 +229,20 @@
     </footer>
   </div>
 
+<div id="login-box" style="padding:20px; margin:20px; border:1px solid #ddd; border-radius:12px;">
+  <h2>Connexion</h2>
+
+  <input id="login-email" type="email" placeholder="Email" style="display:block; width:100%; padding:12px; margin-bottom:10px;">
+  <input id="login-password" type="password" placeholder="Mot de passe" style="display:block; width:100%; padding:12px; margin-bottom:10px;">
+
+  <button onclick="loginUser()" style="padding:12px 20px; cursor:pointer;">
+    Se connecter
+  </button>
+
+  <p id="login-message"></p>
+</div>
+  
+
 <div id="supabase-test" style="padding:20px; margin:20px; border:1px solid #ddd; border-radius:12px;">
   <h2>Test Supabase</h2>
   <p id="supabase-status">Connexion en cours...</p>
@@ -246,6 +260,28 @@
     SUPABASE_KEY
   );
 
+async function loginUser() {
+  const email = document.getElementById("login-email").value;
+  const password = document.getElementById("login-password").value;
+  const message = document.getElementById("login-message");
+
+  message.textContent = "Connexion en cours...";
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    message.textContent = "Erreur : " + error.message;
+    return;
+  }
+
+  message.textContent = "Connexion réussie.";
+
+  await testSupabase();
+}
+  
   async function testSupabase() {
     const status = document.getElementById("supabase-status");
     const list = document.getElementById("modules-list");
@@ -272,10 +308,15 @@
       li.textContent = module.title;
       list.appendChild(li);
     });
+
+    
   }
 
   testSupabase();
 </script>
+
+
+
   
 </body>
 </html>
