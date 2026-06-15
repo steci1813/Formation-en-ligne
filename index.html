@@ -3,30 +3,493 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>Étude de marché — Formation en ligne</title>
-  <meta name="description" content="Site autonome pour gérer une formation en ligne en étude de marché : cours, ressources, livrables, élèves et suivi." />
-  <link rel="stylesheet" href="styles.css" />
 
   <style>
+    :root {
+      --green: #0f5748;
+      --green-soft: #e8f5ef;
+      --cream: #f7f1e8;
+      --text: #1f2933;
+      --muted: #667085;
+      --border: #e4e7ec;
+      --white: #ffffff;
+      --danger: #b42318;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--cream);
+      color: var(--text);
+    }
+
     #authLoading {
       position: fixed;
       inset: 0;
       z-index: 9999;
-      background: #f7f1e8;
+      background: var(--cream);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: Arial, sans-serif;
-      color: #0f5748;
-      font-weight: 800;
+      color: var(--green);
       font-size: 18px;
+      font-weight: 800;
     }
 
-    .logout-button {
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 22px 0 40px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 14px;
+      z-index: 50;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(15, 87, 72, 0.12);
+      border-radius: 24px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: var(--green);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 16px;
+    }
+
+    .brand small {
+      color: var(--muted);
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-link {
       border: 0;
+      padding: 10px 14px;
+      border-radius: 999px;
       background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .logout {
+      color: var(--danger);
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active-view {
+      display: block;
+    }
+
+    .hero {
+      margin: 28px 0;
+      background: var(--white);
+      border-radius: 32px;
+      padding: 34px;
+      border: 1px solid rgba(15, 87, 72, 0.12);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    h1 {
+      margin: 0 0 14px;
+      font-size: clamp(34px, 5vw, 62px);
+      line-height: 1.02;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: clamp(24px, 3vw, 36px);
+    }
+
+    h3 {
+      margin: 0 0 12px;
+      font-size: 22px;
+    }
+
+    h4 {
+      margin: 22px 0 10px;
+      font-size: 17px;
+    }
+
+    p {
+      line-height: 1.7;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: 18px;
+      max-width: 720px;
+    }
+
+    .video-box {
+      overflow: hidden;
+      border-radius: 24px;
+      background: #111827;
+      aspect-ratio: 16 / 9;
+      box-shadow: var(--shadow);
+    }
+
+    .video-box iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 110px;
+      background: var(--white);
+      border-radius: 24px;
+      padding: 18px;
+      border: 1px solid rgba(15, 87, 72, 0.12);
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar-title {
+      color: var(--green);
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+
+    .sidebar a,
+    .sidebar button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      text-decoration: none;
+      color: var(--text);
+      background: transparent;
+      border: 0;
+      padding: 11px 12px;
+      border-radius: 14px;
       cursor: pointer;
       font: inherit;
+    }
+
+    .sidebar a:hover,
+    .sidebar button:hover {
+      background: var(--cream);
+      color: var(--green);
+    }
+
+    .page-stack {
+      display: grid;
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 28px;
+      padding: 28px;
+      border: 1px solid rgba(15, 87, 72, 0.12);
+      box-shadow: var(--shadow);
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .info-card {
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .info-card strong {
+      display: block;
+      color: var(--green);
+      margin-bottom: 6px;
+    }
+
+    .objectives-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .objective-item {
+      padding: 15px 18px;
+      border-radius: 18px;
+      background: var(--green-soft);
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .material-list {
+      margin: 0;
+      padding-left: 20px;
+      line-height: 1.9;
+    }
+
+    .callout {
+      border-left: 5px solid var(--green);
+      background: #f4fbf8;
+      border-radius: 20px;
+      padding: 18px 20px;
+      margin: 20px 0;
+    }
+
+    .callout p {
+      margin: 6px 0;
+    }
+
+    .activities {
+      display: grid;
+      gap: 18px;
+    }
+
+    .activity-card {
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 22px;
+      background: #fcfcfd;
+    }
+
+    .activity-card p {
+      color: var(--muted);
+      margin-top: 0;
+    }
+
+    .activity-pages {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .page-button {
+      min-height: 86px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      border-radius: 18px;
+      padding: 15px;
+      text-align: left;
+      cursor: pointer;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .page-button small {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .page-button:hover {
+      border-color: var(--green);
+      color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .sub-page {
+      display: none;
+      background: var(--white);
+      border-radius: 28px;
+      border: 1px solid rgba(15, 87, 72, 0.12);
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .sub-page.active-page {
+      display: block;
+    }
+
+    .back-row {
+      margin-bottom: 18px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-weight: 900;
+      background: var(--green);
+      color: white;
+    }
+
+    .btn.secondary {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .btn.danger {
+      background: #fee4e2;
+      color: var(--danger);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+    }
+
+    th,
+    td {
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      background: #f9fafb;
+    }
+
+    .tag {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .field {
+      width: 100%;
+      border: 1px solid #d0d5dd;
+      border-radius: 14px;
+      padding: 13px;
+      font: inherit;
+      margin-top: 7px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 14px;
+      font-weight: 800;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .footer {
+      margin-top: 28px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 940px) {
+      .hero-grid,
+      .layout,
+      .admin-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+
+      .info-grid,
+      .activity-pages {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -36,269 +499,576 @@
 
   <div class="shell">
     <header class="topbar">
-      <a class="brand" href="#home" aria-label="Accueil">
+      <a class="brand" href="#accueil">
         <span class="brand-mark">EM</span>
         <span>
-          <strong id="brandTitle">Étude de marché</strong>
+          <strong>Étude de marché</strong>
           <small>Formation en ligne</small>
         </span>
       </a>
 
-      <nav class="nav" aria-label="Navigation principale">
-        <button class="nav-link active" data-view="studentView">Espace élève</button>
-        <button class="nav-link" data-view="adminView">Gestion</button>
-        <button class="nav-link logout-button" type="button" onclick="logout()">Déconnexion</button>
+      <nav class="nav">
+        <button class="nav-link active" type="button" onclick="showStudentView(this)">
+          Espace élève
+        </button>
+
+        <button class="nav-link" type="button" data-admin-trigger>
+          Gestion
+        </button>
+
+        <button class="nav-link logout" type="button" onclick="logout()">
+          Déconnexion
+        </button>
       </nav>
     </header>
 
     <main>
-      <section class="hero" id="home">
-        <div class="hero-copy">
-          <p class="eyebrow">Nouveau cours en ligne</p>
-          <h1 id="courseTitle">Étude de marché</h1>
-          <p id="courseSubtitle" class="lead">
-            Comprendre son marché, valider son idée et construire une offre cohérente avant de se lancer.
-          </p>
-          <div class="hero-actions">
-            <a class="btn primary" href="#modules">Voir les cours</a>
-            <button class="btn ghost" id="copyStudentMessage">Copier le message élèves</button>
-          </div>
-        </div>
-
-        <aside class="hero-card" aria-label="Résumé de la formation">
-          <div class="metric">
-            <span id="moduleCount">0</span>
-            <small>modules</small>
-          </div>
-          <div class="metric">
-            <span id="livrableCount">0</span>
-            <small>livrables</small>
-          </div>
-          <div class="metric">
-            <span id="studentCount">0</span>
-            <small>élèves suivis</small>
-          </div>
-        </aside>
-      </section>
-
-      <section class="notice" id="studentNotice">
-        <div>
-          <strong>Message d’accueil</strong>
-          <p id="welcomeMessage"></p>
-        </div>
-      </section>
-
       <section id="studentView" class="view active-view">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Espace élève</p>
-            <h2>Suivre le cours sans Notion</h2>
-          </div>
+        <section class="hero" id="accueil">
+          <div class="hero-grid">
+            <div>
+              <p class="eyebrow">Cours en ligne</p>
+              <h1>📊 Étude de marché</h1>
 
-          <div class="tools-row">
-            <input id="searchInput" class="field search" type="search" placeholder="Rechercher un module, ressource, livrable…" />
-            <select id="statusFilter" class="field">
-              <option value="all">Tous les statuts</option>
-              <option value="Publié">Publié</option>
-              <option value="Brouillon">Brouillon</option>
-            </select>
-          </div>
-        </div>
+              <p class="lead">
+                Un espace centralisé pour suivre le cours, ouvrir les activités, consulter les exercices,
+                organiser les groupes et déposer les livrables.
+              </p>
 
-        <div class="progress-card">
-          <div>
-            <strong>Ma progression locale</strong>
-            <p>Les cases cochées sont enregistrées sur cet appareil.</p>
-          </div>
-
-          <div class="progress-wrap">
-            <div class="progress-bar">
-              <span id="progressFill"></span>
+              <button class="btn" type="button" onclick="document.getElementById('activites').scrollIntoView({ behavior: 'smooth' })">
+                Voir les activités
+              </button>
             </div>
-            <small id="progressText">0%</small>
+
+            <div class="video-box">
+              <iframe
+                src="edm.webm"
+                title="Vidéo d’introduction — Étude de marché"
+                allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+        </section>
+
+        <div class="layout">
+          <aside class="sidebar">
+            <div class="sidebar-title">Navigation</div>
+
+            <a href="#informations">Informations générales</a>
+            <a href="#objectifs">Objectifs d’apprentissage</a>
+            <a href="#materiel">Matériel nécessaire</a>
+            <a href="#introduction">Introduction</a>
+            <a href="#activites">Activités</a>
+
+            <button type="button" data-admin-trigger>
+              Gestion
+            </button>
+          </aside>
+
+          <div class="page-stack">
+            <section class="card" id="informations">
+              <p class="eyebrow">Informations générales</p>
+              <h2>Présentation du cours</h2>
+
+              <div class="info-grid">
+                <div class="info-card">
+                  <strong>Date</strong>
+                  <span>26-08-2024</span>
+                </div>
+
+                <div class="info-card">
+                  <strong>Durée</strong>
+                  <span>30 heures</span>
+                </div>
+
+                <div class="info-card">
+                  <strong>Niveau</strong>
+                  <span>L3</span>
+                </div>
+              </div>
+
+              <div class="info-grid">
+                <div class="info-card">
+                  <strong>Titre du cours</strong>
+                  <span>Étude de marché</span>
+                </div>
+
+                <div class="info-card">
+                  <strong>Format</strong>
+                  <span>Formation en ligne</span>
+                </div>
+
+                <div class="info-card">
+                  <strong>Suivi</strong>
+                  <span>Activités, exercices et dépôts</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="card" id="objectifs">
+              <p class="eyebrow">Objectifs d’apprentissage</p>
+              <h2>À la fin du cours, vous saurez :</h2>
+
+              <div class="objectives-list">
+                <div class="objective-item">
+                  🎯 Identifier les besoins et préférences des consommateurs cibles
+                </div>
+
+                <div class="objective-item">
+                  📊 Analyser la concurrence et positionner le produit ou service sur le marché
+                </div>
+
+                <div class="objective-item">
+                  💡 Évaluer le potentiel commercial d’un nouveau produit ou service
+                </div>
+              </div>
+            </section>
+
+            <section class="card" id="materiel">
+              <p class="eyebrow">Matériel nécessaire</p>
+              <h2>Ce qu’il faut prévoir</h2>
+
+              <ul class="material-list">
+                <li>Ordinateur portable avec logiciel d’analyse statistique</li>
+                <li>Tablette ou téléphone pour réaliser des sondages sur le terrain</li>
+                <li>Connexion internet</li>
+                <li>Support de prise de notes</li>
+              </ul>
+            </section>
+
+            <section class="card" id="introduction">
+              <p class="eyebrow">Déroulement du cours</p>
+              <h2>🕒 Introduction</h2>
+
+              <p>
+                Le data marketing et le web analytics ont modifié en profondeur la pratique des études de marché
+                et de la connaissance client. Malgré ces révolutions, l’adéquation entre une offre et son marché,
+                ou <em>Product Market Fit</em>, semble parfois encore plus difficile à définir et à partager.
+              </p>
+
+              <div class="callout">
+                <p><strong>Comment anticiper les besoins de vos prospects et clients ?</strong></p>
+                <p><strong>Comment convaincre de la pertinence du Product Market Fit identifié ?</strong></p>
+              </div>
+
+              <p>
+                Nous allons voir ensemble comment répondre à ces questions pas à pas, et de manière simple.
+              </p>
+            </section>
+
+            <section class="card" id="activites">
+              <p class="eyebrow">Activités à faire</p>
+              <h2>Programme de travail</h2>
+
+              <div class="activities">
+                <article class="activity-card">
+                  <h3>📊 Activité 1 : Exprimez clairement votre besoin : le brief</h3>
+                  <p>Réalisez une étude de marché — Partie 1</p>
+
+                  <div class="activity-pages">
+                    <button class="page-button" type="button" onclick="openCoursePage('a1-cours')">
+                      📘 Contenu de cours
+                      <small>Comprendre le brief et formuler le besoin.</small>
+                    </button>
+
+                    <button class="page-button" type="button" onclick="openCoursePage('a1-exercice')">
+                      ✍️ Exo 1
+                      <small>Rédiger le brief de l’étude.</small>
+                    </button>
+
+                    <button class="page-button" type="button" onclick="openCoursePage('a1-groupe')">
+                      👥 Répartition groupe et dépôt 1
+                      <small>Organiser les groupes et suivre les dépôts.</small>
+                    </button>
+                  </div>
+                </article>
+
+                <article class="activity-card">
+                  <h3>📊 Activité 2 : Maîtrisez les étapes clés d’une étude</h3>
+                  <p>Comprendre la démarche complète d’une étude de marché.</p>
+
+                  <div class="activity-pages">
+                    <button class="page-button" type="button" onclick="openCoursePage('a2-cours')">
+                      📘 Contenu de cours
+                      <small>Étapes, méthode et collecte de données.</small>
+                    </button>
+
+                    <button class="page-button" type="button" onclick="openCoursePage('a2-exercice')">
+                      ✍️ Exo 2
+                      <small>Construire la méthodologie de l’étude.</small>
+                    </button>
+
+                    <button class="page-button" type="button" onclick="openCoursePage('a2-groupe')">
+                      👥 Répartition groupe et dépôt 2
+                      <small>Suivre les groupes et le deuxième dépôt.</small>
+                    </button>
+                  </div>
+                </article>
+
+                <article class="activity-card">
+                  <h3>📊 Activité 3 : Donnez de la crédibilité à vos résultats</h3>
+                  <p>Présenter des résultats fiables, lisibles et convaincants.</p>
+
+                  <div class="activity-pages">
+                    <button class="page-button" type="button" onclick="openCoursePage('a3-cours')">
+                      📘 Contenu de cours
+                      <small>Interprétation, preuves et crédibilité.</small>
+                    </button>
+
+                    <button class="page-button" type="button" onclick="openCoursePage('a3-exercice')">
+                      ✍️ Exo 3
+                      <small>Construire une synthèse crédible.</small>
+                    </button>
+
+                    <button class="page-button" type="button" onclick="openCoursePage('a3-groupe')">
+                      👥 Répartition groupe et dépôt 3
+                      <small>Suivre le dernier dépôt.</small>
+                    </button>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section id="pagesActivites" class="page-stack">
+              <article id="a1-cours" class="sub-page">
+                <div class="back-row">
+                  <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
+                </div>
+
+                <p class="eyebrow">Activité 1</p>
+                <h2>📘 Contenu de cours — Exprimez clairement votre besoin : le brief</h2>
+
+                <p>
+                  Cette première partie permet de poser la base de toute étude de marché :
+                  comprendre pourquoi l’étude est nécessaire et quelles informations doivent être recherchées.
+                </p>
+
+                <h4>Points clés</h4>
+                <ul>
+                  <li>Identifier le contexte du projet</li>
+                  <li>Définir le problème à résoudre</li>
+                  <li>Clarifier le besoin d’information</li>
+                  <li>Identifier les consommateurs ou clients cibles</li>
+                  <li>Formuler les questions principales de l’étude</li>
+                </ul>
+              </article>
+
+              <article id="a1-exercice" class="sub-page">
+                <div class="back-row">
+                  <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
+                </div>
+
+                <p class="eyebrow">Activité 1</p>
+                <h2>✍️ Exo 1 — Le brief</h2>
+
+                <p>
+                  Rédigez le brief de votre étude de marché.
+                </p>
+
+                <h4>Travail demandé</h4>
+                <ul>
+                  <li>Présenter l’idée, le produit, le service ou le projet étudié</li>
+                  <li>Décrire le besoin ou le problème de départ</li>
+                  <li>Identifier la cible concernée</li>
+                  <li>Lister les informations à rechercher</li>
+                  <li>Formuler 3 à 5 questions auxquelles l’étude devra répondre</li>
+                </ul>
+              </article>
+
+              <article id="a1-groupe" class="sub-page">
+                <div class="back-row">
+                  <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
+                </div>
+
+                <p class="eyebrow">Activité 1</p>
+                <h2>👥 Répartition groupe et dépôt 1</h2>
+
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Groupe</th>
+                        <th>Membres</th>
+                        <th>Sujet / projet</th>
+                        <th>Lien du dépôt</th>
+                        <th>Statut</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      <tr>
+                        <td>Groupe 1</td>
+                        <td>À compléter</td>
+                        <td>À compléter</td>
+                        <td>À compléter</td>
+                        <td><span class="tag">En attente</span></td>
+                      </tr>
+
+                      <tr>
+                        <td>Groupe 2</td>
+                        <td>À compléter</td>
+                        <td>À compléter</td>
+                        <td>À compléter</td>
+                        <td><span class="tag">En attente</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+
+              <article id="a2-cours" class="sub-page">
+                <div class="back-row">
+                  <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
+                </div>
+
+                <p class="eyebrow">Activité 2</p>
+                <h2>📘 Contenu de cours — Maîtrisez les étapes clés d’une étude</h2>
+
+                <p>
+                  Une étude de marché suit une démarche structurée. Elle part d’un besoin d’information,
+                  puis passe par la collecte, l’analyse et la formulation de recommandations.
+                </p>
+
+                <h4>Étapes principales</h4>
+                <ul>
+                  <li>Définir les objectifs de l’étude</li>
+                  <li>Choisir la méthode de collecte</li>
+                  <li>Construire le questionnaire ou guide d’entretien</li>
+                  <li>Collecter les données</li>
+                  <li>Analyser les résultats</li>
+                  <li>Présenter les conclusions</li>
+                </ul>
+              </article>
+
+              <article id="a2-exercice" class="sub-page">
+                <div class="back-row">
+                  <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
+                </div>
+
+                <p class="eyebrow">Activité 2</p>
+                <h2>✍️ Exo 2 — Méthodologie de l’étude</h2>
+
+                <p>
+                  Construisez la méthodologie de votre étude.
+                </p>
+
+                <h4>Travail demandé</h4>
+                <ul>
+                  <li>Choisir une méthode : sondage, entretien, observation ou recherche documentaire</li>
+                  <li>Définir le nombre de personnes à interroger</li>
+                  <li>Rédiger les questions principales</li>
+                  <li>Expliquer comment les données seront collectées</li>
+                  <li>Expliquer comment les résultats seront analysés</li>
+                </ul>
+              </article>
+
+              <article id="a2-groupe" class="sub-page">
+                <div class="back-row">
+                  <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
+                </div>
+
+                <p class="eyebrow">Activité 2</p>
+                <h2>👥 Répartition groupe et dépôt 2</h2>
+
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Groupe</th>
+                        <th>Membres</th>
+                        <th>Méthode choisie</th>
+                        <th>Lien du dépôt</th>
+                        <th>Statut</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      <tr>
+                        <td>Groupe 1</td>
+                        <td>À compléter</td>
+                        <td>À compléter</td>
+                        <td>À compléter</td>
+                        <td><span class="tag">En attente</span></td>
+                      </tr>
+
+                      <tr>
+                        <td>Groupe 2</td>
+                        <td>À compléter</td>
+                        <td>À compléter</td>
+                        <td>À compléter</td>
+                        <td><span class="tag">En attente</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+
+              <article id="a3-cours" class="sub-page">
+                <div class="back-row">
+                  <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
+                </div>
+
+                <p class="eyebrow">Activité 3</p>
+                <h2>📘 Contenu de cours — Donnez de la crédibilité à vos résultats</h2>
+
+                <p>
+                  Une étude de marché doit être crédible. Les résultats doivent être appuyés par des données,
+                  des sources fiables et une interprétation claire.
+                </p>
+
+                <h4>Points clés</h4>
+                <ul>
+                  <li>Présenter les données de manière claire</li>
+                  <li>Utiliser des chiffres, tableaux ou graphiques</li>
+                  <li>Justifier les conclusions</li>
+                  <li>Relier les résultats aux décisions marketing</li>
+                  <li>Éviter les affirmations non prouvées</li>
+                </ul>
+              </article>
+
+              <article id="a3-exercice" class="sub-page">
+                <div class="back-row">
+                  <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
+                </div>
+
+                <p class="eyebrow">Activité 3</p>
+                <h2>✍️ Exo 3 — Crédibiliser les résultats</h2>
+
+                <p>
+                  Préparez une synthèse crédible de vos résultats.
+                </p>
+
+                <h4>Travail demandé</h4>
+                <ul>
+                  <li>Présenter les résultats principaux</li>
+                  <li>Ajouter au moins un tableau ou graphique</li>
+                  <li>Identifier les tendances importantes</li>
+                  <li>Expliquer ce que les résultats signifient pour le projet</li>
+                  <li>Formuler des recommandations</li>
+                </ul>
+              </article>
+
+              <article id="a3-groupe" class="sub-page">
+                <div class="back-row">
+                  <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
+                </div>
+
+                <p class="eyebrow">Activité 3</p>
+                <h2>👥 Répartition groupe et dépôt 3</h2>
+
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Groupe</th>
+                        <th>Membres</th>
+                        <th>Résultat attendu</th>
+                        <th>Lien du dépôt</th>
+                        <th>Statut</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      <tr>
+                        <td>Groupe 1</td>
+                        <td>À compléter</td>
+                        <td>Synthèse des résultats</td>
+                        <td>À compléter</td>
+                        <td><span class="tag">En attente</span></td>
+                      </tr>
+
+                      <tr>
+                        <td>Groupe 2</td>
+                        <td>À compléter</td>
+                        <td>Synthèse des résultats</td>
+                        <td>À compléter</td>
+                        <td><span class="tag">En attente</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+            </section>
           </div>
         </div>
-
-        <div id="modules" class="grid cards-grid" aria-live="polite"></div>
-
-        <section class="panel split-panel">
-          <div>
-            <p class="eyebrow">Livrables</p>
-            <h3>Déposer un livrable</h3>
-            <p class="muted">
-              Version simple : l’élève renseigne un lien Drive, Canva, PDF ou un commentaire.
-              Le suivi est visible dans l’espace gestion.
-            </p>
-          </div>
-
-          <form id="submissionForm" class="form-card">
-            <label>Nom de l’élève
-              <input required name="studentName" class="field" placeholder="Ex : Sarah Rakoto" />
-            </label>
-
-            <label>Email ou WhatsApp
-              <input name="contact" class="field" placeholder="Ex : sarah@email.com / 034…" />
-            </label>
-
-            <label>Livrable
-              <select required name="livrableId" id="submissionLivrable" class="field"></select>
-            </label>
-
-            <label>Lien ou commentaire
-              <textarea required name="submissionText" class="field" rows="4" placeholder="Colle le lien du livrable ou écris ton commentaire ici…"></textarea>
-            </label>
-
-            <button class="btn primary" type="submit">Enregistrer le dépôt</button>
-          </form>
-        </section>
       </section>
 
       <section id="adminView" class="view">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Gestion</p>
-            <h2>Administrer la formation</h2>
-            <p class="muted">
-              Ajoute tes cours, ressources, livrables et élèves.
-              Cet espace est réservé à l’administrateur.
-            </p>
-          </div>
+        <section class="hero">
+          <p class="eyebrow">Gestion</p>
+          <h1>Administration</h1>
 
-          <div class="tools-row">
-            <button class="btn ghost" id="exportData">Exporter JSON</button>
-            <label class="btn ghost import-btn">
-              Importer JSON
-              <input id="importData" type="file" accept="application/json" hidden />
-            </label>
-            <button class="btn danger" id="resetData">Réinitialiser</button>
-          </div>
-        </div>
+          <p class="lead">
+            Cet espace est réservé à l’administrateur. Il permettra de gérer les activités,
+            les contenus, les exercices, les groupes, les dépôts et les élèves.
+          </p>
+        </section>
 
         <div class="admin-grid">
-          <form id="courseForm" class="panel form-card">
-            <p class="eyebrow">Infos générales</p>
+          <section class="card">
+            <p class="eyebrow">Activités</p>
+            <h2>Ajouter / modifier une activité</h2>
 
-            <label>Titre du cours
-              <input name="title" class="field" />
+            <label>
+              Titre de l’activité
+              <input class="field" placeholder="Ex : Activité 1 : Exprimez clairement votre besoin" />
             </label>
 
-            <label>Sous-titre
-              <textarea name="subtitle" class="field" rows="3"></textarea>
+            <label>
+              Description
+              <textarea class="field" rows="4" placeholder="Description de l’activité"></textarea>
             </label>
 
-            <label>Nom formateur / organisme
-              <input name="instructor" class="field" />
+            <button class="btn" type="button">
+              Enregistrer
+            </button>
+          </section>
+
+          <section class="card">
+            <p class="eyebrow">Groupes</p>
+            <h2>Suivi des groupes</h2>
+
+            <label>
+              Nom du groupe
+              <input class="field" placeholder="Ex : Groupe 1" />
             </label>
 
-            <label>Lien groupe WhatsApp
-              <input name="whatsapp" class="field" placeholder="https://chat.whatsapp.com/…" />
+            <label>
+              Membres
+              <textarea class="field" rows="4" placeholder="Liste des membres"></textarea>
             </label>
 
-            <label>Message d’accueil aux élèves
-              <textarea name="welcome" class="field" rows="6"></textarea>
-            </label>
-
-            <button class="btn primary" type="submit">Sauvegarder les infos</button>
-          </form>
-
-          <form id="moduleForm" class="panel form-card">
-            <p class="eyebrow">Ajouter un module</p>
-
-            <label>Titre du module
-              <input required name="title" class="field" placeholder="Ex : Analyser la concurrence" />
-            </label>
-
-            <label>Objectif pédagogique
-              <textarea required name="objective" class="field" rows="3" placeholder="Ce que les élèves doivent comprendre ou produire…"></textarea>
-            </label>
-
-            <label>Contenu / consignes
-              <textarea name="content" class="field" rows="5" placeholder="Sépare les points importants par des retours à la ligne."></textarea>
-            </label>
-
-            <div class="two-cols">
-              <label>Durée
-                <input name="duration" class="field" placeholder="1h30" />
-              </label>
-
-              <label>Statut
-                <select name="status" class="field">
-                  <option>Publié</option>
-                  <option>Brouillon</option>
-                </select>
-              </label>
-            </div>
-
-            <label>Lien vidéo / replay
-              <input name="videoUrl" class="field" placeholder="https://…" />
-            </label>
-
-            <label>Ressources
-              <textarea name="resources" class="field" rows="3" placeholder="Une ressource par ligne : titre | lien"></textarea>
-            </label>
-
-            <label>Livrable associé
-              <input name="deliverable" class="field" placeholder="Ex : Benchmark concurrence" />
-            </label>
-
-            <button class="btn primary" type="submit">Ajouter le module</button>
-          </form>
+            <button class="btn" type="button">
+              Ajouter le groupe
+            </button>
+          </section>
         </div>
 
-        <section class="panel">
-          <div class="section-head compact">
-            <div>
-              <p class="eyebrow">Modules</p>
-              <h3>Liste administrable</h3>
-            </div>
-          </div>
-
-          <div id="adminModules" class="admin-list"></div>
-        </section>
-
-        <section class="panel split-panel">
-          <div>
-            <p class="eyebrow">Élèves</p>
-            <h3>Suivi simple</h3>
-            <p class="muted">
-              Ajoute les élèves pour suivre leur progression, les présences ou les remarques.
-            </p>
-          </div>
-
-          <form id="studentForm" class="form-card small-form">
-            <label>Nom
-              <input required name="name" class="field" placeholder="Nom de l’élève" />
-            </label>
-
-            <label>Contact
-              <input name="contact" class="field" placeholder="Email / WhatsApp" />
-            </label>
-
-            <button class="btn primary" type="submit">Ajouter l’élève</button>
-          </form>
-        </section>
-
-        <section class="panel">
-          <div class="section-head compact">
-            <div>
-              <p class="eyebrow">Tableau de suivi</p>
-              <h3>Élèves et dépôts</h3>
-            </div>
-          </div>
+        <section class="card" style="margin-top: 24px;">
+          <p class="eyebrow">Dépôts</p>
+          <h2>Tableau de suivi</h2>
 
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Élève</th>
-                  <th>Contact</th>
-                  <th>Progression</th>
-                  <th>Dernier dépôt</th>
-                  <th>Action</th>
+                  <th>Activité</th>
+                  <th>Groupe</th>
+                  <th>Dépôt</th>
+                  <th>Statut</th>
+                  <th>Feedback</th>
                 </tr>
               </thead>
 
-              <tbody id="studentTable"></tbody>
+              <tbody>
+                <tr>
+                  <td>Activité 1</td>
+                  <td>Groupe 1</td>
+                  <td>À compléter</td>
+                  <td><span class="tag">En attente</span></td>
+                  <td>À corriger</td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </section>
@@ -306,12 +1076,10 @@
     </main>
 
     <footer class="footer">
-      <span>Site autonome — Étude de marché</span>
-      <span>Connexion Supabase sécurisée</span>
+      <span>Formation — Étude de marché</span>
+      <span>Connexion sécurisée avec Supabase</span>
     </footer>
   </div>
-
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -375,17 +1143,22 @@
       return currentProfile && currentProfile.role === "admin";
     }
 
-    async function blockGestionIfNotAdmin(event) {
-      const gestionButton = event.target.closest('[data-view="adminView"]');
+    function showStudentView(button) {
+      const studentView = document.getElementById("studentView");
+      const adminView = document.getElementById("adminView");
+      const navLinks = document.querySelectorAll(".nav-link");
 
-      if (!gestionButton) {
-        return;
+      navLinks.forEach(link => link.classList.remove("active"));
+
+      if (button) {
+        button.classList.add("active");
       }
 
-      event.preventDefault();
-      event.stopPropagation();
-      event.stopImmediatePropagation();
+      adminView.classList.remove("active-view");
+      studentView.classList.add("active-view");
+    }
 
+    async function openAdminView(button) {
       const isAdmin = await isCurrentUserAdmin();
 
       if (!isAdmin) {
@@ -393,23 +1166,55 @@
         return;
       }
 
-      openGestionView(gestionButton);
+      const studentView = document.getElementById("studentView");
+      const adminView = document.getElementById("adminView");
+      const navLinks = document.querySelectorAll(".nav-link");
+
+      navLinks.forEach(link => link.classList.remove("active"));
+
+      if (button && button.classList.contains("nav-link")) {
+        button.classList.add("active");
+      }
+
+      studentView.classList.remove("active-view");
+      adminView.classList.add("active-view");
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
     }
 
-    function openGestionView(gestionButton) {
-      const buttons = document.querySelectorAll(".nav-link[data-view]");
-      const views = document.querySelectorAll(".view");
+    function openCoursePage(pageId) {
+      const pages = document.querySelectorAll(".sub-page");
 
-      buttons.forEach(button => button.classList.remove("active"));
-      gestionButton.classList.add("active");
+      pages.forEach(page => {
+        page.classList.remove("active-page");
+      });
 
-      views.forEach(view => view.classList.remove("active-view"));
+      const selectedPage = document.getElementById(pageId);
 
-      const adminView = document.getElementById("adminView");
+      if (selectedPage) {
+        selectedPage.classList.add("active-page");
 
-      if (adminView) {
-        adminView.classList.add("active-view");
+        selectedPage.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
       }
+    }
+
+    function closeCoursePages() {
+      const pages = document.querySelectorAll(".sub-page");
+
+      pages.forEach(page => {
+        page.classList.remove("active-page");
+      });
+
+      document.getElementById("activites").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
     }
 
     async function logout() {
@@ -417,11 +1222,16 @@
       window.location.href = "login.html";
     }
 
-    document.addEventListener("click", blockGestionIfNotAdmin, true);
+    document.addEventListener("click", function(event) {
+      const adminTrigger = event.target.closest("[data-admin-trigger]");
+
+      if (adminTrigger) {
+        event.preventDefault();
+        openAdminView(adminTrigger);
+      }
+    });
 
     protectSite();
   </script>
-
-  <script src="app.js"></script>
 </body>
 </html>
