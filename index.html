@@ -229,8 +229,12 @@
     </footer>
   </div>
 
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="app.js"></script>
+<div id="supabase-test" style="padding:20px; margin:20px; border:1px solid #ddd; border-radius:12px;">
+  <h2>Test Supabase</h2>
+  <p id="supabase-status">Connexion en cours...</p>
+  <ul id="modules-list"></ul>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
@@ -242,7 +246,35 @@
     SUPABASE_KEY
   );
 
-  console.log("Supabase connecté :", supabaseClient);
+  async function testSupabase() {
+    const status = document.getElementById("supabase-status");
+    const list = document.getElementById("modules-list");
+
+    status.textContent = "Connexion à Supabase...";
+
+    const { data, error } = await supabaseClient
+      .from("modules")
+      .select("*")
+      .order("order_index", { ascending: true });
+
+    if (error) {
+      status.textContent = "Erreur Supabase : " + error.message;
+      console.error("Erreur Supabase :", error);
+      return;
+    }
+
+    status.textContent = "Connexion réussie. Modules trouvés : " + data.length;
+
+    list.innerHTML = "";
+
+    data.forEach(module => {
+      const li = document.createElement("li");
+      li.textContent = module.title;
+      list.appendChild(li);
+    });
+  }
+
+  testSupabase();
 </script>
   
 </body>
