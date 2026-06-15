@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Connexion — Formation Étude de marché</title>
 
   <style>
@@ -63,6 +64,12 @@
       border-radius: 14px;
       border: 1px solid #d0d5dd;
       font-size: 15px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #0f5748;
+      box-shadow: 0 0 0 3px rgba(15, 87, 72, 0.12);
     }
 
     button {
@@ -81,10 +88,27 @@
       opacity: 0.92;
     }
 
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
     #message {
       margin-top: 16px;
       font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .message-error {
       color: #b42318;
+    }
+
+    .message-success {
+      color: #0f5748;
+    }
+
+    .message-info {
+      color: #667085;
     }
   </style>
 </head>
@@ -96,15 +120,29 @@
     <h1>Connexion</h1>
     <p>Accède à ta formation en ligne.</p>
 
-    <label for="email">Email</label>
-    <input id="email" type="email" placeholder="exemple@email.com" />
+    <form id="loginForm">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        placeholder="exemple@email.com"
+        autocomplete="email"
+      />
 
-    <label for="password">Mot de passe</label>
-    <input id="password" type="password" placeholder="Mot de passe" />
+      <label for="password">Mot de passe</label>
+      <input
+        id="password"
+        type="password"
+        placeholder="Mot de passe"
+        autocomplete="current-password"
+      />
 
-    <button onclick="login()">Se connecter</button>
+      <button id="loginButton" type="submit">
+        Se connecter
+      </button>
 
-    <div id="message"></div>
+      <div id="message"></div>
+    </form>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -118,17 +156,50 @@
       SUPABASE_KEY
     );
 
+    const loginForm = document.getElementById("loginForm");
+    const loginButton = document.getElementById("loginButton");
+    const message = document.getElementById("message");
+
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = "";
+
+      if (type === "error") {
+        message.classList.add("message-error");
+      }
+
+      if (type === "success") {
+        message.classList.add("message-success");
+      }
+
+      if (type === "info") {
+        message.classList.add("message-info");
+      }
+    }
+
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
     async function login() {
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
-      const message = document.getElementById("message");
 
-      message.textContent = "";
+      showMessage("", "info");
 
       if (!email || !password) {
-        message.textContent = "Entre ton email et ton mot de passe.";
+        showMessage("Entre ton email et ton mot de passe.", "error");
         return;
       }
+
+      if (!isValidEmail(email)) {
+        showMessage("Entre une adresse email valide.", "error");
+        return;
+      }
+
+      loginButton.disabled = true;
+      loginButton.textContent = "Connexion...";
+      showMessage("Vérification en cours...", "info");
 
       const { data, error } = await supabaseClient.auth.signInWithPassword({
         email: email,
@@ -136,18 +207,38 @@
       });
 
       if (error) {
-        message.textContent = "Connexion impossible : " + error.message;
+        loginButton.disabled = false;
+        loginButton.textContent = "Se connecter";
+
+        showMessage("Email ou mot de passe incorrect.", "error");
         return;
       }
 
-      window.location.href = "index.html";
+      if (!data.session) {
+        loginButton.disabled = false;
+        loginButton.textContent = "Se connecter";
+
+        showMessage("Connexion refusée. Réessaie.", "error");
+        return;
+      }
+
+      showMessage("Connexion réussie. Redirection...", "success");
+
+      setTimeout(() => {
+        window.location.href = "./index.html";
+      }, 700);
     }
+
+    loginForm.addEventListener("submit", function(event) {
+      event.preventDefault();
+      login();
+    });
 
     async function redirectIfAlreadyConnected() {
       const { data } = await supabaseClient.auth.getSession();
 
       if (data.session) {
-        window.location.href = "index.html";
+        window.location.href = "./index.html";
       }
     }
 
