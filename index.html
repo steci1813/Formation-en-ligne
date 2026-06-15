@@ -231,21 +231,18 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-  async function testDatabase() {
-    const { data, error } = await supabaseClient
-      .from("modules")
-      .select("*");
+  const SUPABASE_URL = "https://xlyhujiebervldzoxouk.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_IqLPvaAeDZoDlYKE-m_Fxw_29Zbnhh_";
 
-    if (error) {
-      console.error("Erreur Supabase :", error);
-      return;
-    }
+  const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
-    console.log("Modules récupérés :", data);
-  }
-
-  testDatabase();
+  console.log("Supabase connecté :", supabaseClient);
 </script>
   
 </body>
