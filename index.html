@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Étude de marché — Formation en ligne</title>
+  <meta name="description" content="Site autonome pour gérer une formation en ligne en étude de marché : cours, ressources, livrables, élèves et suivi." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="#home" aria-label="Accueil">
+        <span class="brand-mark">EM</span>
+        <span>
+          <strong id="brandTitle">Étude de marché</strong>
+          <small>Formation en ligne</small>
+        </span>
+      </a>
+      <nav class="nav" aria-label="Navigation principale">
+        <button class="nav-link active" data-view="studentView">Espace élève</button>
+        <button class="nav-link" data-view="adminView">Gestion</button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" id="home">
+        <div class="hero-copy">
+          <p class="eyebrow">Nouveau cours en ligne</p>
+          <h1 id="courseTitle">Étude de marché</h1>
+          <p id="courseSubtitle" class="lead">Comprendre son marché, valider son idée et construire une offre cohérente avant de se lancer.</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#modules">Voir les cours</a>
+            <button class="btn ghost" id="copyStudentMessage">Copier le message élèves</button>
+          </div>
+        </div>
+        <aside class="hero-card" aria-label="Résumé de la formation">
+          <div class="metric"><span id="moduleCount">0</span><small>modules</small></div>
+          <div class="metric"><span id="livrableCount">0</span><small>livrables</small></div>
+          <div class="metric"><span id="studentCount">0</span><small>élèves suivis</small></div>
+        </aside>
+      </section>
+
+      <section class="notice" id="studentNotice">
+        <div>
+          <strong>Message d’accueil</strong>
+          <p id="welcomeMessage"></p>
+        </div>
+      </section>
+
+      <section id="studentView" class="view active-view">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Espace élève</p>
+            <h2>Suivre le cours sans Notion</h2>
+          </div>
+          <div class="tools-row">
+            <input id="searchInput" class="field search" type="search" placeholder="Rechercher un module, ressource, livrable…" />
+            <select id="statusFilter" class="field">
+              <option value="all">Tous les statuts</option>
+              <option value="Publié">Publié</option>
+              <option value="Brouillon">Brouillon</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="progress-card">
+          <div>
+            <strong>Ma progression locale</strong>
+            <p>Les cases cochées sont enregistrées sur cet appareil.</p>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-bar"><span id="progressFill"></span></div>
+            <small id="progressText">0%</small>
+          </div>
+        </div>
+
+        <div id="modules" class="grid cards-grid" aria-live="polite"></div>
+
+        <section class="panel split-panel">
+          <div>
+            <p class="eyebrow">Livrables</p>
+            <h3>Déposer un livrable</h3>
+            <p class="muted">Version simple : l’élève renseigne un lien Drive, Canva, PDF ou un commentaire. Le suivi est visible dans l’espace gestion sur ce navigateur.</p>
+          </div>
+          <form id="submissionForm" class="form-card">
+            <label>Nom de l’élève
+              <input required name="studentName" class="field" placeholder="Ex : Sarah Rakoto" />
+            </label>
+            <label>Email ou WhatsApp
+              <input name="contact" class="field" placeholder="Ex : sarah@email.com / 034…" />
+            </label>
+            <label>Livrable
+              <select required name="livrableId" id="submissionLivrable" class="field"></select>
+            </label>
+            <label>Lien ou commentaire
+              <textarea required name="submissionText" class="field" rows="4" placeholder="Colle le lien du livrable ou écris ton commentaire ici…"></textarea>
+            </label>
+            <button class="btn primary" type="submit">Enregistrer le dépôt</button>
+          </form>
+        </section>
+      </section>
+
+      <section id="adminView" class="view">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Gestion</p>
+            <h2>Administrer la formation</h2>
+            <p class="muted">Ajoute tes cours, ressources, livrables et élèves. Tout est stocké dans le navigateur, avec import/export JSON.</p>
+          </div>
+          <div class="tools-row">
+            <button class="btn ghost" id="exportData">Exporter JSON</button>
+            <label class="btn ghost import-btn">Importer JSON<input id="importData" type="file" accept="application/json" hidden /></label>
+            <button class="btn danger" id="resetData">Réinitialiser</button>
+          </div>
+        </div>
+
+        <div class="admin-grid">
+          <form id="courseForm" class="panel form-card">
+            <p class="eyebrow">Infos générales</p>
+            <label>Titre du cours
+              <input name="title" class="field" />
+            </label>
+            <label>Sous-titre
+              <textarea name="subtitle" class="field" rows="3"></textarea>
+            </label>
+            <label>Nom formateur / organisme
+              <input name="instructor" class="field" />
+            </label>
+            <label>Lien groupe WhatsApp
+              <input name="whatsapp" class="field" placeholder="https://chat.whatsapp.com/…" />
+            </label>
+            <label>Message d’accueil aux élèves
+              <textarea name="welcome" class="field" rows="6"></textarea>
+            </label>
+            <button class="btn primary" type="submit">Sauvegarder les infos</button>
+          </form>
+
+          <form id="moduleForm" class="panel form-card">
+            <p class="eyebrow">Ajouter un module</p>
+            <label>Titre du module
+              <input required name="title" class="field" placeholder="Ex : Analyser la concurrence" />
+            </label>
+            <label>Objectif pédagogique
+              <textarea required name="objective" class="field" rows="3" placeholder="Ce que les élèves doivent comprendre ou produire…"></textarea>
+            </label>
+            <label>Contenu / consignes
+              <textarea name="content" class="field" rows="5" placeholder="Sépare les points importants par des retours à la ligne."></textarea>
+            </label>
+            <div class="two-cols">
+              <label>Durée
+                <input name="duration" class="field" placeholder="1h30" />
+              </label>
+              <label>Statut
+                <select name="status" class="field">
+                  <option>Publié</option>
+                  <option>Brouillon</option>
+                </select>
+              </label>
+            </div>
+            <label>Lien vidéo / replay
+              <input name="videoUrl" class="field" placeholder="https://…" />
+            </label>
+            <label>Ressources
+              <textarea name="resources" class="field" rows="3" placeholder="Une ressource par ligne : titre | lien"></textarea>
+            </label>
+            <label>Livrable associé
+              <input name="deliverable" class="field" placeholder="Ex : Benchmark concurrence" />
+            </label>
+            <button class="btn primary" type="submit">Ajouter le module</button>
+          </form>
+        </div>
+
+        <section class="panel">
+          <div class="section-head compact">
+            <div>
+              <p class="eyebrow">Modules</p>
+              <h3>Liste administrable</h3>
+            </div>
+          </div>
+          <div id="adminModules" class="admin-list"></div>
+        </section>
+
+        <section class="panel split-panel">
+          <div>
+            <p class="eyebrow">Élèves</p>
+            <h3>Suivi simple</h3>
+            <p class="muted">Ajoute les élèves pour suivre leur progression, les présences ou les remarques.</p>
+          </div>
+          <form id="studentForm" class="form-card small-form">
+            <label>Nom
+              <input required name="name" class="field" placeholder="Nom de l’élève" />
+            </label>
+            <label>Contact
+              <input name="contact" class="field" placeholder="Email / WhatsApp" />
+            </label>
+            <button class="btn primary" type="submit">Ajouter l’élève</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <div class="section-head compact">
+            <div>
+              <p class="eyebrow">Tableau de suivi</p>
+              <h3>Élèves et dépôts</h3>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Élève</th>
+                  <th>Contact</th>
+                  <th>Progression</th>
+                  <th>Dernier dépôt</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="studentTable"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>Site autonome — Étude de marché</span>
+      <span>Données locales + export JSON</span>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
