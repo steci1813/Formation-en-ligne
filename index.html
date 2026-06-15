@@ -326,6 +326,46 @@
       margin-top: 0;
     }
 
+    .lesson-image {
+  width: 100%;
+  max-width: 760px;
+  display: block;
+  margin: 22px auto 8px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+}
+
+.lesson-caption {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 22px;
+}
+
+.lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin: 18px 0;
+}
+
+.lesson-box {
+  background: #f9fafb;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.lesson-box strong {
+  color: var(--green);
+}
+
+@media (max-width: 800px) {
+  .lesson-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
     .activity-pages {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
