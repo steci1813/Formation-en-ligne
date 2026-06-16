@@ -623,6 +623,29 @@
     grid-template-columns: 1fr;
   }
 }
+
+.table-field {
+  min-width: 150px;
+  margin-top: 0;
+}
+
+#groupDepositTable textarea.table-field {
+  min-width: 220px;
+}
+
+.date-fixed {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: #f9fafb;
+  color: var(--muted);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+      
       
       .topbar {
         align-items: flex-start;
@@ -2118,6 +2141,112 @@
       }
     });
 
+function saveGroupDepositTable() {
+  const rows = document.querySelectorAll("#groupDepositTable tbody tr");
+
+  const data = [];
+
+  rows.forEach(row => {
+    const groupNumber = row.dataset.group;
+    const fields = row.querySelectorAll(".table-field");
+
+    const rowData = {
+      group: groupNumber,
+      depositDate: row.querySelector('[data-field="depositDate"]')?.textContent || "Automatique"
+    };
+
+    fields.forEach(field => {
+      rowData[field.dataset.field] = field.value;
+    });
+
+    data.push(rowData);
+  });
+
+  localStorage.setItem("activity1GroupDeposits", JSON.stringify(data));
+}
+
+function loadGroupDepositTable() {
+  const savedData = localStorage.getItem("activity1GroupDeposits");
+
+  if (!savedData) {
+    return;
+  }
+
+  const data = JSON.parse(savedData);
+
+  data.forEach(rowData => {
+    const row = document.querySelector(`#groupDepositTable tbody tr[data-group="${rowData.group}"]`);
+
+    if (!row) {
+      return;
+    }
+
+    const fields = row.querySelectorAll(".table-field");
+
+    fields.forEach(field => {
+      if (rowData[field.dataset.field] !== undefined) {
+        field.value = rowData[field.dataset.field];
+      }
+    });
+
+    const depositDate = row.querySelector('[data-field="depositDate"]');
+
+    if (depositDate && rowData.depositDate) {
+      depositDate.textContent = rowData.depositDate;
+    }
+  });
+}
+
+function setAutomaticDepositDate(row) {
+  const depositDate = row.querySelector('[data-field="depositDate"]');
+
+  if (!depositDate) {
+    return;
+  }
+
+  if (depositDate.textContent !== "Automatique") {
+    return;
+  }
+
+  const today = new Date();
+
+  depositDate.textContent = today.toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric"
+  });
+}
+
+function initGroupDepositTable() {
+  loadGroupDepositTable();
+
+  const fields = document.querySelectorAll("#groupDepositTable .table-field");
+
+  fields.forEach(field => {
+    field.addEventListener("input", function() {
+      const row = field.closest("tr");
+
+      if (row) {
+        setAutomaticDepositDate(row);
+      }
+
+      saveGroupDepositTable();
+    });
+
+    field.addEventListener("change", function() {
+      const row = field.closest("tr");
+
+      if (row) {
+        setAutomaticDepositDate(row);
+      }
+
+      saveGroupDepositTable();
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", initGroupDepositTable);
+    
     protectSite();
   </script>
 </body>
