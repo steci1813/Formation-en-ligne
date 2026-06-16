@@ -793,6 +793,148 @@
       margin: 22px auto 30px;
     }
 
+
+    /* Examen final — countdown visuel */
+    .final-exam-timer-card {
+      max-width: 980px;
+      margin: 0 auto 26px;
+      padding: 22px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, #ffffff 0%, #f4fbf8 100%);
+      border: 1px solid rgba(15, 87, 72, 0.18);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+
+    .final-exam-timer-main {
+      display: flex;
+      gap: 22px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .final-exam-ring {
+      width: 154px;
+      height: 154px;
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .final-exam-ring svg {
+      width: 154px;
+      height: 154px;
+      transform: rotate(-90deg);
+    }
+
+    .final-exam-ring-bg {
+      fill: none;
+      stroke: #e8f5ef;
+      stroke-width: 12;
+    }
+
+    .final-exam-ring-progress {
+      fill: none;
+      stroke: var(--green);
+      stroke-width: 12;
+      stroke-linecap: round;
+      stroke-dasharray: 339.292;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 0.8s ease, stroke 0.3s ease;
+    }
+
+    .final-exam-ring-center {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .final-exam-ring-center span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .final-exam-ring-center strong {
+      display: block;
+      color: var(--green);
+      font-size: 30px;
+      line-height: 1.1;
+      margin-top: 4px;
+    }
+
+    .final-exam-timer-copy {
+      flex: 1;
+      min-width: 260px;
+    }
+
+    .final-exam-timer-copy h3 {
+      margin: 0 0 8px;
+      color: var(--green);
+    }
+
+    .final-exam-timer-copy p {
+      margin: 6px 0;
+      color: var(--muted);
+    }
+
+    .final-exam-progress-track {
+      height: 12px;
+      background: #e8f5ef;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 18px;
+    }
+
+    .final-exam-progress-bar {
+      display: block;
+      height: 100%;
+      width: 100%;
+      background: var(--green);
+      border-radius: 999px;
+      transition: width 0.8s ease, background 0.3s ease;
+    }
+
+    .final-exam-timer-card.warning .final-exam-ring-progress,
+    .final-exam-timer-card.warning .final-exam-progress-bar {
+      stroke: #f79009;
+      background: #f79009;
+    }
+
+    .final-exam-timer-card.danger .final-exam-ring-progress,
+    .final-exam-timer-card.danger .final-exam-progress-bar {
+      stroke: #d92d20;
+      background: #d92d20;
+    }
+
+    .final-exam-admin-badge {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      border-radius: 999px;
+      padding: 6px 12px;
+      background: #fff7ed;
+      color: #b54708;
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 640px) {
+      .final-exam-timer-main {
+        justify-content: center;
+        text-align: center;
+      }
+    }
+
     @media (max-width: 940px) {
       .hero-grid,
       .layout,
@@ -1410,10 +1552,30 @@
   </div>
 
   <div id="finalExamRunning" style="display:none;">
-    <div class="callout" style="position:sticky; top:0; z-index:30;">
-      <p><strong>⏱ Temps restant</strong></p>
-      <h2 id="finalExamTimer" style="margin:0;">60:00</h2>
-      <p id="finalExamProgressText">Répondez à toutes les questions avant la fin du temps.</p>
+    <div id="finalExamTimerCard" class="final-exam-timer-card">
+      <div class="final-exam-timer-main">
+        <div class="final-exam-ring" aria-label="Compte à rebours de l’examen">
+          <svg viewBox="0 0 120 120" role="img">
+            <circle class="final-exam-ring-bg" cx="60" cy="60" r="54"></circle>
+            <circle id="finalExamRingProgress" class="final-exam-ring-progress" cx="60" cy="60" r="54"></circle>
+          </svg>
+          <div class="final-exam-ring-center">
+            <div>
+              <span>Temps restant</span>
+              <strong id="finalExamTimer">60:00</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="final-exam-timer-copy">
+          <h3>⏱ Examen en cours</h3>
+          <p id="finalExamTimerStatus">Répondez calmement. Le chronomètre démarre dès le clic.</p>
+          <p id="finalExamProgressText">Progression du temps : 0 % utilisé.</p>
+          <div class="final-exam-progress-track">
+            <span id="finalExamProgressBar" class="final-exam-progress-bar"></span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <form id="finalExamForm" class="notion-course-content" onsubmit="submitFinalExam(event)">
@@ -2091,6 +2253,7 @@ const FINAL_EXAM_DURATION_MINUTES = 60;
 
 let finalExamInterval = null;
 let finalExamCurrentUser = null;
+let finalExamIsAdmin = false;
 
 const FINAL_EXAM_QUESTIONS = [
   {
@@ -2327,6 +2490,84 @@ function formatFinalExamTime(ms) {
   return minutes + ":" + seconds;
 }
 
+
+async function refreshFinalExamAdminStatus() {
+  finalExamIsAdmin = false;
+
+  if (!finalExamCurrentUser) {
+    return false;
+  }
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .select("role")
+      .eq("id", finalExamCurrentUser.id)
+      .single();
+
+    if (!error && data && data.role === "admin") {
+      finalExamIsAdmin = true;
+    }
+  } catch (e) {
+    finalExamIsAdmin = false;
+  }
+
+  return finalExamIsAdmin;
+}
+
+function isFinalExamOfficialStartWindow() {
+  const now = new Date();
+  return now >= FINAL_EXAM_START_AT && now < FINAL_EXAM_LATEST_START_AT;
+}
+
+function updateFinalExamVisualTimer(remaining, totalDuration) {
+  const safeRemaining = Math.max(0, remaining);
+  const ratioRemaining = Math.max(0, Math.min(1, safeRemaining / totalDuration));
+  const percentUsed = Math.round((1 - ratioRemaining) * 100);
+
+  const timerCard = document.getElementById("finalExamTimerCard");
+  const ring = document.getElementById("finalExamRingProgress");
+  const bar = document.getElementById("finalExamProgressBar");
+  const progressText = document.getElementById("finalExamProgressText");
+  const status = document.getElementById("finalExamTimerStatus");
+
+  if (timerCard) {
+    timerCard.classList.remove("warning", "danger");
+
+    if (ratioRemaining <= 0.10) {
+      timerCard.classList.add("danger");
+    } else if (ratioRemaining <= 0.25) {
+      timerCard.classList.add("warning");
+    }
+  }
+
+  if (ring) {
+    const circumference = 339.292;
+    ring.style.strokeDashoffset = String(circumference * (1 - ratioRemaining));
+  }
+
+  if (bar) {
+    bar.style.width = Math.max(0, Math.min(100, ratioRemaining * 100)) + "%";
+  }
+
+  if (progressText) {
+    progressText.textContent = "Progression du temps : " + percentUsed + " % utilisé.";
+  }
+
+  if (status) {
+    if (ratioRemaining <= 0.10) {
+      status.textContent = "Dernières minutes : validez vos réponses.";
+    } else if (ratioRemaining <= 0.25) {
+      status.textContent = "Attention : il reste moins du quart du temps.";
+    } else if (finalExamIsAdmin && localStorage.getItem(finalExamUserKey("adminTestMode")) === "true") {
+      status.textContent = "Mode test admin : le résultat ne sera pas enregistré dans Supabase.";
+    } else {
+      status.textContent = "Répondez calmement. Le chronomètre démarre dès le clic.";
+    }
+  }
+}
+
+
 function isSameAnswer(selected, expected) {
   const a = [...selected].map(Number).sort((x, y) => x - y);
   const b = [...expected].map(Number).sort((x, y) => x - y);
@@ -2341,8 +2582,10 @@ async function initFinalExam() {
   try {
     const { data } = await supabaseClient.auth.getUser();
     finalExamCurrentUser = data && data.user ? data.user : null;
+    await refreshFinalExamAdminStatus();
   } catch (e) {
     finalExamCurrentUser = null;
+    finalExamIsAdmin = false;
   }
 
   renderFinalExamQuestions();
@@ -2353,7 +2596,7 @@ async function initFinalExam() {
   const submitted = localStorage.getItem(finalExamUserKey("submitted"));
   const startedAt = localStorage.getItem(finalExamUserKey("startedAt"));
 
-  if (submitted === "true") {
+  if (submitted === "true" && !finalExamIsAdmin) {
     showFinalExamDone();
     return;
   }
@@ -2374,14 +2617,25 @@ function refreshFinalExamGate() {
   const submitted = localStorage.getItem(finalExamUserKey("submitted"));
   const startedAt = localStorage.getItem(finalExamUserKey("startedAt"));
 
-  if (submitted === "true") {
-    message.innerHTML = "✅ Vous avez déjà envoyé cet examen.";
+  if (startedAt) {
+    message.innerHTML = "⏱ Examen en cours. Le compte à rebours continue.";
     button.disabled = true;
     return;
   }
 
-  if (startedAt) {
-    message.innerHTML = "⏱ Examen en cours. Le compte à rebours continue.";
+  if (finalExamIsAdmin) {
+    message.innerHTML = `
+      <span class="final-exam-admin-badge">🧪 Mode test admin activé</span><br>
+      Vous pouvez commencer l’examen maintenant pour tester le site, même avant le 30 juin à 10h00.
+      <br><strong>Important :</strong> en mode test admin hors créneau officiel, le résultat ne sera pas enregistré dans Supabase.
+    `;
+    button.disabled = false;
+    button.textContent = "🧪 Commencer le test admin";
+    return;
+  }
+
+  if (submitted === "true") {
+    message.innerHTML = "✅ Vous avez déjà envoyé cet examen.";
     button.disabled = true;
     return;
   }
@@ -2396,6 +2650,7 @@ function refreshFinalExamGate() {
   if (now >= FINAL_EXAM_START_AT && now < FINAL_EXAM_LATEST_START_AT) {
     message.innerHTML = "✅ L’examen est ouvert. Cliquez maintenant pour commencer.";
     button.disabled = false;
+    button.textContent = "Commencer l’examen";
     return;
   }
 
@@ -2431,17 +2686,21 @@ function renderFinalExamQuestions() {
 async function startFinalExam() {
   const now = new Date();
 
-  if (now < FINAL_EXAM_START_AT || now >= FINAL_EXAM_LATEST_START_AT) {
-    alert("L’examen ne peut être démarré que le 30 juin à 10h00 précise.");
-    refreshFinalExamGate();
-    return;
-  }
-
   const { data } = await supabaseClient.auth.getUser();
   finalExamCurrentUser = data && data.user ? data.user : null;
 
   if (!finalExamCurrentUser) {
     alert("Vous devez être connecté pour commencer l’examen.");
+    return;
+  }
+
+  await refreshFinalExamAdminStatus();
+
+  const isAdminTest = finalExamIsAdmin && !isFinalExamOfficialStartWindow();
+
+  if (!finalExamIsAdmin && (now < FINAL_EXAM_START_AT || now >= FINAL_EXAM_LATEST_START_AT)) {
+    alert("L’examen ne peut être démarré que le 30 juin à 10h00 précise.");
+    refreshFinalExamGate();
     return;
   }
 
@@ -2453,8 +2712,13 @@ async function startFinalExam() {
     return;
   }
 
+  if (finalExamIsAdmin) {
+    localStorage.removeItem(finalExamUserKey("submitted"));
+  }
+
   localStorage.setItem(finalExamUserKey("startedAt"), now.toISOString());
   localStorage.setItem(finalExamUserKey("fullName"), fullName);
+  localStorage.setItem(finalExamUserKey("adminTestMode"), isAdminTest ? "true" : "false");
 
   showFinalExamRunning();
   startFinalExamCountdown();
@@ -2488,12 +2752,15 @@ function startFinalExamCountdown() {
     if (!startedAtRaw) return;
 
     const startedAt = new Date(startedAtRaw);
-    const endAt = new Date(startedAt.getTime() + FINAL_EXAM_DURATION_MINUTES * 60 * 1000);
+    const totalDuration = FINAL_EXAM_DURATION_MINUTES * 60 * 1000;
+    const endAt = new Date(startedAt.getTime() + totalDuration);
     const now = new Date();
     const remaining = endAt - now;
 
     const timer = document.getElementById("finalExamTimer");
     if (timer) timer.textContent = formatFinalExamTime(remaining);
+
+    updateFinalExamVisualTimer(remaining, totalDuration);
 
     if (remaining <= 0) {
       clearInterval(finalExamInterval);
@@ -2546,7 +2813,9 @@ async function autoSubmitFinalExam() {
 
 async function sendFinalExamResult(autoSubmitted) {
   const submitted = localStorage.getItem(finalExamUserKey("submitted"));
-  if (submitted === "true") {
+  const adminTestMode = localStorage.getItem(finalExamUserKey("adminTestMode")) === "true";
+
+  if (submitted === "true" && !adminTestMode) {
     showFinalExamDone();
     return;
   }
@@ -2558,6 +2827,8 @@ async function sendFinalExamResult(autoSubmitted) {
     alert("Erreur : utilisateur non connecté. Le résultat n’a pas été envoyé.");
     return;
   }
+
+  await refreshFinalExamAdminStatus();
 
   const startedAtRaw = localStorage.getItem(finalExamUserKey("startedAt"));
   if (!startedAtRaw) {
@@ -2571,6 +2842,28 @@ async function sendFinalExamResult(autoSubmitted) {
 
   const result = collectFinalExamAnswers();
   const fullName = localStorage.getItem(finalExamUserKey("fullName")) || "";
+
+  if (adminTestMode && finalExamIsAdmin) {
+    localStorage.removeItem(finalExamUserKey("startedAt"));
+    localStorage.removeItem(finalExamUserKey("adminTestMode"));
+
+    alert(
+      "Mode test admin terminé.\n\n" +
+      "Score test : " + result.score + "/" + result.total + " (" + result.percentage + "%).\n\n" +
+      "Aucun résultat n’a été enregistré dans Supabase."
+    );
+
+    const intro = document.getElementById("finalExamIntro");
+    const running = document.getElementById("finalExamRunning");
+    const done = document.getElementById("finalExamDone");
+
+    if (intro) intro.style.display = "block";
+    if (running) running.style.display = "none";
+    if (done) done.style.display = "none";
+
+    refreshFinalExamGate();
+    return;
+  }
 
   const payload = {
     user_id: finalExamCurrentUser.id,
@@ -2613,7 +2906,6 @@ async function sendFinalExamResult(autoSubmitted) {
 }
 
 document.addEventListener("DOMContentLoaded", initFinalExam);
-</script>
-
+  </script>
 </body>
 </html>
