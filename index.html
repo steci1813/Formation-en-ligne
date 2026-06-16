@@ -794,6 +794,163 @@
     }
 
 
+
+    /* Examen final — écran fermé avant ouverture */
+    .final-exam-gate-card {
+      margin-top: 16px;
+      border: 1px solid rgba(15, 87, 72, 0.16);
+      border-radius: 28px;
+      padding: 22px;
+      background:
+        radial-gradient(circle at top left, rgba(15, 87, 72, 0.14), transparent 34%),
+        linear-gradient(135deg, #ffffff 0%, #f4fbf8 100%);
+      box-shadow: var(--shadow);
+    }
+
+    .final-exam-gate-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .final-exam-gate-kicker {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      border-radius: 999px;
+      padding: 7px 13px;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .final-exam-gate-title {
+      margin: 10px 0 4px;
+      color: var(--green);
+      font-size: clamp(24px, 3vw, 34px);
+      line-height: 1.1;
+    }
+
+    .final-exam-gate-subtitle {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .final-exam-gate-date {
+      min-width: 190px;
+      padding: 14px 16px;
+      border-radius: 22px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      text-align: right;
+    }
+
+    .final-exam-gate-date span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .final-exam-gate-date strong {
+      display: block;
+      color: var(--green);
+      font-size: 18px;
+      margin-top: 4px;
+    }
+
+    .final-exam-gate-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(92px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .final-exam-gate-unit {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 18px 12px;
+      text-align: center;
+      box-shadow: 0 10px 26px rgba(15, 87, 72, 0.05);
+    }
+
+    .final-exam-gate-unit strong {
+      display: block;
+      color: var(--green);
+      font-size: clamp(28px, 5vw, 46px);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .final-exam-gate-unit span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .final-exam-gate-note {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: #fff7ed;
+      color: #9a3412;
+      font-weight: 800;
+    }
+
+    .final-exam-gate-note p {
+      margin: 0;
+      line-height: 1.55;
+    }
+
+    .final-exam-gate-pulse {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--green);
+      font-weight: 900;
+      margin-top: 14px;
+    }
+
+    .final-exam-gate-pulse::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 0 0 rgba(15, 87, 72, 0.45);
+      animation: finalGatePulse 1.6s infinite;
+    }
+
+    @keyframes finalGatePulse {
+      0% { box-shadow: 0 0 0 0 rgba(15, 87, 72, 0.45); }
+      70% { box-shadow: 0 0 0 12px rgba(15, 87, 72, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(15, 87, 72, 0); }
+    }
+
+    @media (max-width: 640px) {
+      .final-exam-gate-date {
+        text-align: left;
+        width: 100%;
+      }
+
+      .final-exam-gate-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
     /* Examen final — countdown visuel */
     .final-exam-timer-card {
       max-width: 980px;
@@ -2520,6 +2677,70 @@ function isFinalExamOfficialStartWindow() {
   return now >= FINAL_EXAM_START_AT && now < FINAL_EXAM_LATEST_START_AT;
 }
 
+
+function getFinalExamCountdownParts(ms) {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  return {
+    days: String(days).padStart(2, "0"),
+    hours: String(hours).padStart(2, "0"),
+    minutes: String(minutes).padStart(2, "0"),
+    seconds: String(seconds).padStart(2, "0")
+  };
+}
+
+function renderFinalExamClosedGate(ms) {
+  const parts = getFinalExamCountdownParts(ms);
+
+  return `
+    <div class="final-exam-gate-card">
+      <div class="final-exam-gate-top">
+        <div>
+          <span class="final-exam-gate-kicker">🔒 Examen verrouillé</span>
+          <h3 class="final-exam-gate-title">Ouverture automatique bientôt</h3>
+          <p class="final-exam-gate-subtitle">
+            Le bouton “Commencer l’examen” sera activé uniquement à l’heure prévue.
+          </p>
+        </div>
+
+        <div class="final-exam-gate-date">
+          <span>Date officielle</span>
+          <strong>30 juin 2026 — 10h00</strong>
+        </div>
+      </div>
+
+      <div class="final-exam-gate-grid">
+        <div class="final-exam-gate-unit">
+          <strong>${parts.days}</strong>
+          <span>jours</span>
+        </div>
+        <div class="final-exam-gate-unit">
+          <strong>${parts.hours}</strong>
+          <span>heures</span>
+        </div>
+        <div class="final-exam-gate-unit">
+          <strong>${parts.minutes}</strong>
+          <span>minutes</span>
+        </div>
+        <div class="final-exam-gate-unit">
+          <strong>${parts.seconds}</strong>
+          <span>secondes</span>
+        </div>
+      </div>
+
+      <div class="final-exam-gate-note">
+        <p>⚠️ Les étudiants ne pourront cliquer qu’à <strong>10h00 précise</strong>. L’admin peut tester à tout moment.</p>
+      </div>
+
+      <div class="final-exam-gate-pulse">Synchronisation du compte à rebours en cours</div>
+    </div>
+  `;
+}
+
 function updateFinalExamVisualTimer(remaining, totalDuration) {
   const safeRemaining = Math.max(0, remaining);
   const ratioRemaining = Math.max(0, Math.min(1, safeRemaining / totalDuration));
@@ -2642,8 +2863,9 @@ function refreshFinalExamGate() {
 
   if (now < FINAL_EXAM_START_AT) {
     const remaining = FINAL_EXAM_START_AT - now;
-    message.innerHTML = "🔒 Examen fermé pour le moment.<br>Ouverture dans : <strong>" + formatFinalExamTime(remaining) + "</strong>";
+    message.innerHTML = renderFinalExamClosedGate(remaining);
     button.disabled = true;
+    button.textContent = "🔒 Examen fermé";
     return;
   }
 
@@ -2654,8 +2876,17 @@ function refreshFinalExamGate() {
     return;
   }
 
-  message.innerHTML = "⛔ Le créneau de démarrage est dépassé. L’examen était cliquable à 10h00 précise.";
+  message.innerHTML = `
+    <div class="final-exam-gate-card">
+      <span class="final-exam-gate-kicker">⛔ Créneau dépassé</span>
+      <h3 class="final-exam-gate-title">L’accès à l’examen est fermé</h3>
+      <p class="final-exam-gate-subtitle">
+        L’examen était cliquable uniquement le <strong>30 juin 2026 à 10h00 précise</strong>.
+      </p>
+    </div>
+  `;
   button.disabled = true;
+  button.textContent = "⛔ Créneau dépassé";
 }
 
 function renderFinalExamQuestions() {
