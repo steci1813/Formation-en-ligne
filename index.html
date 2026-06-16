@@ -16,7 +16,9 @@
       --border: #e4e7ec;
       --white: #ffffff;
       --danger: #b42318;
+      --warning: #b54708;
       --shadow: 0 18px 50px rgba(0, 0, 0, 0.06);
+      --shadow-strong: 0 30px 90px rgba(0, 0, 0, 0.22);
     }
 
     * {
@@ -32,6 +34,11 @@
       font-family: Arial, sans-serif;
       background: var(--cream);
       color: var(--text);
+    }
+
+    body.fullscreen-open,
+    body.modal-open {
+      overflow: hidden;
     }
 
     #authLoading {
@@ -56,7 +63,7 @@
     .topbar {
       position: sticky;
       top: 14px;
-      z-index: 50;
+      z-index: 100;
       background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(14px);
       border: 1px solid rgba(15, 87, 72, 0.12);
@@ -65,6 +72,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 14px;
       box-shadow: var(--shadow);
     }
 
@@ -184,7 +192,7 @@
     .lead {
       color: var(--muted);
       font-size: 18px;
-      max-width: 720px;
+      max-width: 760px;
     }
 
     .video-box {
@@ -265,7 +273,40 @@
     }
 
     .sub-page.active-page {
+      position: fixed;
+      inset: 18px;
+      z-index: 9998;
       display: block;
+      overflow: auto;
+      background: var(--white);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: var(--shadow-strong);
+    }
+
+    .fullscreen-header {
+      position: sticky;
+      top: -28px;
+      z-index: 20;
+      background: var(--white);
+      padding: 0 0 18px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .fullscreen-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .page-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 18px 0;
     }
 
     .info-grid {
@@ -278,8 +319,7 @@
     .info-card,
     .lesson-box,
     .question-card,
-    .group-card,
-    .group-detail-item {
+    .admin-stat-card {
       background: #f9fafb;
       border: 1px solid var(--border);
       border-radius: 20px;
@@ -288,7 +328,7 @@
 
     .info-card strong,
     .lesson-box strong,
-    .group-detail-item strong {
+    .admin-stat-card strong {
       display: block;
       color: var(--green);
       margin-bottom: 6px;
@@ -319,6 +359,11 @@
       border-radius: 20px;
       padding: 18px 20px;
       margin: 20px 0;
+    }
+
+    .callout.warning {
+      border-left-color: var(--warning);
+      background: #fff7ed;
     }
 
     .callout p {
@@ -422,10 +467,6 @@
       list-style-position: inside;
     }
 
-    .back-row {
-      margin-bottom: 18px;
-    }
-
     .btn {
       border: 0;
       border-radius: 999px;
@@ -446,8 +487,21 @@
       color: var(--danger);
     }
 
+    .btn.warning {
+      background: #fff7ed;
+      color: var(--warning);
+    }
+
     .table-wrap {
       overflow-x: auto;
+    }
+
+    .table-wrap.fullscreen-table {
+      max-width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: #ffffff;
     }
 
     table {
@@ -470,6 +524,58 @@
       font-size: 12px;
       letter-spacing: 0.05em;
       background: #f9fafb;
+      white-space: nowrap;
+    }
+
+    .tracking-table {
+      min-width: 2300px;
+      font-size: 14px;
+    }
+
+    .tracking-table th,
+    .tracking-table td {
+      padding: 16px;
+      vertical-align: top;
+    }
+
+    .tracking-table td:first-child,
+    .tracking-table th:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 10;
+      background: #ffffff;
+      box-shadow: 8px 0 16px rgba(0, 0, 0, 0.04);
+      min-width: 145px;
+    }
+
+    .tracking-table th:nth-child(2),
+    .tracking-table td:nth-child(2) {
+      min-width: 360px;
+    }
+
+    .tracking-table th:nth-child(3),
+    .tracking-table td:nth-child(3) {
+      min-width: 320px;
+    }
+
+    .tracking-table th:nth-child(4),
+    .tracking-table td:nth-child(4),
+    .tracking-table th:nth-child(6),
+    .tracking-table td:nth-child(6) {
+      min-width: 190px;
+    }
+
+    .tracking-table th:nth-child(5),
+    .tracking-table td:nth-child(5),
+    .tracking-table th:nth-child(7),
+    .tracking-table td:nth-child(7),
+    .tracking-table th:nth-child(8),
+    .tracking-table td:nth-child(8),
+    .tracking-table th:nth-child(9),
+    .tracking-table td:nth-child(9),
+    .tracking-table th:nth-child(10),
+    .tracking-table td:nth-child(10) {
+      min-width: 190px;
     }
 
     .tag,
@@ -483,6 +589,7 @@
       color: var(--green);
       font-size: 13px;
       font-weight: 900;
+      white-space: nowrap;
     }
 
     .field {
@@ -495,145 +602,7 @@
       background: #ffffff;
     }
 
-    label {
-      display: block;
-      margin-bottom: 14px;
-      font-weight: 800;
-    }
-
-    textarea {
-      resize: vertical;
-    }
-
-    .muted {
-      color: var(--muted);
-    }
-
-    .admin-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-
-    .footer {
-      margin-top: 28px;
-      color: var(--muted);
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    /* Pleine page pour la répartition */
-    .fullscreen-subpage.active-page {
-      position: fixed;
-      inset: 18px;
-      z-index: 9998;
-      display: block;
-      overflow: auto;
-      background: var(--white);
-      border-radius: 28px;
-      padding: 28px;
-      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.22);
-    }
-
-    body.fullscreen-open {
-      overflow: hidden;
-    }
-
-    .fullscreen-header {
-      position: sticky;
-      top: -28px;
-      z-index: 20;
-      background: var(--white);
-      padding: 0 0 18px;
-      margin-bottom: 18px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .fullscreen-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .table-help {
-      color: var(--muted);
-      font-size: 14px;
-      margin: 8px 0 16px;
-    }
-
-    .table-wrap.fullscreen-table {
-      max-width: 100%;
-      overflow-x: auto;
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      background: #ffffff;
-    }
-
-    #groupDepositTable {
-      min-width: 2100px;
-      font-size: 14px;
-    }
-
-    #groupDepositTable th,
-    #groupDepositTable td {
-      padding: 16px;
-      vertical-align: top;
-    }
-
-    #groupDepositTable th {
-      white-space: nowrap;
-    }
-
-    #groupDepositTable td:first-child,
-    #groupDepositTable th:first-child {
-      position: sticky;
-      left: 0;
-      z-index: 10;
-      background: #ffffff;
-      box-shadow: 8px 0 16px rgba(0, 0, 0, 0.04);
-    }
-
-    #groupDepositTable th:nth-child(1),
-    #groupDepositTable td:nth-child(1) {
-      min-width: 145px;
-    }
-
-    #groupDepositTable th:nth-child(2),
-    #groupDepositTable td:nth-child(2) {
-      min-width: 360px;
-    }
-
-    #groupDepositTable th:nth-child(3),
-    #groupDepositTable td:nth-child(3) {
-      min-width: 320px;
-    }
-
-    #groupDepositTable th:nth-child(4),
-    #groupDepositTable td:nth-child(4),
-    #groupDepositTable th:nth-child(6),
-    #groupDepositTable td:nth-child(6) {
-      min-width: 190px;
-    }
-
-    #groupDepositTable th:nth-child(5),
-    #groupDepositTable td:nth-child(5) {
-      min-width: 190px;
-    }
-
-    #groupDepositTable th:nth-child(7),
-    #groupDepositTable td:nth-child(7),
-    #groupDepositTable th:nth-child(8),
-    #groupDepositTable td:nth-child(8),
-    #groupDepositTable th:nth-child(9),
-    #groupDepositTable td:nth-child(9) {
-      min-width: 190px;
-    }
-
-    #groupDepositTable .field {
+    .tracking-table .field {
       min-height: 42px;
       margin-top: 0;
       border-radius: 14px;
@@ -659,51 +628,109 @@
       cursor: pointer;
     }
 
-    .date-field::-webkit-calendar-picker-indicator {
-      cursor: pointer;
+    label {
+      display: block;
+      margin-bottom: 14px;
+      font-weight: 800;
     }
 
-    .group-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin: 22px 0;
+    textarea {
+      resize: vertical;
     }
 
-    .group-card h3 {
-      margin-top: 0;
-      color: var(--green);
-    }
-
-    .group-meta {
-      display: grid;
-      gap: 8px;
-      margin: 14px 0;
+    .muted {
       color: var(--muted);
-      font-size: 14px;
     }
 
-    .group-meta strong {
-      color: var(--text);
-    }
-
-    .group-detail-grid {
+    .admin-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       gap: 14px;
-      margin: 20px 0;
+      margin: 18px 0;
+    }
+
+    .submission-table {
+      min-width: 1250px;
+    }
+
+    .submission-table input,
+    .submission-table textarea,
+    .submission-table select {
+      min-width: 150px;
+    }
+
+    .footer {
+      margin-top: 28px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(17, 24, 39, 0.55);
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-card {
+      width: min(720px, 100%);
+      max-height: calc(100vh - 36px);
+      overflow: auto;
+      background: var(--white);
+      border-radius: 28px;
+      padding: 26px;
+      box-shadow: var(--shadow-strong);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .span-2 {
+      grid-column: span 2;
     }
 
     @media (max-width: 940px) {
       .hero-grid,
       .layout,
       .admin-grid,
+      .admin-stats,
       .info-grid,
       .activity-pages,
       .lesson-grid,
-      .group-grid,
-      .group-detail-grid {
+      .form-grid {
         grid-template-columns: 1fr;
+      }
+
+      .span-2 {
+        grid-column: span 1;
       }
 
       .sidebar {
@@ -715,7 +742,7 @@
         flex-direction: column;
       }
 
-      .fullscreen-subpage.active-page {
+      .sub-page.active-page {
         inset: 8px;
         padding: 18px;
         border-radius: 22px;
@@ -739,7 +766,7 @@
 
       <nav class="nav">
         <button class="nav-link active" type="button" onclick="showStudentView(this)">Espace élève</button>
-        <button class="nav-link" type="button" data-admin-trigger>Gestion</button>
+        <button class="nav-link" type="button" data-admin-trigger>Gestion des dépôts</button>
         <button class="nav-link logout" type="button" onclick="logout()">Déconnexion</button>
       </nav>
     </header>
@@ -755,9 +782,14 @@
                 Un espace centralisé pour suivre le cours, ouvrir les activités, consulter les exercices,
                 organiser les groupes et déposer les livrables.
               </p>
-              <button class="btn" type="button" onclick="document.getElementById('activites').scrollIntoView({ behavior: 'smooth' })">
-                Voir les activités
-              </button>
+              <div class="page-actions">
+                <button class="btn" type="button" onclick="document.getElementById('activites').scrollIntoView({ behavior: 'smooth' })">
+                  Voir les activités
+                </button>
+                <button class="btn secondary" type="button" onclick="openSubmissionModal()">
+                  📤 Envoyer un dépôt
+                </button>
+              </div>
             </div>
 
             <div class="video-box">
@@ -777,7 +809,8 @@
             <a href="#materiel">Matériel nécessaire</a>
             <a href="#introduction">Introduction</a>
             <a href="#activites">Activités</a>
-            <button type="button" data-admin-trigger>Gestion</button>
+            <button type="button" onclick="openSubmissionModal()">📤 Envoyer un dépôt</button>
+            <button type="button" data-admin-trigger>Gestion des dépôts</button>
           </aside>
 
           <div class="page-stack">
@@ -853,12 +886,10 @@
                       📘 Contenu de cours
                       <small>Comprendre le brief et formuler le besoin.</small>
                     </button>
-
                     <button class="page-button" type="button" onclick="openCoursePage('a1-exercice')">
                       ✍️ Exo 1
-                      <small>Rédiger le brief de l’étude.</small>
+                      <small>Rédiger le brief de l’étude et déposer le livrable.</small>
                     </button>
-
                     <button class="page-button" type="button" onclick="openCoursePage('a1-groupe')">
                       👥 Répartition groupe et dépôt 1
                       <small>Organiser les groupes et suivre les dépôts.</small>
@@ -875,12 +906,10 @@
                       📘 Contenu de cours
                       <small>Étapes, méthode et collecte de données.</small>
                     </button>
-
                     <button class="page-button" type="button" onclick="openCoursePage('a2-exercice')">
                       ✍️ Exo 2
-                      <small>Construire la méthodologie de l’étude.</small>
+                      <small>Construire la méthodologie de l’étude et déposer le livrable.</small>
                     </button>
-
                     <button class="page-button" type="button" onclick="openCoursePage('a2-groupe')">
                       👥 Répartition groupe et dépôt 2
                       <small>Suivre les groupes et le deuxième dépôt.</small>
@@ -897,12 +926,10 @@
                       📘 Contenu de cours
                       <small>Interprétation, preuves et crédibilité.</small>
                     </button>
-
                     <button class="page-button" type="button" onclick="openCoursePage('a3-exercice')">
                       ✍️ Exo 3
-                      <small>Construire une synthèse crédible.</small>
+                      <small>Construire une synthèse crédible et déposer le livrable.</small>
                     </button>
-
                     <button class="page-button" type="button" onclick="openCoursePage('a3-groupe')">
                       👥 Répartition groupe et dépôt 3
                       <small>Suivre le dernier dépôt.</small>
@@ -914,12 +941,16 @@
 
             <section id="pagesActivites" class="page-stack">
               <article id="a1-cours" class="sub-page">
-                <div class="back-row">
-                  <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
+                <div class="fullscreen-header">
+                  <div class="fullscreen-actions">
+                    <div>
+                      <p class="eyebrow">Activité 1 — Contenu de cours</p>
+                      <h2>📘 Réalisez une étude de marché — Partie 1</h2>
+                    </div>
+                    <button class="btn secondary" type="button" onclick="closeCoursePages()">← Fermer la page</button>
+                  </div>
                 </div>
 
-                <p class="eyebrow">Activité 1 — Contenu de cours</p>
-                <h2>📘 Réalisez une étude de marché — Partie 1</h2>
                 <h3>Exprimez clairement votre besoin : le brief</h3>
 
                 <div class="callout">
@@ -945,11 +976,10 @@
                   <div class="lesson-box"><strong>5. Poser les questions clés</strong><p>Anticiper les difficultés, le budget, les cibles et les attentes internes.</p></div>
                 </div>
 
-                <h3>1. Établissez le constat préalable</h3>
+                <h3>Établissez le constat préalable</h3>
                 <p>
                   La première chose à faire pour préparer une étude, c’est un constat business et marketing.
-                  Il sert à décrire concrètement le but du projet, en l’ancrant dans la réalité de l’entreprise
-                  et du marché.
+                  Il sert à décrire concrètement le but du projet, en l’ancrant dans la réalité de l’entreprise et du marché.
                 </p>
 
                 <img class="lesson-image" src="image2.jpg" alt="Exemple de shampoing Biolessan">
@@ -964,42 +994,21 @@
                   <li>Identifier les problématiques auxquelles l’étude devra répondre</li>
                 </ul>
 
-                <h3>2. Définissez les objectifs</h3>
-                <p>
-                  Pour maximiser les chances de succès de l’étude, les objectifs doivent être définis avec précision.
-                  Un objectif comme “améliorer la connaissance des acheteurs potentiels” reste trop vague.
-                </p>
-
-                <h3>3. Listez les décisions et actions attendues</h3>
-                <p>
-                  Le brief doit montrer l’intérêt opérationnel de l’étude. Il faut préciser les décisions à prendre
-                  et les actions qui découleront des résultats.
-                </p>
-
-                <h3>4. Planifiez le projet</h3>
-                <img class="lesson-image" src="image10.png" alt="Planning type d'une étude quantitative">
-                <p class="lesson-caption">Exemple de planning type d’une étude quantitative</p>
-
                 <h3>Choisissez votre méthodologie</h3>
                 <div class="lesson-grid">
                   <div class="lesson-box"><strong>Approche qualitative</strong><p>Comprendre, explorer, illustrer, exprimer.</p></div>
                   <div class="lesson-box"><strong>Approche quantitative</strong><p>Mesurer, comparer, hiérarchiser, valider statistiquement.</p></div>
                 </div>
 
-                <h3>Utilisez correctement les études qualitatives</h3>
-                <h4>Le focus group</h4>
                 <img class="lesson-image" src="image8.jpg" alt="Focus group">
                 <p class="lesson-caption">Exemple : un focus group</p>
 
-                <h4>L’entretien individuel</h4>
                 <img class="lesson-image" src="image1.jpg" alt="Entretien individuel">
                 <p class="lesson-caption">Exemple : un entretien individuel</p>
 
-                <h4>L’entretien à distance</h4>
                 <img class="lesson-image" src="image6.jpg" alt="Entretien à distance">
                 <p class="lesson-caption">Exemple : entretien à distance</p>
 
-                <h3>Utilisez correctement les études quantitatives</h3>
                 <img class="lesson-image" src="image3.jpg" alt="Calcul de taille minimum d'échantillon">
                 <p class="lesson-caption">Exemple de calcul d’une taille minimum d’échantillon</p>
 
@@ -1014,24 +1023,21 @@
 
                 <img class="lesson-image" src="image7.jpg" alt="Exemple de stimulus marketing">
                 <p class="lesson-caption">Exemple de support à tester auprès des consommateurs</p>
-
-                <div class="callout">
-                  <p><strong>À retenir</strong></p>
-                  <p>
-                    Le brief est le point de départ de l’étude de marché. Il permet de clarifier le besoin,
-                    de définir les objectifs, de cadrer les décisions attendues, de choisir la bonne méthode
-                    et de planifier le projet.
-                  </p>
-                </div>
               </article>
 
               <article id="a1-exercice" class="sub-page">
-                <div class="back-row">
-                  <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
+                <div class="fullscreen-header">
+                  <div class="fullscreen-actions">
+                    <div>
+                      <p class="eyebrow">Activité 1 — Exercice</p>
+                      <h2>✍️ Exo 1 — Briefez des professionnels pour sous-traiter votre étude</h2>
+                    </div>
+                    <button class="btn secondary" type="button" onclick="closeCoursePages()">← Fermer la page</button>
+                  </div>
+                  <div class="page-actions">
+                    <button class="btn" type="button" onclick="openSubmissionModal(1, 'Exo 1 — Brief')">📤 Envoyer mon dépôt</button>
+                  </div>
                 </div>
-
-                <p class="eyebrow">Activité 1 — Exercice</p>
-                <h2>✍️ Exo 1 — Briefez des professionnels pour sous-traiter votre étude</h2>
 
                 <div class="callout">
                   <p><strong>💡 Objectif de l’exercice</strong></p>
@@ -1041,33 +1047,25 @@
                   </p>
                 </div>
 
-                <h3>Compétence évaluée</h3>
-                <ul>
-                  <li>Préparer un projet d’étude de marché</li>
-                </ul>
-
                 <section class="question-card">
                   <h3>Question 1 : Comment identifier un brief de qualité ?</h3>
                   <ul class="answer-list">
                     <li>On y trouve la raison d’être du lancement de produit.</li>
-                    <li>Il comprend : un constat préalable, des objectifs, les décisions et actions découlant de l’étude, une planification, des questions clés.</li>
+                    <li>Il comprend : un constat préalable, des objectifs, les décisions attendues, une planification, des questions clés.</li>
                     <li>Il liste les problématiques auxquelles l’étude répondra.</li>
                   </ul>
                 </section>
 
                 <section class="question-card">
-                  <h3>Question 2 : Que lui répondez-vous ?</h3>
+                  <h3>Question 2 : Que répondez-vous sur le résultat du test packaging ?</h3>
                   <p>
-                    <strong>
-                      Vous venez de présenter les résultats du test de packaging de votre nouveau shampoing.
-                      Le score de la meilleure proposition est de 21 % d’intention d’achat certaine et
-                      36 % d’intention d’achat probable.
-                    </strong>
+                    Vous venez de présenter les résultats du test de packaging : 21 % d’intention d’achat certaine et
+                    36 % d’intention d’achat probable.
                   </p>
                   <ul class="answer-list">
-                    <li>C’est un bon résultat car le cumul des intentions d’achat certaine et probable est de 57 %.</li>
-                    <li>C’est difficile de répondre dans l’absolu car il s’agit d’un nouveau produit.</li>
-                    <li>C’est difficile de répondre à cette question sans benchmark.</li>
+                    <li>Le cumul est de 57 %, ce qui semble encourageant.</li>
+                    <li>Mais sans benchmark, on ne peut pas conclure définitivement.</li>
+                    <li>Le contexte de lancement d’un nouveau produit doit être pris en compte.</li>
                   </ul>
                 </section>
 
@@ -1075,606 +1073,168 @@
                   <h3>Question 3 : Quelles questions clés devez-vous poser pour compléter le brief ?</h3>
                   <ul class="answer-list">
                     <li>Quels délais de réalisation ? Quelle méthodologie privilégier ?</li>
-                    <li>Que se passe-t-il si vous renoncez à cette étude ?</li>
-                    <li>Quels sont les objectifs de l’étude ? Quelles actions sont attendues ?</li>
-                    <li>Quel budget consacrer à l’étude ? Qui sont les clients internes et externes ?</li>
-                  </ul>
-                </section>
-
-                <section class="question-card">
-                  <h3>Question 4 : Quels verbes induisent une approche qualitative ?</h3>
-                  <ul class="answer-list">
-                    <li>Comprendre</li>
-                    <li>Illustrer</li>
-                  </ul>
-                </section>
-
-                <section class="question-card">
-                  <h3>Question 5 : Bulletin board et test de packaging</h3>
-                  <ul class="answer-list">
-                    <li>C’est intéressant d’essayer cette approche, il faut rédiger un brief.</li>
-                    <li>Cela peut donner des retours détaillés sur ce qui plaît ou déplaît.</li>
-                    <li>Attention, cela ne donnera pas de résultats chiffrés fiables.</li>
-                  </ul>
-                </section>
-
-                <section class="question-card">
-                  <h3>Question 6 : Tester les acheteurs d’une marque concurrente</h3>
-                  <ul class="answer-list">
-                    <li>Je dois vérifier préalablement l’incidence de cette population.</li>
-                    <li>Nous avons besoin d’un effectif minimum exploitable pour obtenir des résultats fiables.</li>
-                  </ul>
-                </section>
-
-                <section class="question-card">
-                  <h3>Question 7 : Focus groups ou étude quantitative ?</h3>
-                  <ul class="answer-list">
-                    <li>Que se passe-t-il si nous ne faisons pas les focus groups ?</li>
-                    <li>Les motivations ont-elles changé en 18 mois ?</li>
-                    <li>Peut-on aborder la prospective dans les focus groups ?</li>
-                    <li>Peut-on ajouter des questions fermées dans l’étude quantitative ?</li>
-                  </ul>
-                </section>
-
-                <section class="question-card">
-                  <h3>Question 8 : Dans quels cas utiliser les études quantitatives ?</h3>
-                  <ul class="answer-list">
-                    <li>Pour segmenter une clientèle.</li>
-                    <li>Pour évaluer un taux de pénétration.</li>
-                    <li>Pour mesurer une fréquence d’achat.</li>
-                    <li>Pour comparer des profils de consommateurs.</li>
-                  </ul>
-                </section>
-
-                <section class="question-card">
-                  <h3>Question 9 : Qu’est-ce que le data marketing ?</h3>
-                  <ul class="answer-list">
-                    <li>La collecte, le tri et l’exploitation de données à des fins marketing.</li>
-                    <li>Des projets d’activation, de conversion et de fidélisation à partir de données.</li>
-                  </ul>
-                </section>
-
-                <section class="question-card">
-                  <h3>Question 10 : Quel est l’apport principal du data marketing ?</h3>
-                  <ul class="answer-list">
-                    <li>Il permet d’intégrer beaucoup plus de variables comportementales.</li>
-                    <li>Il permet une connaissance client beaucoup plus fine.</li>
+                    <li>Quel budget consacrer à l’étude ?</li>
+                    <li>Qui sont les clients internes et externes ?</li>
+                    <li>Quelles décisions seront prises grâce à l’étude ?</li>
                   </ul>
                 </section>
               </article>
 
-              <article id="a1-groupe" class="sub-page fullscreen-subpage">
+              <article id="a1-groupe" class="sub-page">
                 <div class="fullscreen-header">
                   <div class="fullscreen-actions">
                     <div>
                       <p class="eyebrow">Activité 1 — Répartition</p>
                       <h2>👥 Répartition GROUPE et Dépôt (1)</h2>
                     </div>
-
                     <button class="btn secondary" type="button" onclick="closeCoursePages()">← Fermer la page</button>
                   </div>
-
-                  <p class="table-help">
-                    Tableau en pleine page. Faites défiler horizontalement pour voir toutes les colonnes.
-                  </p>
+                  <p class="table-help">Tableau en pleine page. Faites défiler horizontalement pour voir toutes les colonnes.</p>
                 </div>
-
-                <div class="callout">
-                  <p><strong>Consigne</strong></p>
-                  <p>
-                    Chaque groupe doit préparer le livrable lié à l’Exo 1.
-                    Le dépôt est attendu pour le <strong>18 juin 2026</strong>.
-                  </p>
-                </div>
-
-                <div class="table-wrap fullscreen-table">
-                  <table id="groupDepositTable">
-                    <thead>
-                      <tr>
-                        <th>Groupe</th>
-                        <th>Membre du groupe</th>
-                        <th>Fichier</th>
-                        <th>Date de dépôt exo</th>
-                        <th>Status</th>
-                        <th>Date d’échéance</th>
-                        <th>Nombre d’étudiants</th>
-                        <th>Type d’exercice</th>
-                        <th>Nom de l’enseignant</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      <tr data-group="1">
-                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-1')">Groupe 1</button></td>
-                        <td>
-                          <div class="student-fields">
-                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
-                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
-                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
-                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
-                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
-                          </div>
-                        </td>
-                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
-                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
-                        <td>
-                          <select class="field table-field" data-field="status">
-                            <option value="En cours">En cours</option>
-                            <option value="Déposé">Déposé</option>
-                            <option value="À corriger">À corriger</option>
-                            <option value="Validé">Validé</option>
-                          </select>
-                        </td>
-                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
-                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
-                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
-                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
-                      </tr>
-
-                      <tr data-group="2">
-                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-2')">Groupe 2</button></td>
-                        <td>
-                          <div class="student-fields">
-                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
-                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
-                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
-                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
-                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
-                          </div>
-                        </td>
-                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
-                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
-                        <td>
-                          <select class="field table-field" data-field="status">
-                            <option value="En cours">En cours</option>
-                            <option value="Déposé">Déposé</option>
-                            <option value="À corriger">À corriger</option>
-                            <option value="Validé">Validé</option>
-                          </select>
-                        </td>
-                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
-                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
-                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
-                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
-                      </tr>
-
-                      <tr data-group="3">
-                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-3')">Groupe 3</button></td>
-                        <td>
-                          <div class="student-fields">
-                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
-                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
-                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
-                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
-                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
-                          </div>
-                        </td>
-                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
-                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
-                        <td>
-                          <select class="field table-field" data-field="status">
-                            <option value="En cours">En cours</option>
-                            <option value="Déposé">Déposé</option>
-                            <option value="À corriger">À corriger</option>
-                            <option value="Validé">Validé</option>
-                          </select>
-                        </td>
-                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
-                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
-                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
-                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
-                      </tr>
-
-                      <tr data-group="4">
-                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-4')">Groupe 4</button></td>
-                        <td>
-                          <div class="student-fields">
-                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
-                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
-                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
-                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
-                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
-                          </div>
-                        </td>
-                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
-                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
-                        <td>
-                          <select class="field table-field" data-field="status">
-                            <option value="En cours">En cours</option>
-                            <option value="Déposé">Déposé</option>
-                            <option value="À corriger">À corriger</option>
-                            <option value="Validé">Validé</option>
-                          </select>
-                        </td>
-                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
-                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
-                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
-                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
-                      </tr>
-
-                      <tr data-group="5">
-                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-5')">Groupe 5</button></td>
-                        <td>
-                          <div class="student-fields">
-                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
-                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
-                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
-                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
-                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
-                          </div>
-                        </td>
-                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
-                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
-                        <td>
-                          <select class="field table-field" data-field="status">
-                            <option value="En cours">En cours</option>
-                            <option value="Déposé">Déposé</option>
-                            <option value="À corriger">À corriger</option>
-                            <option value="Validé">Validé</option>
-                          </select>
-                        </td>
-                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
-                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
-                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
-                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
-                      </tr>
-
-                      <tr data-group="6">
-                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-6')">Groupe 6</button></td>
-                        <td>
-                          <div class="student-fields">
-                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
-                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
-                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
-                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
-                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
-                          </div>
-                        </td>
-                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
-                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
-                        <td>
-                          <select class="field table-field" data-field="status">
-                            <option value="En cours">En cours</option>
-                            <option value="Déposé">Déposé</option>
-                            <option value="À corriger">À corriger</option>
-                            <option value="Validé">Validé</option>
-                          </select>
-                        </td>
-                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
-                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
-                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
-                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </article>
-
-              <article id="groupe-1" class="sub-page">
-                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
-                <p class="eyebrow">Activité 1 — Groupe</p>
-                <h2>👥 Groupe 1</h2>
-                <p class="muted">Page dédiée au Groupe 1. Le dépôt principal se fait dans le tableau de répartition.</p>
-              </article>
-
-              <article id="groupe-2" class="sub-page">
-                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
-                <p class="eyebrow">Activité 1 — Groupe</p>
-                <h2>👥 Groupe 2</h2>
-                <p class="muted">Page dédiée au Groupe 2. Le dépôt principal se fait dans le tableau de répartition.</p>
-              </article>
-
-              <article id="groupe-3" class="sub-page">
-                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
-                <p class="eyebrow">Activité 1 — Groupe</p>
-                <h2>👥 Groupe 3</h2>
-                <p class="muted">Page dédiée au Groupe 3. Le dépôt principal se fait dans le tableau de répartition.</p>
-              </article>
-
-              <article id="groupe-4" class="sub-page">
-                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
-                <p class="eyebrow">Activité 1 — Groupe</p>
-                <h2>👥 Groupe 4</h2>
-                <p class="muted">Page dédiée au Groupe 4. Le dépôt principal se fait dans le tableau de répartition.</p>
-              </article>
-
-              <article id="groupe-5" class="sub-page">
-                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
-                <p class="eyebrow">Activité 1 — Groupe</p>
-                <h2>👥 Groupe 5</h2>
-                <p class="muted">Page dédiée au Groupe 5. Le dépôt principal se fait dans le tableau de répartition.</p>
-              </article>
-
-              <article id="groupe-6" class="sub-page">
-                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
-                <p class="eyebrow">Activité 1 — Groupe</p>
-                <h2>👥 Groupe 6</h2>
-                <p class="muted">Page dédiée au Groupe 6. Le dépôt principal se fait dans le tableau de répartition.</p>
+                <div id="trackingA1"></div>
               </article>
 
               <article id="a2-cours" class="sub-page">
-                <div class="back-row"><button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button></div>
-                <p class="eyebrow">Activité 2</p>
-                <h2>📘 Contenu de cours — Maîtrisez les étapes clés d’une étude</h2>
-                <p>Une étude de marché suit une démarche structurée : objectifs, méthode, collecte, analyse et recommandations.</p>
-              </article>
-
-              <article id="a2-exercice" class="sub-page">
-                <div class="back-row"><button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button></div>
-                <p class="eyebrow">Activité 2</p>
-                <h2>✍️ Exo 2 — Méthodologie de l’étude</h2>
-                <p>Construisez la méthodologie de votre étude.</p>
-              </article>
-
-              <article id="a1-groupe" class="sub-page fullscreen-subpage">
                 <div class="fullscreen-header">
                   <div class="fullscreen-actions">
                     <div>
-                      <p class="eyebrow">Activité 1 — Répartition</p>
-                      <h2>👥 Répartition GROUPE et Dépôt (2)</h2>
+                      <p class="eyebrow">Activité 2 — Contenu de cours</p>
+                      <h2>📘 Maîtrisez les étapes clés d’une étude</h2>
                     </div>
-
                     <button class="btn secondary" type="button" onclick="closeCoursePages()">← Fermer la page</button>
                   </div>
+                </div>
 
-                  <p class="table-help">
-                    Tableau en pleine page. Faites défiler horizontalement pour voir toutes les colonnes.
-                  </p>
+                <p>
+                  Une étude de marché suit une démarche structurée. Elle part d’un besoin d’information,
+                  puis passe par la collecte, l’analyse et la formulation de recommandations.
+                </p>
+
+                <div class="lesson-grid">
+                  <div class="lesson-box"><strong>1. Définir le problème</strong><p>Clarifier ce que l’on cherche à comprendre.</p></div>
+                  <div class="lesson-box"><strong>2. Choisir la méthode</strong><p>Qualitative, quantitative ou documentaire.</p></div>
+                  <div class="lesson-box"><strong>3. Collecter les données</strong><p>Questionnaire, entretien, observation ou sources secondaires.</p></div>
+                  <div class="lesson-box"><strong>4. Analyser</strong><p>Transformer les données en enseignements utiles.</p></div>
                 </div>
 
                 <div class="callout">
-                  <p><strong>Consigne</strong></p>
-                  <p>
-                    Chaque groupe doit préparer le livrable lié à l’Exo 2.
-                    Le dépôt est attendu pour le <strong>21 juin 2026</strong>.
-                  </p>
-                </div>
-
-                <div class="table-wrap fullscreen-table">
-                  <table id="groupDepositTable">
-                    <thead>
-                      <tr>
-                        <th>Groupe</th>
-                        <th>Membre du groupe</th>
-                        <th>Fichier</th>
-                        <th>Date de dépôt exo</th>
-                        <th>Status</th>
-                        <th>Date d’échéance</th>
-                        <th>Nombre d’étudiants</th>
-                        <th>Type d’exercice</th>
-                        <th>Nom de l’enseignant</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      <tr data-group="1">
-                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-1')">Groupe 1</button></td>
-                        <td>
-                          <div class="student-fields">
-                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
-                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
-                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
-                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
-                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
-                          </div>
-                        </td>
-                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
-                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
-                        <td>
-                          <select class="field table-field" data-field="status">
-                            <option value="En cours">En cours</option>
-                            <option value="Déposé">Déposé</option>
-                            <option value="À corriger">À corriger</option>
-                            <option value="Validé">Validé</option>
-                          </select>
-                        </td>
-                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
-                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
-                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
-                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
-                      </tr>
-
-                      <tr data-group="2">
-                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-2')">Groupe 2</button></td>
-                        <td>
-                          <div class="student-fields">
-                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
-                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
-                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
-                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
-                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
-                          </div>
-                        </td>
-                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
-                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
-                        <td>
-                          <select class="field table-field" data-field="status">
-                            <option value="En cours">En cours</option>
-                            <option value="Déposé">Déposé</option>
-                            <option value="À corriger">À corriger</option>
-                            <option value="Validé">Validé</option>
-                          </select>
-                        </td>
-                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
-                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
-                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
-                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
-                      </tr>
-
-                      <tr data-group="3">
-                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-3')">Groupe 3</button></td>
-                        <td>
-                          <div class="student-fields">
-                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
-                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
-                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
-                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
-                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
-                          </div>
-                        </td>
-                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
-                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
-                        <td>
-                          <select class="field table-field" data-field="status">
-                            <option value="En cours">En cours</option>
-                            <option value="Déposé">Déposé</option>
-                            <option value="À corriger">À corriger</option>
-                            <option value="Validé">Validé</option>
-                          </select>
-                        </td>
-                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
-                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
-                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
-                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
-                      </tr>
-
-                      <tr data-group="4">
-                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-4')">Groupe 4</button></td>
-                        <td>
-                          <div class="student-fields">
-                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
-                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
-                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
-                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
-                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
-                          </div>
-                        </td>
-                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
-                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
-                        <td>
-                          <select class="field table-field" data-field="status">
-                            <option value="En cours">En cours</option>
-                            <option value="Déposé">Déposé</option>
-                            <option value="À corriger">À corriger</option>
-                            <option value="Validé">Validé</option>
-                          </select>
-                        </td>
-                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
-                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
-                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
-                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
-                      </tr>
-
-                      <tr data-group="5">
-                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-5')">Groupe 5</button></td>
-                        <td>
-                          <div class="student-fields">
-                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
-                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
-                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
-                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
-                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
-                          </div>
-                        </td>
-                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
-                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
-                        <td>
-                          <select class="field table-field" data-field="status">
-                            <option value="En cours">En cours</option>
-                            <option value="Déposé">Déposé</option>
-                            <option value="À corriger">À corriger</option>
-                            <option value="Validé">Validé</option>
-                          </select>
-                        </td>
-                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
-                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
-                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
-                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
-                      </tr>
-
-                      <tr data-group="6">
-                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-6')">Groupe 6</button></td>
-                        <td>
-                          <div class="student-fields">
-                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
-                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
-                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
-                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
-                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
-                          </div>
-                        </td>
-                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
-                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
-                        <td>
-                          <select class="field table-field" data-field="status">
-                            <option value="En cours">En cours</option>
-                            <option value="Déposé">Déposé</option>
-                            <option value="À corriger">À corriger</option>
-                            <option value="Validé">Validé</option>
-                          </select>
-                        </td>
-                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
-                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
-                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
-                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <p><strong>À retenir</strong></p>
+                  <p>Une méthode claire rend les résultats plus crédibles et plus faciles à défendre.</p>
                 </div>
               </article>
 
-              <article id="groupe-1" class="sub-page">
-                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
-                <p class="eyebrow">Activité 2 — Groupe</p>
-                <h2>👥 Groupe 1</h2>
-                <p class="muted">Page dédiée au Groupe 1. Le dépôt principal se fait dans le tableau de répartition.</p>
+              <article id="a2-exercice" class="sub-page">
+                <div class="fullscreen-header">
+                  <div class="fullscreen-actions">
+                    <div>
+                      <p class="eyebrow">Activité 2 — Exercice</p>
+                      <h2>✍️ Exo 2 — Construire la méthodologie de l’étude</h2>
+                    </div>
+                    <button class="btn secondary" type="button" onclick="closeCoursePages()">← Fermer la page</button>
+                  </div>
+                  <div class="page-actions">
+                    <button class="btn" type="button" onclick="openSubmissionModal(2, 'Exo 2 — Méthodologie')">📤 Envoyer mon dépôt</button>
+                  </div>
+                </div>
+
+                <div class="callout">
+                  <p><strong>Travail demandé</strong></p>
+                  <p>Construisez la méthodologie de votre étude de marché.</p>
+                </div>
+
+                <section class="question-card">
+                  <h3>À produire</h3>
+                  <ul class="answer-list">
+                    <li>Choisir une méthode : sondage, entretien, observation ou recherche documentaire.</li>
+                    <li>Définir le nombre de personnes à interroger.</li>
+                    <li>Rédiger les questions principales.</li>
+                    <li>Expliquer comment les données seront collectées.</li>
+                    <li>Expliquer comment les résultats seront analysés.</li>
+                  </ul>
+                </section>
               </article>
 
-              <article id="groupe-2" class="sub-page">
-                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
-                <p class="eyebrow">Activité 2 — Groupe</p>
-                <h2>👥 Groupe 2</h2>
-                <p class="muted">Page dédiée au Groupe 2. Le dépôt principal se fait dans le tableau de répartition.</p>
+              <article id="a2-groupe" class="sub-page">
+                <div class="fullscreen-header">
+                  <div class="fullscreen-actions">
+                    <div>
+                      <p class="eyebrow">Activité 2 — Répartition</p>
+                      <h2>👥 Répartition GROUPE et Dépôt (2)</h2>
+                    </div>
+                    <button class="btn secondary" type="button" onclick="closeCoursePages()">← Fermer la page</button>
+                  </div>
+                  <p class="table-help">Même logique que l’activité 1, mais enregistrée séparément pour l’Exo 2.</p>
+                </div>
+                <div id="trackingA2"></div>
               </article>
-
-              <article id="groupe-3" class="sub-page">
-                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
-                <p class="eyebrow">Activité 2 — Groupe</p>
-                <h2>👥 Groupe 3</h2>
-                <p class="muted">Page dédiée au Groupe 3. Le dépôt principal se fait dans le tableau de répartition.</p>
-              </article>
-
-              <article id="groupe-4" class="sub-page">
-                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
-                <p class="eyebrow">Activité 2 — Groupe</p>
-                <h2>👥 Groupe 4</h2>
-                <p class="muted">Page dédiée au Groupe 4. Le dépôt principal se fait dans le tableau de répartition.</p>
-              </article>
-
-              <article id="groupe-5" class="sub-page">
-                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
-                <p class="eyebrow">Activité 2 — Groupe</p>
-                <h2>👥 Groupe 5</h2>
-                <p class="muted">Page dédiée au Groupe 5. Le dépôt principal se fait dans le tableau de répartition.</p>
-              </article>
-
-              <article id="groupe-6" class="sub-page">
-                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
-                <p class="eyebrow">Activité 2 — Groupe</p>
-                <h2>👥 Groupe 6</h2>
-                <p class="muted">Page dédiée au Groupe 6. Le dépôt principal se fait dans le tableau de répartition.</p>
-              </article>
-
 
               <article id="a3-cours" class="sub-page">
-                <div class="back-row"><button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button></div>
-                <p class="eyebrow">Activité 3</p>
-                <h2>📘 Contenu de cours — Donnez de la crédibilité à vos résultats</h2>
-                <p>Les résultats doivent être appuyés par des données, des sources fiables et une interprétation claire.</p>
+                <div class="fullscreen-header">
+                  <div class="fullscreen-actions">
+                    <div>
+                      <p class="eyebrow">Activité 3 — Contenu de cours</p>
+                      <h2>📘 Donnez de la crédibilité à vos résultats</h2>
+                    </div>
+                    <button class="btn secondary" type="button" onclick="closeCoursePages()">← Fermer la page</button>
+                  </div>
+                </div>
+
+                <p>
+                  Une étude de marché doit être crédible. Les résultats doivent être appuyés par des données,
+                  des sources fiables et une interprétation claire.
+                </p>
+
+                <div class="lesson-grid">
+                  <div class="lesson-box"><strong>Présenter clairement</strong><p>Tableaux, graphiques et synthèses lisibles.</p></div>
+                  <div class="lesson-box"><strong>Justifier</strong><p>Relier chaque conclusion à une donnée ou une observation.</p></div>
+                  <div class="lesson-box"><strong>Interpréter</strong><p>Expliquer ce que les chiffres veulent dire pour le projet.</p></div>
+                  <div class="lesson-box"><strong>Recommander</strong><p>Formuler des actions marketing concrètes.</p></div>
+                </div>
               </article>
 
               <article id="a3-exercice" class="sub-page">
-                <div class="back-row"><button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button></div>
-                <p class="eyebrow">Activité 3</p>
-                <h2>✍️ Exo 3 — Crédibiliser les résultats</h2>
-                <p>Préparez une synthèse crédible de vos résultats.</p>
+                <div class="fullscreen-header">
+                  <div class="fullscreen-actions">
+                    <div>
+                      <p class="eyebrow">Activité 3 — Exercice</p>
+                      <h2>✍️ Exo 3 — Crédibiliser les résultats</h2>
+                    </div>
+                    <button class="btn secondary" type="button" onclick="closeCoursePages()">← Fermer la page</button>
+                  </div>
+                  <div class="page-actions">
+                    <button class="btn" type="button" onclick="openSubmissionModal(3, 'Exo 3 — Synthèse des résultats')">📤 Envoyer mon dépôt</button>
+                  </div>
+                </div>
+
+                <div class="callout">
+                  <p><strong>Travail demandé</strong></p>
+                  <p>Préparez une synthèse crédible de vos résultats.</p>
+                </div>
+
+                <section class="question-card">
+                  <h3>À produire</h3>
+                  <ul class="answer-list">
+                    <li>Présenter les résultats principaux.</li>
+                    <li>Ajouter au moins un tableau ou graphique.</li>
+                    <li>Identifier les tendances importantes.</li>
+                    <li>Expliquer ce que les résultats signifient pour le projet.</li>
+                    <li>Formuler des recommandations.</li>
+                  </ul>
+                </section>
               </article>
 
               <article id="a3-groupe" class="sub-page">
-                <div class="back-row"><button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button></div>
-                <p class="eyebrow">Activité 3</p>
-                <h2>👥 Répartition groupe et dépôt 3</h2>
-                <p>À compléter.</p>
+                <div class="fullscreen-header">
+                  <div class="fullscreen-actions">
+                    <div>
+                      <p class="eyebrow">Activité 3 — Répartition</p>
+                      <h2>👥 Répartition GROUPE et Dépôt (3)</h2>
+                    </div>
+                    <button class="btn secondary" type="button" onclick="closeCoursePages()">← Fermer la page</button>
+                  </div>
+                  <p class="table-help">Même logique que l’activité 1, mais enregistrée séparément pour l’Exo 3.</p>
+                </div>
+                <div id="trackingA3"></div>
               </article>
             </section>
           </div>
@@ -1683,49 +1243,59 @@
 
       <section id="adminView" class="view">
         <section class="hero">
-          <p class="eyebrow">Gestion</p>
-          <h1>Administration</h1>
+          <p class="eyebrow">Gestion des dépôts</p>
+          <h1>Tableau de réception</h1>
           <p class="lead">
-            Cet espace est réservé à l’administrateur. Il permettra de gérer les activités,
-            les contenus, les exercices, les groupes, les dépôts et les élèves.
+            Les élèves envoient leurs dépôts depuis les boutons “Envoyer mon dépôt”.
+            Chaque dépôt est enregistré dans Supabase, puis apparaît ici pour suivi, correction et validation.
           </p>
+          <div class="page-actions">
+            <button class="btn" type="button" onclick="loadAdminDashboard()">🔄 Actualiser les dépôts</button>
+            <button class="btn secondary" type="button" onclick="showStudentView(document.querySelector('.nav-link'))">Retour espace élève</button>
+          </div>
         </section>
 
-        <div class="admin-grid">
-          <section class="card">
-            <p class="eyebrow">Activités</p>
-            <h2>Ajouter / modifier une activité</h2>
+        <section class="card">
+          <p class="eyebrow">Vue d’ensemble</p>
+          <h2>Résumé</h2>
+          <div class="admin-stats">
+            <div class="admin-stat-card"><strong id="statTotal">0</strong><span>Total dépôts</span></div>
+            <div class="admin-stat-card"><strong id="statSubmitted">0</strong><span>Déposés</span></div>
+            <div class="admin-stat-card"><strong id="statCorrection">0</strong><span>À corriger</span></div>
+            <div class="admin-stat-card"><strong id="statValidated">0</strong><span>Validés</span></div>
+          </div>
+        </section>
 
-            <label>
-              Titre de l’activité
-              <input class="field" placeholder="Ex : Activité 1 : Exprimez clairement votre besoin" />
-            </label>
+        <section class="card" style="margin-top: 24px;">
+          <p class="eyebrow">Dépôts reçus</p>
+          <h2>Réception et correction</h2>
 
-            <label>
-              Description
-              <textarea class="field" rows="4" placeholder="Description de l’activité"></textarea>
-            </label>
+          <div id="adminError" class="callout warning" style="display:none;"></div>
 
-            <button class="btn" type="button">Enregistrer</button>
-          </section>
-
-          <section class="card">
-            <p class="eyebrow">Groupes</p>
-            <h2>Suivi des groupes</h2>
-
-            <label>
-              Nom du groupe
-              <input class="field" placeholder="Ex : Groupe 1" />
-            </label>
-
-            <label>
-              Membres
-              <textarea class="field" rows="4" placeholder="Liste des membres"></textarea>
-            </label>
-
-            <button class="btn" type="button">Ajouter le groupe</button>
-          </section>
-        </div>
+          <div class="table-wrap">
+            <table class="submission-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Activité</th>
+                  <th>Exercice</th>
+                  <th>Groupe</th>
+                  <th>Élève</th>
+                  <th>Fichier</th>
+                  <th>Commentaire élève</th>
+                  <th>Statut</th>
+                  <th>Feedback admin</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminSubmissionsBody">
+                <tr>
+                  <td colspan="10">Aucun dépôt chargé.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
       </section>
     </main>
 
@@ -1735,6 +1305,60 @@
     </footer>
   </div>
 
+  <div id="submissionModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">Dépôt élève</p>
+          <h2>📤 Envoyer un dépôt</h2>
+        </div>
+        <button class="btn secondary" type="button" onclick="closeSubmissionModal()">Fermer</button>
+      </div>
+
+      <div id="submissionMessage" class="callout" style="display:none;"></div>
+
+      <form id="submissionForm" onsubmit="submitWork(event)">
+        <div class="form-grid">
+          <label>
+            Activité
+            <select class="field" id="submissionActivity" required>
+              <option value="1">Activité 1 — Exo 1</option>
+              <option value="2">Activité 2 — Exo 2</option>
+              <option value="3">Activité 3 — Exo 3</option>
+            </select>
+          </label>
+
+          <label>
+            Groupe
+            <select class="field" id="submissionGroup" required>
+              <option value="1">Groupe 1</option>
+              <option value="2">Groupe 2</option>
+              <option value="3">Groupe 3</option>
+              <option value="4">Groupe 4</option>
+              <option value="5">Groupe 5</option>
+              <option value="6">Groupe 6</option>
+            </select>
+          </label>
+
+          <label class="span-2">
+            Lien du fichier
+            <input class="field" id="submissionFileUrl" type="url" placeholder="Collez ici le lien Google Drive, PDF, Docs, etc." required>
+          </label>
+
+          <label class="span-2">
+            Commentaire
+            <textarea class="field" id="submissionComment" rows="4" placeholder="Message facultatif pour l’enseignant"></textarea>
+          </label>
+        </div>
+
+        <div class="page-actions">
+          <button class="btn" type="submit">Envoyer le dépôt</button>
+          <button class="btn secondary" type="button" onclick="closeSubmissionModal()">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
@@ -1742,6 +1366,12 @@
     const SUPABASE_KEY = "sb_publishable_IqLPvaAeDZoDlYKE-m_Fxw_29Zbnhh_";
 
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const activitiesConfig = {
+      1: { title: "Exo 1 — Brief", deadline: "2026-06-18", trackingContainer: "trackingA1", storageKey: "activity1GroupTracking" },
+      2: { title: "Exo 2 — Méthodologie", deadline: "2026-06-21", trackingContainer: "trackingA2", storageKey: "activity2GroupTracking" },
+      3: { title: "Exo 3 — Synthèse des résultats", deadline: "2026-06-25", trackingContainer: "trackingA3", storageKey: "activity3GroupTracking" }
+    };
 
     let currentProfile = null;
 
@@ -1777,8 +1407,12 @@
 
       if (error) {
         console.error("Erreur profil :", error);
-        currentProfile = null;
-        return null;
+        currentProfile = {
+          email: userData.user.email,
+          full_name: userData.user.email,
+          role: "student"
+        };
+        return currentProfile;
       }
 
       currentProfile = profile;
@@ -1831,10 +1465,8 @@
       studentView.classList.remove("active-view");
       adminView.classList.add("active-view");
 
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      loadAdminDashboard();
     }
 
     function openCoursePage(pageId) {
@@ -1848,17 +1480,7 @@
 
       if (selectedPage) {
         selectedPage.classList.add("active-page");
-
-        if (selectedPage.classList.contains("fullscreen-subpage")) {
-          document.body.classList.add("fullscreen-open");
-        } else {
-          document.body.classList.remove("fullscreen-open");
-        }
-
-        selectedPage.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
+        document.body.classList.add("fullscreen-open");
       }
     }
 
@@ -1877,81 +1499,421 @@
       });
     }
 
-    function saveGroupDepositTable() {
-      const rows = document.querySelectorAll("#groupDepositTable tbody tr");
-      const data = [];
+    function renderTrackingTables() {
+      Object.keys(activitiesConfig).forEach(activityNumber => {
+        const config = activitiesConfig[activityNumber];
+        const container = document.getElementById(config.trackingContainer);
+        if (!container) return;
 
-      rows.forEach(row => {
-        const groupNumber = row.dataset.group;
-        const fields = row.querySelectorAll(".table-field");
+        container.innerHTML = `
+          <div class="callout">
+            <p><strong>Consigne</strong></p>
+            <p>
+              Chaque groupe doit préparer le livrable lié à ${config.title}.
+              La date d’échéance proposée est le <strong>${formatDate(config.deadline)}</strong>.
+            </p>
+          </div>
 
-        const rowData = {
-          group: groupNumber
-        };
-
-        fields.forEach(field => {
-          rowData[field.dataset.field] = field.value;
-        });
-
-        data.push(rowData);
+          <div class="table-wrap fullscreen-table">
+            <table class="tracking-table" data-activity="${activityNumber}">
+              <thead>
+                <tr>
+                  <th>Groupe</th>
+                  <th>Membre du groupe</th>
+                  <th>Fichier</th>
+                  <th>Date de dépôt exo</th>
+                  <th>Status</th>
+                  <th>Date d’échéance</th>
+                  <th>Nombre d’étudiants</th>
+                  <th>Type d’exercice</th>
+                  <th>Nom de l’enseignant</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${[1,2,3,4,5,6].map(groupNumber => renderTrackingRow(Number(activityNumber), groupNumber)).join("")}
+              </tbody>
+            </table>
+          </div>
+        `;
       });
-
-      localStorage.setItem("activity1GroupDeposits", JSON.stringify(data));
     }
 
-    function loadGroupDepositTable() {
-      const savedData = localStorage.getItem("activity1GroupDeposits");
+    function renderTrackingRow(activityNumber, groupNumber) {
+      const config = activitiesConfig[activityNumber];
 
-      if (!savedData) {
+      return `
+        <tr data-activity="${activityNumber}" data-group="${groupNumber}">
+          <td><strong>Groupe ${groupNumber}</strong></td>
+          <td>
+            <div class="student-fields">
+              <input class="field tracking-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+              <input class="field tracking-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+              <input class="field tracking-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+              <input class="field tracking-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+              <input class="field tracking-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+            </div>
+          </td>
+          <td><input class="field tracking-field" data-field="file_url" type="url" placeholder="Lien du fichier"></td>
+          <td><input class="field tracking-field date-field" data-field="deposit_date" type="date"></td>
+          <td>
+            <select class="field tracking-field" data-field="status">
+              <option value="En cours">En cours</option>
+              <option value="Déposé">Déposé</option>
+              <option value="À corriger">À corriger</option>
+              <option value="Validé">Validé</option>
+            </select>
+          </td>
+          <td><input class="field tracking-field date-field" data-field="deadline_date" type="date" value="${config.deadline}"></td>
+          <td><input class="field tracking-field" data-field="student_count" type="number" min="1" value="5"></td>
+          <td><input class="field tracking-field" data-field="exercise_type" value="quizz"></td>
+          <td><input class="field tracking-field" data-field="teacher_name" value="Stéphane"></td>
+          <td>
+            <button class="btn" type="button" onclick="prefillSubmissionFromTracking(${activityNumber}, ${groupNumber})">
+              📤 Déposer
+            </button>
+          </td>
+        </tr>
+      `;
+    }
+
+    async function loadAllTrackingTables() {
+      await loadTrackingFromLocalStorage();
+
+      const { data, error } = await supabaseClient
+        .from("activity_group_tracking")
+        .select("*")
+        .order("activity_number", { ascending: true })
+        .order("group_number", { ascending: true });
+
+      if (error) {
+        console.warn("Table Supabase activity_group_tracking non chargée :", error);
         return;
       }
 
-      const data = JSON.parse(savedData);
+      data.forEach(item => fillTrackingRow(item));
+    }
 
-      data.forEach(rowData => {
-        const row = document.querySelector(`#groupDepositTable tbody tr[data-group="${rowData.group}"]`);
+    function fillTrackingRow(item) {
+      const row = document.querySelector(`tr[data-activity="${item.activity_number}"][data-group="${item.group_number}"]`);
+      if (!row) return;
 
-        if (!row) {
-          return;
+      const values = {
+        student1: item.student1 || "",
+        student2: item.student2 || "",
+        student3: item.student3 || "",
+        student4: item.student4 || "",
+        student5: item.student5 || "",
+        file_url: item.file_url || "",
+        deposit_date: item.deposit_date || "",
+        status: item.status || "En cours",
+        deadline_date: item.deadline_date || activitiesConfig[item.activity_number]?.deadline || "",
+        student_count: item.student_count || 5,
+        exercise_type: item.exercise_type || "quizz",
+        teacher_name: item.teacher_name || "Stéphane"
+      };
+
+      row.querySelectorAll(".tracking-field").forEach(field => {
+        const key = field.dataset.field;
+        if (values[key] !== undefined) {
+          field.value = values[key];
         }
-
-        const fields = row.querySelectorAll(".table-field");
-
-        fields.forEach(field => {
-          if (rowData[field.dataset.field] !== undefined) {
-            field.value = rowData[field.dataset.field];
-          }
-        });
       });
     }
 
-    function openDatePicker(input) {
-      if (input.showPicker) {
+    function loadTrackingFromLocalStorage() {
+      Object.keys(activitiesConfig).forEach(activityNumber => {
+        const saved = localStorage.getItem(activitiesConfig[activityNumber].storageKey);
+        if (!saved) return;
+
         try {
-          input.showPicker();
+          const data = JSON.parse(saved);
+          data.forEach(item => fillTrackingRow(item));
         } catch (error) {
-          console.warn("Calendrier non ouvert automatiquement :", error);
+          console.warn("Erreur localStorage tracking :", error);
         }
+      });
+    }
+
+    function saveTrackingToLocalStorage(activityNumber) {
+      const rows = document.querySelectorAll(`tr[data-activity="${activityNumber}"]`);
+      const data = Array.from(rows).map(row => getTrackingPayload(row));
+      localStorage.setItem(activitiesConfig[activityNumber].storageKey, JSON.stringify(data));
+    }
+
+    function getTrackingPayload(row) {
+      const payload = {
+        activity_number: Number(row.dataset.activity),
+        group_number: Number(row.dataset.group)
+      };
+
+      row.querySelectorAll(".tracking-field").forEach(field => {
+        const key = field.dataset.field;
+        payload[key] = field.type === "number" ? Number(field.value || 0) : field.value;
+      });
+
+      return payload;
+    }
+
+    async function saveTrackingRow(row) {
+      const payload = getTrackingPayload(row);
+      saveTrackingToLocalStorage(payload.activity_number);
+
+      const { data: userData } = await supabaseClient.auth.getUser();
+      if (userData.user) {
+        payload.updated_by = userData.user.id;
+      }
+
+      payload.updated_at = new Date().toISOString();
+
+      const { error } = await supabaseClient
+        .from("activity_group_tracking")
+        .upsert(payload, { onConflict: "activity_number,group_number" });
+
+      if (error) {
+        console.warn("Sauvegarde Supabase impossible pour le suivi groupe :", error);
       }
     }
 
-    function initGroupDepositTable() {
-      loadGroupDepositTable();
+    function initTrackingListeners() {
+      document.querySelectorAll(".tracking-field").forEach(field => {
+        field.addEventListener("change", function() {
+          const row = field.closest("tr");
+          if (row) saveTrackingRow(row);
+        });
 
-      const fields = document.querySelectorAll("#groupDepositTable .table-field");
-
-      fields.forEach(field => {
-        field.addEventListener("input", saveGroupDepositTable);
-        field.addEventListener("change", saveGroupDepositTable);
-      });
-
-      const dateFields = document.querySelectorAll('#groupDepositTable input[type="date"]');
-
-      dateFields.forEach(dateField => {
-        dateField.addEventListener("click", function() {
-          openDatePicker(dateField);
+        field.addEventListener("blur", function() {
+          const row = field.closest("tr");
+          if (row) saveTrackingRow(row);
         });
       });
+    }
+
+    function prefillSubmissionFromTracking(activityNumber, groupNumber) {
+      const row = document.querySelector(`tr[data-activity="${activityNumber}"][data-group="${groupNumber}"]`);
+      const fileField = row ? row.querySelector('[data-field="file_url"]') : null;
+
+      openSubmissionModal(activityNumber, activitiesConfig[activityNumber].title, groupNumber);
+
+      if (fileField && fileField.value) {
+        document.getElementById("submissionFileUrl").value = fileField.value;
+      }
+    }
+
+    function openSubmissionModal(activityNumber, exerciseTitle, groupNumber) {
+      const modal = document.getElementById("submissionModal");
+      const message = document.getElementById("submissionMessage");
+
+      message.style.display = "none";
+      message.innerHTML = "";
+
+      if (activityNumber) {
+        document.getElementById("submissionActivity").value = String(activityNumber);
+      }
+
+      if (groupNumber) {
+        document.getElementById("submissionGroup").value = String(groupNumber);
+      }
+
+      modal.classList.add("active");
+      document.body.classList.add("modal-open");
+    }
+
+    function closeSubmissionModal() {
+      const modal = document.getElementById("submissionModal");
+      modal.classList.remove("active");
+      document.body.classList.remove("modal-open");
+    }
+
+    async function submitWork(event) {
+      event.preventDefault();
+
+      const message = document.getElementById("submissionMessage");
+      const activityNumber = Number(document.getElementById("submissionActivity").value);
+      const groupNumber = Number(document.getElementById("submissionGroup").value);
+      const fileUrl = document.getElementById("submissionFileUrl").value.trim();
+      const comment = document.getElementById("submissionComment").value.trim();
+      const config = activitiesConfig[activityNumber];
+
+      const { data: userData } = await supabaseClient.auth.getUser();
+
+      if (!userData.user) {
+        message.className = "callout warning";
+        message.style.display = "block";
+        message.innerHTML = "<p><strong>Erreur :</strong> vous devez être connecté pour envoyer un dépôt.</p>";
+        return;
+      }
+
+      const payload = {
+        activity_number: activityNumber,
+        exercise_title: config.title,
+        group_number: groupNumber,
+        file_url: fileUrl,
+        comment: comment,
+        status: "Déposé",
+        submitted_by: userData.user.id,
+        submitter_email: userData.user.email,
+        submitter_name: currentProfile?.full_name || userData.user.email,
+        submitted_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabaseClient
+        .from("submissions")
+        .insert(payload);
+
+      if (error) {
+        console.error("Erreur dépôt :", error);
+        message.className = "callout warning";
+        message.style.display = "block";
+        message.innerHTML = `
+          <p><strong>Le dépôt n’a pas été envoyé.</strong></p>
+          <p>Vérifiez que la table Supabase <code>submissions</code> existe et que les règles RLS sont bien créées.</p>
+        `;
+        return;
+      }
+
+      message.className = "callout";
+      message.style.display = "block";
+      message.innerHTML = "<p><strong>Dépôt envoyé.</strong> L’enseignant le verra dans la page Gestion des dépôts.</p>";
+
+      document.getElementById("submissionForm").reset();
+      document.getElementById("submissionActivity").value = String(activityNumber);
+      document.getElementById("submissionGroup").value = String(groupNumber);
+    }
+
+    async function loadAdminDashboard() {
+      const errorBox = document.getElementById("adminError");
+      const body = document.getElementById("adminSubmissionsBody");
+
+      errorBox.style.display = "none";
+      errorBox.innerHTML = "";
+      body.innerHTML = `<tr><td colspan="10">Chargement...</td></tr>`;
+
+      const { data, error } = await supabaseClient
+        .from("submissions")
+        .select("*")
+        .order("submitted_at", { ascending: false });
+
+      if (error) {
+        console.error("Erreur chargement dépôts :", error);
+        body.innerHTML = `<tr><td colspan="10">Impossible de charger les dépôts.</td></tr>`;
+        errorBox.style.display = "block";
+        errorBox.innerHTML = `
+          <p><strong>Erreur Supabase.</strong></p>
+          <p>Vérifiez que la table <code>submissions</code> et les politiques RLS sont bien créées.</p>
+        `;
+        updateStats([]);
+        return;
+      }
+
+      updateStats(data);
+
+      if (!data.length) {
+        body.innerHTML = `<tr><td colspan="10">Aucun dépôt reçu pour le moment.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = data.map(item => renderAdminSubmissionRow(item)).join("");
+    }
+
+    function renderAdminSubmissionRow(item) {
+      const submittedDate = item.submitted_at ? formatDateTime(item.submitted_at) : "-";
+      const fileLink = item.file_url
+        ? `<a href="${escapeHtml(item.file_url)}" target="_blank" rel="noopener">Ouvrir le fichier</a>`
+        : "-";
+
+      return `
+        <tr data-submission-id="${item.id}">
+          <td>${submittedDate}</td>
+          <td>Activité ${item.activity_number || "-"}</td>
+          <td>${escapeHtml(item.exercise_title || "-")}</td>
+          <td>Groupe ${item.group_number || "-"}</td>
+          <td>
+            <strong>${escapeHtml(item.submitter_name || "-")}</strong><br>
+            <span class="muted">${escapeHtml(item.submitter_email || "")}</span>
+          </td>
+          <td>${fileLink}</td>
+          <td>${escapeHtml(item.comment || "-")}</td>
+          <td>
+            <select class="field" data-admin-field="status">
+              ${["Déposé", "En correction", "À corriger", "Validé"].map(status => `
+                <option value="${status}" ${item.status === status ? "selected" : ""}>${status}</option>
+              `).join("")}
+            </select>
+          </td>
+          <td>
+            <textarea class="field" data-admin-field="feedback" rows="3" placeholder="Feedback">${escapeHtml(item.feedback || "")}</textarea>
+          </td>
+          <td>
+            <button class="btn" type="button" onclick="saveAdminSubmission('${item.id}')">Enregistrer</button>
+          </td>
+        </tr>
+      `;
+    }
+
+    async function saveAdminSubmission(id) {
+      const row = document.querySelector(`tr[data-submission-id="${id}"]`);
+      if (!row) return;
+
+      const status = row.querySelector('[data-admin-field="status"]').value;
+      const feedback = row.querySelector('[data-admin-field="feedback"]').value;
+
+      const { error } = await supabaseClient
+        .from("submissions")
+        .update({
+          status: status,
+          feedback: feedback,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", id);
+
+      if (error) {
+        alert("Erreur : modification non enregistrée.");
+        console.error(error);
+        return;
+      }
+
+      alert("Dépôt mis à jour.");
+      loadAdminDashboard();
+    }
+
+    function updateStats(data) {
+      const total = data.length;
+      const submitted = data.filter(item => item.status === "Déposé").length;
+      const correction = data.filter(item => item.status === "À corriger" || item.status === "En correction").length;
+      const validated = data.filter(item => item.status === "Validé").length;
+
+      document.getElementById("statTotal").textContent = total;
+      document.getElementById("statSubmitted").textContent = submitted;
+      document.getElementById("statCorrection").textContent = correction;
+      document.getElementById("statValidated").textContent = validated;
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return "-";
+      const date = new Date(`${dateString}T00:00:00`);
+      return date.toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+    }
+
+    function formatDateTime(dateString) {
+      if (!dateString) return "-";
+      return new Date(dateString).toLocaleString("fr-FR", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
     async function logout() {
@@ -1968,7 +1930,9 @@
       }
     });
 
-    initGroupDepositTable();
+    renderTrackingTables();
+    initTrackingListeners();
+    loadAllTrackingTables();
     protectSite();
   </script>
 </body>
