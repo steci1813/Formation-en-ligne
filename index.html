@@ -1161,97 +1161,294 @@
   </div>
 
   <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Groupe</th>
-          <th>Membre du groupe</th>
-          <th>Fichier</th>
-          <th>Date de dépôt exo</th>
-          <th>Status</th>
-          <th>Date d’échéance</th>
-          <th>Nombre d’étudiants</th>
-          <th>Type d’exercice</th>
-          <th>Nom de l’enseignant</th>
-        </tr>
-      </thead>
+  <table id="groupDepositTable">
+    <thead>
+      <tr>
+        <th>Groupe</th>
+        <th>Membre du groupe</th>
+        <th>Fichier</th>
+        <th>Date de dépôt exo</th>
+        <th>Status</th>
+        <th>Date d’échéance</th>
+        <th>Nombre d’étudiants</th>
+        <th>Type d’exercice</th>
+        <th>Nom de l’enseignant</th>
+      </tr>
+    </thead>
 
-      <tbody>
-        <tr>
-          <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-1')">Groupe 1</button></td>
-          <td>À compléter</td>
-          <td>À déposer</td>
-          <td>À compléter</td>
-          <td><span class="status-pill">En cours</span></td>
-          <td>18 juin 2026</td>
-          <td>4</td>
-          <td>quizz</td>
-          <td>Stéphane</td>
-        </tr>
+    <tbody>
+      <tr data-group="1">
+        <td>
+          <button class="btn secondary" type="button" onclick="openCoursePage('groupe-1')">
+            Groupe 1
+          </button>
+        </td>
 
-        <tr>
-          <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-2')">Groupe 2</button></td>
-          <td>À compléter</td>
-          <td>À déposer</td>
-          <td>À compléter</td>
-          <td><span class="status-pill">En cours</span></td>
-          <td>18 juin 2026</td>
-          <td>4</td>
-          <td>quizz</td>
-          <td>Stéphane</td>
-        </tr>
+        <td>
+          <textarea class="field table-field" data-field="members" rows="2" placeholder="Noms des membres"></textarea>
+        </td>
 
-        <tr>
-          <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-3')">Groupe 3</button></td>
-          <td>À compléter</td>
-          <td>À déposer</td>
-          <td>À compléter</td>
-          <td><span class="status-pill">En cours</span></td>
-          <td>18 juin 2026</td>
-          <td>4</td>
-          <td>quizz</td>
-          <td>Stéphane</td>
-        </tr>
+        <td>
+          <input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier">
+        </td>
 
-        <tr>
-          <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-4')">Groupe 4</button></td>
-          <td>À compléter</td>
-          <td>À déposer</td>
-          <td>À compléter</td>
-          <td><span class="status-pill">En cours</span></td>
-          <td>18 juin 2026</td>
-          <td>4</td>
-          <td>quizz</td>
-          <td>Stéphane</td>
-        </tr>
+        <td>
+          <span class="date-fixed" data-field="depositDate">Automatique</span>
+        </td>
 
-        <tr>
-          <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-5')">Groupe 5</button></td>
-          <td>À compléter</td>
-          <td>À déposer</td>
-          <td>À compléter</td>
-          <td><span class="status-pill">En cours</span></td>
-          <td>18 juin 2026</td>
-          <td>4</td>
-          <td>quizz</td>
-          <td>Stéphane</td>
-        </tr>
+        <td>
+          <select class="field table-field" data-field="status">
+            <option value="En cours">En cours</option>
+            <option value="Déposé">Déposé</option>
+            <option value="À corriger">À corriger</option>
+            <option value="Validé">Validé</option>
+          </select>
+        </td>
 
-        <tr>
-          <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-6')">Groupe 6</button></td>
-          <td>À compléter</td>
-          <td>À déposer</td>
-          <td>À compléter</td>
-          <td><span class="status-pill">En cours</span></td>
-          <td>18 juin 2026</td>
-          <td>4</td>
-          <td>quizz</td>
-          <td>Stéphane</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+        <td>
+          <span class="date-fixed">18 juin 2026</span>
+        </td>
 
+        <td>
+          <input class="field table-field" data-field="studentCount" type="number" min="1" value="4">
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="exerciseType" value="quizz">
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="teacher" value="Stéphane">
+        </td>
+      </tr>
+
+      <tr data-group="2">
+        <td>
+          <button class="btn secondary" type="button" onclick="openCoursePage('groupe-2')">
+            Groupe 2
+          </button>
+        </td>
+
+        <td>
+          <textarea class="field table-field" data-field="members" rows="2" placeholder="Noms des membres"></textarea>
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier">
+        </td>
+
+        <td>
+          <span class="date-fixed" data-field="depositDate">Automatique</span>
+        </td>
+
+        <td>
+          <select class="field table-field" data-field="status">
+            <option value="En cours">En cours</option>
+            <option value="Déposé">Déposé</option>
+            <option value="À corriger">À corriger</option>
+            <option value="Validé">Validé</option>
+          </select>
+        </td>
+
+        <td>
+          <span class="date-fixed">18 juin 2026</span>
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="studentCount" type="number" min="1" value="4">
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="exerciseType" value="quizz">
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="teacher" value="Stéphane">
+        </td>
+      </tr>
+
+      <tr data-group="3">
+        <td>
+          <button class="btn secondary" type="button" onclick="openCoursePage('groupe-3')">
+            Groupe 3
+          </button>
+        </td>
+
+        <td>
+          <textarea class="field table-field" data-field="members" rows="2" placeholder="Noms des membres"></textarea>
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier">
+        </td>
+
+        <td>
+          <span class="date-fixed" data-field="depositDate">Automatique</span>
+        </td>
+
+        <td>
+          <select class="field table-field" data-field="status">
+            <option value="En cours">En cours</option>
+            <option value="Déposé">Déposé</option>
+            <option value="À corriger">À corriger</option>
+            <option value="Validé">Validé</option>
+          </select>
+        </td>
+
+        <td>
+          <span class="date-fixed">18 juin 2026</span>
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="studentCount" type="number" min="1" value="4">
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="exerciseType" value="quizz">
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="teacher" value="Stéphane">
+        </td>
+      </tr>
+
+      <tr data-group="4">
+        <td>
+          <button class="btn secondary" type="button" onclick="openCoursePage('groupe-4')">
+            Groupe 4
+          </button>
+        </td>
+
+        <td>
+          <textarea class="field table-field" data-field="members" rows="2" placeholder="Noms des membres"></textarea>
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier">
+        </td>
+
+        <td>
+          <span class="date-fixed" data-field="depositDate">Automatique</span>
+        </td>
+
+        <td>
+          <select class="field table-field" data-field="status">
+            <option value="En cours">En cours</option>
+            <option value="Déposé">Déposé</option>
+            <option value="À corriger">À corriger</option>
+            <option value="Validé">Validé</option>
+          </select>
+        </td>
+
+        <td>
+          <span class="date-fixed">18 juin 2026</span>
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="studentCount" type="number" min="1" value="4">
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="exerciseType" value="quizz">
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="teacher" value="Stéphane">
+        </td>
+      </tr>
+
+      <tr data-group="5">
+        <td>
+          <button class="btn secondary" type="button" onclick="openCoursePage('groupe-5')">
+            Groupe 5
+          </button>
+        </td>
+
+        <td>
+          <textarea class="field table-field" data-field="members" rows="2" placeholder="Noms des membres"></textarea>
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier">
+        </td>
+
+        <td>
+          <span class="date-fixed" data-field="depositDate">Automatique</span>
+        </td>
+
+        <td>
+          <select class="field table-field" data-field="status">
+            <option value="En cours">En cours</option>
+            <option value="Déposé">Déposé</option>
+            <option value="À corriger">À corriger</option>
+            <option value="Validé">Validé</option>
+          </select>
+        </td>
+
+        <td>
+          <span class="date-fixed">18 juin 2026</span>
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="studentCount" type="number" min="1" value="4">
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="exerciseType" value="quizz">
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="teacher" value="Stéphane">
+        </td>
+      </tr>
+
+      <tr data-group="6">
+        <td>
+          <button class="btn secondary" type="button" onclick="openCoursePage('groupe-6')">
+            Groupe 6
+          </button>
+        </td>
+
+        <td>
+          <textarea class="field table-field" data-field="members" rows="2" placeholder="Noms des membres"></textarea>
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier">
+        </td>
+
+        <td>
+          <span class="date-fixed" data-field="depositDate">Automatique</span>
+        </td>
+
+        <td>
+          <select class="field table-field" data-field="status">
+            <option value="En cours">En cours</option>
+            <option value="Déposé">Déposé</option>
+            <option value="À corriger">À corriger</option>
+            <option value="Validé">Validé</option>
+          </select>
+        </td>
+
+        <td>
+          <span class="date-fixed">18 juin 2026</span>
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="studentCount" type="number" min="1" value="4">
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="exerciseType" value="quizz">
+        </td>
+
+        <td>
+          <input class="field table-field" data-field="teacher" value="Stéphane">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
   <h3 style="margin-top: 28px;">Pages groupes</h3>
 
   <div class="group-grid">
