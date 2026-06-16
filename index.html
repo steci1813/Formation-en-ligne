@@ -824,6 +824,126 @@ body.fullscreen-open {
 #groupDepositTable td {
   padding: 16px;
 }
+
+      /* Correction affichage pleine page sur ordinateur */
+.fullscreen-subpage.active-page {
+  position: fixed;
+  inset: 18px;
+  z-index: 9998;
+  display: block;
+  overflow: auto;
+  background: var(--white);
+  border-radius: 28px;
+  padding: 28px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.22);
+}
+
+body.fullscreen-open {
+  overflow: hidden;
+}
+
+.fullscreen-header {
+  position: sticky;
+  top: -28px;
+  z-index: 20;
+  background: var(--white);
+  padding: 0 0 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.table-wrap.fullscreen-table {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: #ffffff;
+}
+
+/* Tableau plus lisible */
+#groupDepositTable {
+  min-width: 2100px;
+  font-size: 14px;
+}
+
+#groupDepositTable th,
+#groupDepositTable td {
+  padding: 16px;
+  vertical-align: top;
+}
+
+/* Colonne Groupe */
+#groupDepositTable th:nth-child(1),
+#groupDepositTable td:nth-child(1) {
+  min-width: 145px;
+}
+
+/* Colonne Membres */
+#groupDepositTable th:nth-child(2),
+#groupDepositTable td:nth-child(2) {
+  min-width: 360px;
+}
+
+/* 5 champs étudiants propres */
+.student-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  min-width: 330px;
+}
+
+.student-name-field {
+  width: 100%;
+  min-width: 320px;
+  height: 42px;
+  margin-top: 0;
+  font-size: 14px;
+  padding: 10px 12px;
+}
+
+/* Colonne Fichier */
+#groupDepositTable th:nth-child(3),
+#groupDepositTable td:nth-child(3) {
+  min-width: 320px;
+}
+
+#groupDepositTable td:nth-child(3) input {
+  min-width: 290px;
+}
+
+/* Dates */
+#groupDepositTable th:nth-child(4),
+#groupDepositTable td:nth-child(4),
+#groupDepositTable th:nth-child(6),
+#groupDepositTable td:nth-child(6) {
+  min-width: 190px;
+}
+
+/* Statut */
+#groupDepositTable th:nth-child(5),
+#groupDepositTable td:nth-child(5) {
+  min-width: 190px;
+}
+
+#groupDepositTable td:nth-child(5) select {
+  min-width: 160px;
+}
+
+/* Colonnes restantes */
+#groupDepositTable th:nth-child(7),
+#groupDepositTable td:nth-child(7),
+#groupDepositTable th:nth-child(8),
+#groupDepositTable td:nth-child(8),
+#groupDepositTable th:nth-child(9),
+#groupDepositTable td:nth-child(9) {
+  min-width: 190px;
+}
+
+/* Champs généraux du tableau */
+#groupDepositTable .field {
+  min-height: 42px;
+  border-radius: 14px;
+}
       
       .topbar {
         align-items: flex-start;
@@ -1371,7 +1491,7 @@ body.fullscreen-open {
     </p>
   </div>
 
-  <div class="table-wrap">
+  <div class="table-wrap fullscreen-table">
   <table id="groupDepositTable">
     <thead>
       <tr>
@@ -1396,7 +1516,13 @@ body.fullscreen-open {
         </td>
 
         <td>
-          <textarea class="field table-field" data-field="members" rows="2" placeholder="Noms des membres"></textarea>
+<div class="student-fields">
+    <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+    <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+    <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+    <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+    <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+  </div>
         </td>
 
         <td>
@@ -1421,7 +1547,7 @@ body.fullscreen-open {
         </td>
 
         <td>
-          <input class="field table-field" data-field="studentCount" type="number" min="1" value="4">
+          <input class="field table-field" data-field="studentCount" type="number" min="1" value="5">
         </td>
 
         <td>
@@ -1441,7 +1567,13 @@ body.fullscreen-open {
         </td>
 
         <td>
-          <textarea class="field table-field" data-field="members" rows="2" placeholder="Noms des membres"></textarea>
+      <div class="student-fields">
+    <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+    <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+    <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+    <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+    <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+  </div>
         </td>
 
         <td>
@@ -1466,7 +1598,7 @@ body.fullscreen-open {
         </td>
 
         <td>
-          <input class="field table-field" data-field="studentCount" type="number" min="1" value="4">
+          <input class="field table-field" data-field="studentCount" type="number" min="1" value="5">
         </td>
 
         <td>
@@ -1486,7 +1618,13 @@ body.fullscreen-open {
         </td>
 
         <td>
-          <textarea class="field table-field" data-field="members" rows="2" placeholder="Noms des membres"></textarea>
+       <div class="student-fields">
+    <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+    <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+    <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+    <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+    <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+  </div>
         </td>
 
         <td>
@@ -1511,7 +1649,7 @@ body.fullscreen-open {
         </td>
 
         <td>
-          <input class="field table-field" data-field="studentCount" type="number" min="1" value="4">
+          <input class="field table-field" data-field="studentCount" type="number" min="1" value="5">
         </td>
 
         <td>
@@ -1531,8 +1669,13 @@ body.fullscreen-open {
         </td>
 
         <td>
-          <textarea class="field table-field" data-field="members" rows="2" placeholder="Noms des membres"></textarea>
-        </td>
+<div class="student-fields">
+    <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+    <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+    <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+    <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+    <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+  </div>        </td>
 
         <td>
           <input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier">
@@ -1556,7 +1699,7 @@ body.fullscreen-open {
         </td>
 
         <td>
-          <input class="field table-field" data-field="studentCount" type="number" min="1" value="4">
+          <input class="field table-field" data-field="studentCount" type="number" min="1" value="5">
         </td>
 
         <td>
@@ -1576,8 +1719,13 @@ body.fullscreen-open {
         </td>
 
         <td>
-          <textarea class="field table-field" data-field="members" rows="2" placeholder="Noms des membres"></textarea>
-        </td>
+<div class="student-fields">
+    <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+    <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+    <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+    <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+    <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+  </div>        </td>
 
         <td>
           <input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier">
@@ -1601,7 +1749,7 @@ body.fullscreen-open {
         </td>
 
         <td>
-          <input class="field table-field" data-field="studentCount" type="number" min="1" value="4">
+          <input class="field table-field" data-field="studentCount" type="number" min="1" value="5">
         </td>
 
         <td>
@@ -1621,8 +1769,13 @@ body.fullscreen-open {
         </td>
 
         <td>
-          <textarea class="field table-field" data-field="members" rows="2" placeholder="Noms des membres"></textarea>
-        </td>
+<div class="student-fields">
+    <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+    <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+    <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+    <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+    <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+  </div>        </td>
 
         <td>
           <input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier">
@@ -1646,7 +1799,7 @@ body.fullscreen-open {
         </td>
 
         <td>
-          <input class="field table-field" data-field="studentCount" type="number" min="1" value="4">
+          <input class="field table-field" data-field="studentCount" type="number" min="1" value="5">
         </td>
 
         <td>
@@ -1660,7 +1813,7 @@ body.fullscreen-open {
     </tbody>
   </table>
 </div>
-
+</article>
               
               <article id="a2-cours" class="sub-page">
                 <div class="back-row">
