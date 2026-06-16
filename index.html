@@ -645,7 +645,97 @@
   white-space: nowrap;
 }
 
-      
+      .fullscreen-subpage.active-page {
+  position: fixed;
+  inset: 18px;
+  z-index: 9998;
+  display: block;
+  overflow: auto;
+  background: var(--white);
+  border-radius: 28px;
+  padding: 28px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.22);
+}
+
+body.fullscreen-open {
+  overflow: hidden;
+}
+
+.fullscreen-header {
+  position: sticky;
+  top: -28px;
+  z-index: 20;
+  background: var(--white);
+  padding: 0 0 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.fullscreen-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+#groupDepositTable {
+  min-width: 1650px;
+  font-size: 14px;
+}
+
+#groupDepositTable th {
+  white-space: nowrap;
+}
+
+#groupDepositTable td {
+  vertical-align: top;
+}
+
+#groupDepositTable .field {
+  width: 100%;
+  min-width: 170px;
+}
+
+#groupDepositTable textarea.field {
+  min-width: 240px;
+}
+
+#groupDepositTable td:first-child,
+#groupDepositTable th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background: #ffffff;
+  box-shadow: 8px 0 16px rgba(0, 0, 0, 0.04);
+}
+
+.table-wrap.fullscreen-table {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: #ffffff;
+}
+
+.table-help {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 8px 0 16px;
+}
+
+.date-field {
+  min-width: 155px;
+  cursor: pointer;
+}
+
+.date-field::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+#groupDepositTable input[type="date"] {
+  background: #ffffff;
+}
       
       .topbar {
         align-items: flex-start;
@@ -1167,13 +1257,23 @@
   </div>
 </article>
               
-<article id="a1-groupe" class="sub-page">
-  <div class="back-row">
-    <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
+<article id="a1-groupe" class="sub-page fullscreen-subpage">
+<div class="fullscreen-header">
+  <div class="fullscreen-actions">
+    <div>
+      <p class="eyebrow">Activité 1 — Répartition</p>
+      <h2>👥 Répartition GROUPE et Dépôt (1)</h2>
+    </div>
+
+    <button class="btn secondary" type="button" onclick="closeCoursePages()">
+      ← Fermer la page
+    </button>
   </div>
 
-  <p class="eyebrow">Activité 1 — Répartition</p>
-  <h2>👥 Répartition GROUPE et Dépôt (1)</h2>
+  <p class="table-help">
+    Le tableau est en pleine page. Faites défiler horizontalement pour voir toutes les colonnes.
+  </p>
+</div>
 
   <div class="callout">
     <p><strong>Consigne</strong></p>
@@ -1216,7 +1316,7 @@
         </td>
 
         <td>
-          <span class="date-fixed" data-field="depositDate">Automatique</span>
+  <input class="field table-field date-field" data-field="depositDate" type="date">
         </td>
 
         <td>
@@ -1229,7 +1329,7 @@
         </td>
 
         <td>
-          <span class="date-fixed">18 juin 2026</span>
+  <input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18">
         </td>
 
         <td>
@@ -1261,7 +1361,7 @@
         </td>
 
         <td>
-          <span class="date-fixed" data-field="depositDate">Automatique</span>
+  <input class="field table-field date-field" data-field="depositDate" type="date">
         </td>
 
         <td>
@@ -1274,7 +1374,7 @@
         </td>
 
         <td>
-          <span class="date-fixed">18 juin 2026</span>
+  <input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18">
         </td>
 
         <td>
@@ -1306,7 +1406,7 @@
         </td>
 
         <td>
-          <span class="date-fixed" data-field="depositDate">Automatique</span>
+  <input class="field table-field date-field" data-field="depositDate" type="date">
         </td>
 
         <td>
@@ -1319,7 +1419,7 @@
         </td>
 
         <td>
-          <span class="date-fixed">18 juin 2026</span>
+  <input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18">
         </td>
 
         <td>
@@ -1351,7 +1451,7 @@
         </td>
 
         <td>
-          <span class="date-fixed" data-field="depositDate">Automatique</span>
+  <input class="field table-field date-field" data-field="depositDate" type="date">
         </td>
 
         <td>
@@ -1364,7 +1464,7 @@
         </td>
 
         <td>
-          <span class="date-fixed">18 juin 2026</span>
+  <input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18">
         </td>
 
         <td>
@@ -1396,7 +1496,7 @@
         </td>
 
         <td>
-          <span class="date-fixed" data-field="depositDate">Automatique</span>
+  <input class="field table-field date-field" data-field="depositDate" type="date">
         </td>
 
         <td>
@@ -1409,7 +1509,7 @@
         </td>
 
         <td>
-          <span class="date-fixed">18 juin 2026</span>
+  <input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18">
         </td>
 
         <td>
@@ -1441,7 +1541,7 @@
         </td>
 
         <td>
-          <span class="date-fixed" data-field="depositDate">Automatique</span>
+  <input class="field table-field date-field" data-field="depositDate" type="date">
         </td>
 
         <td>
@@ -1454,7 +1554,7 @@
         </td>
 
         <td>
-          <span class="date-fixed">18 juin 2026</span>
+  <input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18">
         </td>
 
         <td>
@@ -2143,7 +2243,6 @@
 
 function saveGroupDepositTable() {
   const rows = document.querySelectorAll("#groupDepositTable tbody tr");
-
   const data = [];
 
   rows.forEach(row => {
@@ -2151,8 +2250,7 @@ function saveGroupDepositTable() {
     const fields = row.querySelectorAll(".table-field");
 
     const rowData = {
-      group: groupNumber,
-      depositDate: row.querySelector('[data-field="depositDate"]')?.textContent || "Automatique"
+      group: groupNumber
     };
 
     fields.forEach(field => {
@@ -2188,32 +2286,6 @@ function loadGroupDepositTable() {
         field.value = rowData[field.dataset.field];
       }
     });
-
-    const depositDate = row.querySelector('[data-field="depositDate"]');
-
-    if (depositDate && rowData.depositDate) {
-      depositDate.textContent = rowData.depositDate;
-    }
-  });
-}
-
-function setAutomaticDepositDate(row) {
-  const depositDate = row.querySelector('[data-field="depositDate"]');
-
-  if (!depositDate) {
-    return;
-  }
-
-  if (depositDate.textContent !== "Automatique") {
-    return;
-  }
-
-  const today = new Date();
-
-  depositDate.textContent = today.toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric"
   });
 }
 
@@ -2223,24 +2295,23 @@ function initGroupDepositTable() {
   const fields = document.querySelectorAll("#groupDepositTable .table-field");
 
   fields.forEach(field => {
-    field.addEventListener("input", function() {
-      const row = field.closest("tr");
+    field.addEventListener("input", saveGroupDepositTable);
+    field.addEventListener("change", saveGroupDepositTable);
+  });
 
-      if (row) {
-        setAutomaticDepositDate(row);
+  const dateFields = document.querySelectorAll('#groupDepositTable input[type="date"]');
+
+  dateFields.forEach(dateField => {
+    dateField.addEventListener("click", function() {
+      if (dateField.showPicker) {
+        dateField.showPicker();
       }
-
-      saveGroupDepositTable();
     });
 
-    field.addEventListener("change", function() {
-      const row = field.closest("tr");
-
-      if (row) {
-        setAutomaticDepositDate(row);
+    dateField.addEventListener("focus", function() {
+      if (dateField.showPicker) {
+        dateField.showPicker();
       }
-
-      saveGroupDepositTable();
     });
   });
 }
