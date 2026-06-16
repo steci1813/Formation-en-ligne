@@ -1377,6 +1377,96 @@
       margin-top: 8px;
     }
 
+
+    /* Messagerie pédagogique */
+    .message-layout {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .message-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 18px;
+      margin: 14px 0;
+      box-shadow: 0 10px 28px rgba(15, 87, 72, 0.04);
+    }
+
+    .message-card.unread {
+      border-color: rgba(15, 87, 72, 0.35);
+      background: #f4fbf8;
+    }
+
+    .message-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 8px 0 12px;
+    }
+
+    .message-pill {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      border-radius: 999px;
+      padding: 6px 11px;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .message-pill.warning {
+      background: #fff7ed;
+      color: #b54708;
+    }
+
+    .message-pill.danger {
+      background: #fee4e2;
+      color: #b42318;
+    }
+
+    .message-thread-box {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      margin-top: 12px;
+    }
+
+    .message-thread-box.reply {
+      background: #f4fbf8;
+      border-color: rgba(15, 87, 72, 0.20);
+    }
+
+    .message-table {
+      min-width: 1250px;
+    }
+
+    .message-table textarea {
+      min-width: 260px;
+    }
+
+    .message-empty {
+      padding: 18px;
+      border-radius: 20px;
+      background: #f9fafb;
+      border: 1px dashed var(--border);
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 940px) {
+      .message-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (max-width: 940px) {
       .hero-grid,
       .layout,
@@ -1449,6 +1539,9 @@
                 <button class="btn secondary" type="button" onclick="document.getElementById('activites').scrollIntoView({ behavior: 'smooth' })">
                   📝 Accéder aux QCM
                 </button>
+                <button class="btn secondary" type="button" onclick="openCoursePage('student-messages')">
+                  💬 Contacter l’enseignant
+                </button>
               </div>
             </div>
 
@@ -1470,6 +1563,7 @@
             <a href="#introduction">Introduction</a>
             <a href="#activites">Activités</a>
             <button type="button" onclick="document.getElementById('activites').scrollIntoView({ behavior: 'smooth' })">📝 Accéder aux QCM</button>
+            <button type="button" onclick="openCoursePage('student-messages')">💬 Contacter l’enseignant</button>
             <button type="button" data-admin-trigger>Gestion des dépôts</button>
             <button class="btn" type="button" onclick="openCoursePage('final-exam')">
   🧾 Examen final
@@ -1601,6 +1695,63 @@
                 </article>
               </div>
             </section>
+
+              <article id="student-messages" class="sub-page">
+                <div class="fullscreen-header">
+                  <div class="fullscreen-actions">
+                    <div>
+                      <p class="eyebrow">Messagerie élève</p>
+                      <h2>💬 Contacter l’enseignant</h2>
+                    </div>
+                    <button class="btn secondary" type="button" onclick="closeCoursePages()">← Fermer la page</button>
+                  </div>
+                </div>
+
+                <div class="message-layout">
+                  <section class="card">
+                    <p class="eyebrow">Nouveau message</p>
+                    <h2>Écrire à l’enseignant</h2>
+
+                    <div id="studentMessageNotice" class="callout" style="display:none;"></div>
+
+                    <form id="studentMessageForm" onsubmit="sendStudentMessage(event)">
+                      <label for="studentMessageName">Nom complet</label>
+                      <input id="studentMessageName" class="field" type="text" placeholder="Votre nom complet" required>
+
+                      <label for="studentMessageGroup">Groupe</label>
+                      <select id="studentMessageGroup" class="field" required>
+                        <option value="">Sélectionner votre groupe</option>
+                        <option value="1">Groupe 1</option>
+                        <option value="2">Groupe 2</option>
+                        <option value="3">Groupe 3</option>
+                        <option value="4">Groupe 4</option>
+                        <option value="5">Groupe 5</option>
+                        <option value="6">Groupe 6</option>
+                      </select>
+
+                      <label for="studentMessageSubject">Sujet</label>
+                      <input id="studentMessageSubject" class="field" type="text" placeholder="Ex : Question sur le QCM 2" required>
+
+                      <label for="studentMessageContent">Message</label>
+                      <textarea id="studentMessageContent" class="field" rows="7" placeholder="Écrivez votre message ici..." required></textarea>
+
+                      <div class="page-actions">
+                        <button class="btn" type="submit">📨 Envoyer le message</button>
+                        <button class="btn secondary" type="button" onclick="loadStudentMessages()">🔄 Actualiser mes messages</button>
+                      </div>
+                    </form>
+                  </section>
+
+                  <section class="card">
+                    <p class="eyebrow">Mes messages</p>
+                    <h2>Réponses de l’enseignant</h2>
+
+                    <div id="studentMessagesList">
+                      <div class="message-empty">Aucun message chargé.</div>
+                    </div>
+                  </section>
+                </div>
+              </article>
 
             <section id="pagesActivites" class="page-stack">
               <article id="a1-cours" class="sub-page">
@@ -2145,14 +2296,13 @@
 
       <section id="adminView" class="view">
         <section class="hero">
-          <p class="eyebrow">Gestion des dépôts</p>
-          <h1>Tableau de réception</h1>
+          <p class="eyebrow">Gestion pédagogique</p>
+          <h1>Dépôts et messages</h1>
           <p class="lead">
-            Les élèves envoient leurs dépôts depuis les boutons “Envoyer mon dépôt”.
-            Chaque dépôt est enregistré dans Supabase, puis apparaît ici pour suivi, correction et validation.
+            Les QCM, dépôts existants et messages élèves sont centralisés ici pour le suivi pédagogique.
           </p>
           <div class="page-actions">
-            <button class="btn" type="button" onclick="loadAdminDashboard()">🔄 Actualiser les dépôts</button>
+            <button class="btn" type="button" onclick="loadAdminDashboard(); loadAdminMessages();">🔄 Actualiser tout</button>
             <button class="btn secondary" type="button" onclick="showStudentView(document.querySelector('.nav-link'))">Retour espace élève</button>
           </div>
         </section>
@@ -2198,6 +2348,40 @@
             </table>
           </div>
         </section>
+
+        <section class="card" style="margin-top: 24px;">
+          <p class="eyebrow">Messages reçus</p>
+          <h2>Boîte de réception pédagogique</h2>
+
+          <div class="page-actions">
+            <button class="btn" type="button" onclick="loadAdminMessages()">🔄 Actualiser les messages</button>
+          </div>
+
+          <div id="adminMessagesError" class="callout warning" style="display:none;"></div>
+
+          <div class="table-wrap">
+            <table class="message-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Élève</th>
+                  <th>Groupe</th>
+                  <th>Sujet</th>
+                  <th>Message</th>
+                  <th>Statut</th>
+                  <th>Réponse admin</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminMessagesBody">
+                <tr>
+                  <td colspan="8">Aucun message chargé.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
       </section>
       <article id="final-exam" class="sub-page">
   <div class="fullscreen-header">
@@ -2489,6 +2673,7 @@
 
       window.scrollTo({ top: 0, behavior: "smooth" });
       loadAdminDashboard();
+      loadAdminMessages();
     }
 
     function openCoursePage(pageId) {
@@ -2503,6 +2688,11 @@
       if (selectedPage) {
         selectedPage.classList.add("active-page");
         document.body.classList.add("fullscreen-open");
+
+        if (pageId === "student-messages") {
+          hydrateStudentMessageForm();
+          loadStudentMessages();
+        }
       }
     }
 
@@ -2918,6 +3108,266 @@
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
     }
+
+
+    /* ======================================================
+       MESSAGERIE PÉDAGOGIQUE
+       Élève → Admin / Admin → Élève
+       ====================================================== */
+
+    function getMessageStatusLabel(status) {
+      if (status === "Répondu") return `<span class="message-pill">Répondu</span>`;
+      if (status === "Fermé") return `<span class="message-pill danger">Fermé</span>`;
+      return `<span class="message-pill warning">Nouveau</span>`;
+    }
+
+    function hydrateStudentMessageForm() {
+      const nameInput = document.getElementById("studentMessageName");
+      const groupInput = document.getElementById("studentMessageGroup");
+
+      if (nameInput && !nameInput.value) {
+        nameInput.value = currentProfile?.full_name || currentProfile?.email || "";
+      }
+
+      const storedGroup = localStorage.getItem("student_default_group");
+      if (groupInput && storedGroup && !groupInput.value) {
+        groupInput.value = storedGroup;
+      }
+    }
+
+    async function sendStudentMessage(event) {
+      event.preventDefault();
+
+      const { data } = await supabaseClient.auth.getUser();
+
+      if (!data.user) {
+        alert("Vous devez être connecté pour envoyer un message.");
+        return;
+      }
+
+      if (!currentProfile) {
+        await loadCurrentProfile();
+      }
+
+      const notice = document.getElementById("studentMessageNotice");
+      const name = document.getElementById("studentMessageName").value.trim();
+      const groupNumber = document.getElementById("studentMessageGroup").value;
+      const subject = document.getElementById("studentMessageSubject").value.trim();
+      const message = document.getElementById("studentMessageContent").value.trim();
+
+      if (!name || !groupNumber || !subject || !message) {
+        alert("Veuillez remplir tous les champs.");
+        return;
+      }
+
+      localStorage.setItem("student_default_group", groupNumber);
+
+      const { error } = await supabaseClient
+        .from("course_messages")
+        .insert({
+          student_id: data.user.id,
+          student_email: data.user.email,
+          student_name: name,
+          group_number: Number(groupNumber),
+          subject: subject,
+          message: message,
+          status: "Nouveau",
+          admin_read: false,
+          student_read: true
+        });
+
+      if (error) {
+        console.error("Erreur envoi message :", error);
+        if (notice) {
+          notice.className = "callout warning";
+          notice.style.display = "block";
+          notice.innerHTML = `
+            <p><strong>Erreur.</strong></p>
+            <p>Le message n’a pas été envoyé. Vérifiez que la table <code>course_messages</code> existe dans Supabase.</p>
+          `;
+        }
+        return;
+      }
+
+      document.getElementById("studentMessageSubject").value = "";
+      document.getElementById("studentMessageContent").value = "";
+
+      if (notice) {
+        notice.className = "callout";
+        notice.style.display = "block";
+        notice.innerHTML = `<p><strong>Message envoyé.</strong> L’enseignant le verra dans sa boîte de réception.</p>`;
+      }
+
+      loadStudentMessages();
+    }
+
+    async function loadStudentMessages() {
+      const list = document.getElementById("studentMessagesList");
+      if (!list) return;
+
+      const { data: userData } = await supabaseClient.auth.getUser();
+
+      if (!userData.user) {
+        list.innerHTML = `<div class="message-empty">Connectez-vous pour voir vos messages.</div>`;
+        return;
+      }
+
+      list.innerHTML = `<div class="message-empty">Chargement des messages...</div>`;
+
+      const { data, error } = await supabaseClient
+        .from("course_messages")
+        .select("*")
+        .eq("student_id", userData.user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Erreur chargement messages élève :", error);
+        list.innerHTML = `<div class="message-empty">Impossible de charger vos messages. Vérifiez Supabase.</div>`;
+        return;
+      }
+
+      if (!data.length) {
+        list.innerHTML = `<div class="message-empty">Vous n’avez pas encore envoyé de message.</div>`;
+        return;
+      }
+
+      list.innerHTML = data.map(item => renderStudentMessageCard(item)).join("");
+    }
+
+    function renderStudentMessageCard(item) {
+      const date = item.created_at ? formatDateTime(item.created_at) : "-";
+      const repliedDate = item.replied_at ? formatDateTime(item.replied_at) : "";
+
+      return `
+        <article class="message-card ${item.admin_reply ? "unread" : ""}">
+          <div class="message-meta">
+            ${getMessageStatusLabel(item.status)}
+            <span class="message-pill">Groupe ${item.group_number || "-"}</span>
+            <span class="muted">${date}</span>
+          </div>
+
+          <h3>${escapeHtml(item.subject || "Sans sujet")}</h3>
+
+          <div class="message-thread-box">
+            <strong>Votre message</strong>
+            <p>${escapeHtml(item.message || "").replaceAll("\n", "<br>")}</p>
+          </div>
+
+          <div class="message-thread-box reply">
+            <strong>Réponse de l’enseignant</strong>
+            ${
+              item.admin_reply
+                ? `<p>${escapeHtml(item.admin_reply).replaceAll("\n", "<br>")}</p><p class="muted">Répondu le ${repliedDate}</p>`
+                : `<p class="muted">Pas encore de réponse.</p>`
+            }
+          </div>
+        </article>
+      `;
+    }
+
+    async function loadAdminMessages() {
+      const body = document.getElementById("adminMessagesBody");
+      const errorBox = document.getElementById("adminMessagesError");
+
+      if (!body) return;
+
+      if (errorBox) {
+        errorBox.style.display = "none";
+        errorBox.innerHTML = "";
+      }
+
+      body.innerHTML = `<tr><td colspan="8">Chargement des messages...</td></tr>`;
+
+      const { data, error } = await supabaseClient
+        .from("course_messages")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Erreur chargement messages admin :", error);
+        body.innerHTML = `<tr><td colspan="8">Impossible de charger les messages.</td></tr>`;
+        if (errorBox) {
+          errorBox.style.display = "block";
+          errorBox.innerHTML = `
+            <p><strong>Erreur Supabase.</strong></p>
+            <p>Vérifiez que la table <code>course_messages</code> et les politiques RLS sont bien créées.</p>
+          `;
+        }
+        return;
+      }
+
+      if (!data.length) {
+        body.innerHTML = `<tr><td colspan="8">Aucun message reçu pour le moment.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = data.map(item => renderAdminMessageRow(item)).join("");
+    }
+
+    function renderAdminMessageRow(item) {
+      const date = item.created_at ? formatDateTime(item.created_at) : "-";
+
+      return `
+        <tr data-message-id="${item.id}">
+          <td>${date}</td>
+          <td>
+            <strong>${escapeHtml(item.student_name || "-")}</strong><br>
+            <span class="muted">${escapeHtml(item.student_email || "")}</span>
+          </td>
+          <td>Groupe ${item.group_number || "-"}</td>
+          <td>${escapeHtml(item.subject || "-")}</td>
+          <td>${escapeHtml(item.message || "-").replaceAll("\n", "<br>")}</td>
+          <td>
+            <select class="field" data-message-field="status">
+              ${["Nouveau", "Répondu", "Fermé"].map(status => `
+                <option value="${status}" ${item.status === status ? "selected" : ""}>${status}</option>
+              `).join("")}
+            </select>
+          </td>
+          <td>
+            <textarea class="field" data-message-field="admin_reply" rows="4" placeholder="Réponse à l’élève">${escapeHtml(item.admin_reply || "")}</textarea>
+          </td>
+          <td>
+            <button class="btn" type="button" onclick="saveAdminMessageReply('${item.id}')">Répondre</button>
+          </td>
+        </tr>
+      `;
+    }
+
+    async function saveAdminMessageReply(id) {
+      const row = document.querySelector(`tr[data-message-id="${id}"]`);
+      if (!row) return;
+
+      const status = row.querySelector('[data-message-field="status"]').value;
+      const reply = row.querySelector('[data-message-field="admin_reply"]').value.trim();
+
+      const payload = {
+        status: reply ? "Répondu" : status,
+        admin_reply: reply || null,
+        admin_read: true,
+        student_read: false,
+        updated_at: new Date().toISOString()
+      };
+
+      if (reply) {
+        payload.replied_at = new Date().toISOString();
+      }
+
+      const { error } = await supabaseClient
+        .from("course_messages")
+        .update(payload)
+        .eq("id", id);
+
+      if (error) {
+        console.error("Erreur réponse admin :", error);
+        alert("Erreur : réponse non enregistrée.");
+        return;
+      }
+
+      alert("Réponse envoyée à l’élève.");
+      loadAdminMessages();
+    }
+
 
     async function logout() {
       await supabaseClient.auth.signOut();
