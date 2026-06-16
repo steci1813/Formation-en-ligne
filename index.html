@@ -57,7 +57,7 @@
       position: sticky;
       top: 14px;
       z-index: 50;
-      background: rgba(255,255,255,0.92);
+      background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(14px);
       border: 1px solid rgba(15, 87, 72, 0.12);
       border-radius: 24px;
@@ -195,10 +195,11 @@
       box-shadow: var(--shadow);
     }
 
-    .video-box iframe {
+    .video-box video {
       width: 100%;
       height: 100%;
-      border: 0;
+      object-fit: cover;
+      display: block;
     }
 
     .layout {
@@ -250,12 +251,21 @@
       gap: 24px;
     }
 
-    .card {
+    .card,
+    .sub-page {
       background: var(--white);
       border-radius: 28px;
       padding: 28px;
       border: 1px solid rgba(15, 87, 72, 0.12);
       box-shadow: var(--shadow);
+    }
+
+    .sub-page {
+      display: none;
+    }
+
+    .sub-page.active-page {
+      display: block;
     }
 
     .info-grid {
@@ -265,14 +275,20 @@
       margin-top: 20px;
     }
 
-    .info-card {
+    .info-card,
+    .lesson-box,
+    .question-card,
+    .group-card,
+    .group-detail-item {
       background: #f9fafb;
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 18px;
     }
 
-    .info-card strong {
+    .info-card strong,
+    .lesson-box strong,
+    .group-detail-item strong {
       display: block;
       color: var(--green);
       margin-bottom: 6px;
@@ -326,46 +342,6 @@
       margin-top: 0;
     }
 
-    .lesson-image {
-  width: 100%;
-  max-width: 760px;
-  display: block;
-  margin: 22px auto 8px;
-  border-radius: 18px;
-  border: 1px solid var(--border);
-}
-
-.lesson-caption {
-  text-align: center;
-  color: var(--muted);
-  font-size: 14px;
-  margin-bottom: 22px;
-}
-
-.lesson-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  margin: 18px 0;
-}
-
-.lesson-box {
-  background: #f9fafb;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 18px;
-}
-
-.lesson-box strong {
-  color: var(--green);
-}
-
-@media (max-width: 800px) {
-  .lesson-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
     .activity-pages {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -399,17 +375,51 @@
       background: var(--green-soft);
     }
 
-    .sub-page {
-      display: none;
-      background: var(--white);
-      border-radius: 28px;
-      border: 1px solid rgba(15, 87, 72, 0.12);
-      padding: 28px;
-      box-shadow: var(--shadow);
+    .lesson-image {
+      width: 100%;
+      max-width: 760px;
+      display: block;
+      margin: 22px auto 8px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
     }
 
-    .sub-page.active-page {
-      display: block;
+    .lesson-caption {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 22px;
+    }
+
+    .lesson-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin: 18px 0;
+    }
+
+    .question-card {
+      background: #ffffff;
+      margin: 18px 0;
+    }
+
+    .question-card h3 {
+      color: var(--green);
+      margin-bottom: 12px;
+    }
+
+    .answer-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .answer-list li {
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      list-style-position: inside;
     }
 
     .back-row {
@@ -462,29 +472,27 @@
       background: #f9fafb;
     }
 
-    .tag {
+    .tag,
+    .status-pill {
       display: inline-flex;
+      width: fit-content;
+      align-items: center;
       border-radius: 999px;
-      padding: 5px 10px;
+      padding: 6px 12px;
       background: var(--green-soft);
       color: var(--green);
       font-size: 13px;
       font-weight: 900;
     }
 
-    .admin-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-
     .field {
       width: 100%;
       border: 1px solid #d0d5dd;
       border-radius: 14px;
-      padding: 13px;
+      padding: 12px 14px;
       font: inherit;
       margin-top: 7px;
+      background: #ffffff;
     }
 
     label {
@@ -501,6 +509,12 @@
       color: var(--muted);
     }
 
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
     .footer {
       margin-top: 28px;
       color: var(--muted);
@@ -510,10 +524,185 @@
       flex-wrap: wrap;
     }
 
+    /* Pleine page pour la répartition */
+    .fullscreen-subpage.active-page {
+      position: fixed;
+      inset: 18px;
+      z-index: 9998;
+      display: block;
+      overflow: auto;
+      background: var(--white);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.22);
+    }
+
+    body.fullscreen-open {
+      overflow: hidden;
+    }
+
+    .fullscreen-header {
+      position: sticky;
+      top: -28px;
+      z-index: 20;
+      background: var(--white);
+      padding: 0 0 18px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .fullscreen-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .table-help {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 8px 0 16px;
+    }
+
+    .table-wrap.fullscreen-table {
+      max-width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: #ffffff;
+    }
+
+    #groupDepositTable {
+      min-width: 2100px;
+      font-size: 14px;
+    }
+
+    #groupDepositTable th,
+    #groupDepositTable td {
+      padding: 16px;
+      vertical-align: top;
+    }
+
+    #groupDepositTable th {
+      white-space: nowrap;
+    }
+
+    #groupDepositTable td:first-child,
+    #groupDepositTable th:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 10;
+      background: #ffffff;
+      box-shadow: 8px 0 16px rgba(0, 0, 0, 0.04);
+    }
+
+    #groupDepositTable th:nth-child(1),
+    #groupDepositTable td:nth-child(1) {
+      min-width: 145px;
+    }
+
+    #groupDepositTable th:nth-child(2),
+    #groupDepositTable td:nth-child(2) {
+      min-width: 360px;
+    }
+
+    #groupDepositTable th:nth-child(3),
+    #groupDepositTable td:nth-child(3) {
+      min-width: 320px;
+    }
+
+    #groupDepositTable th:nth-child(4),
+    #groupDepositTable td:nth-child(4),
+    #groupDepositTable th:nth-child(6),
+    #groupDepositTable td:nth-child(6) {
+      min-width: 190px;
+    }
+
+    #groupDepositTable th:nth-child(5),
+    #groupDepositTable td:nth-child(5) {
+      min-width: 190px;
+    }
+
+    #groupDepositTable th:nth-child(7),
+    #groupDepositTable td:nth-child(7),
+    #groupDepositTable th:nth-child(8),
+    #groupDepositTable td:nth-child(8),
+    #groupDepositTable th:nth-child(9),
+    #groupDepositTable td:nth-child(9) {
+      min-width: 190px;
+    }
+
+    #groupDepositTable .field {
+      min-height: 42px;
+      margin-top: 0;
+      border-radius: 14px;
+    }
+
+    .student-fields {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      min-width: 330px;
+    }
+
+    .student-name-field {
+      width: 100%;
+      min-width: 320px;
+      height: 42px;
+      font-size: 14px;
+      padding: 10px 12px;
+    }
+
+    .date-field {
+      min-width: 155px;
+      cursor: pointer;
+    }
+
+    .date-field::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+    }
+
+    .group-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 22px 0;
+    }
+
+    .group-card h3 {
+      margin-top: 0;
+      color: var(--green);
+    }
+
+    .group-meta {
+      display: grid;
+      gap: 8px;
+      margin: 14px 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .group-meta strong {
+      color: var(--text);
+    }
+
+    .group-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin: 20px 0;
+    }
+
     @media (max-width: 940px) {
       .hero-grid,
       .layout,
-      .admin-grid {
+      .admin-grid,
+      .info-grid,
+      .activity-pages,
+      .lesson-grid,
+      .group-grid,
+      .group-detail-grid {
         grid-template-columns: 1fr;
       }
 
@@ -521,433 +710,15 @@
         position: static;
       }
 
-      .info-grid,
-      .activity-pages {
-        grid-template-columns: 1fr;
-      }
-
-.question-card {
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: 22px;
-  padding: 22px;
-  margin: 18px 0;
-}
-
-.question-card h3 {
-  color: var(--green);
-  margin-bottom: 12px;
-}
-
-.answer-list {
-  display: grid;
-  gap: 10px;
-  margin-top: 14px;
-}
-
-.answer-list li {
-  background: #f9fafb;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 12px 14px;
-  list-style-position: inside;
-}
-
-      .group-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin: 22px 0;
-}
-
-.group-card {
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: 22px;
-  padding: 20px;
-  box-shadow: var(--shadow);
-}
-
-.group-card h3 {
-  margin-top: 0;
-  color: var(--green);
-}
-
-.group-meta {
-  display: grid;
-  gap: 8px;
-  margin: 14px 0;
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.group-meta strong {
-  color: var(--text);
-}
-
-.status-pill {
-  display: inline-flex;
-  width: fit-content;
-  align-items: center;
-  border-radius: 999px;
-  padding: 6px 12px;
-  background: var(--green-soft);
-  color: var(--green);
-  font-weight: 900;
-  font-size: 13px;
-}
-
-.group-detail-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  margin: 20px 0;
-}
-
-.group-detail-item {
-  background: #f9fafb;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 16px;
-}
-
-.group-detail-item strong {
-  display: block;
-  color: var(--green);
-  margin-bottom: 6px;
-}
-
-@media (max-width: 900px) {
-  .group-grid,
-  .group-detail-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.table-field {
-  min-width: 150px;
-  margin-top: 0;
-}
-
-#groupDepositTable textarea.table-field {
-  min-width: 220px;
-}
-
-.date-fixed {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 8px 10px;
-  border-radius: 12px;
-  background: #f9fafb;
-  color: var(--muted);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-      .fullscreen-subpage.active-page {
-  position: fixed;
-  inset: 18px;
-  z-index: 9998;
-  display: block;
-  overflow: auto;
-  background: var(--white);
-  border-radius: 28px;
-  padding: 28px;
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.22);
-}
-
-body.fullscreen-open {
-  overflow: hidden;
-}
-
-.fullscreen-header {
-  position: sticky;
-  top: -28px;
-  z-index: 20;
-  background: var(--white);
-  padding: 0 0 18px;
-  margin-bottom: 18px;
-  border-bottom: 1px solid var(--border);
-}
-
-.fullscreen-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-#groupDepositTable {
-  min-width: 1650px;
-  font-size: 14px;
-}
-
-#groupDepositTable th {
-  white-space: nowrap;
-}
-
-#groupDepositTable td {
-  vertical-align: top;
-}
-
-#groupDepositTable .field {
-  width: 100%;
-  min-width: 170px;
-}
-
-#groupDepositTable textarea.field {
-  min-width: 240px;
-}
-
-#groupDepositTable td:first-child,
-#groupDepositTable th:first-child {
-  position: sticky;
-  left: 0;
-  z-index: 10;
-  background: #ffffff;
-  box-shadow: 8px 0 16px rgba(0, 0, 0, 0.04);
-}
-
-.table-wrap.fullscreen-table {
-  max-width: 100%;
-  overflow-x: auto;
-  border: 1px solid var(--border);
-  border-radius: 22px;
-  background: #ffffff;
-}
-
-.table-help {
-  color: var(--muted);
-  font-size: 14px;
-  margin: 8px 0 16px;
-}
-
-.date-field {
-  min-width: 155px;
-  cursor: pointer;
-}
-
-.date-field::-webkit-calendar-picker-indicator {
-  cursor: pointer;
-}
-
-#groupDepositTable input[type="date"] {
-  background: #ffffff;
-}
-
-      /* Agrandir les colonnes importantes du tableau Répartition */
-#groupDepositTable {
-  min-width: 2300px;
-}
-
-/* Colonne Groupe */
-#groupDepositTable th:nth-child(1),
-#groupDepositTable td:nth-child(1) {
-  min-width: 150px;
-}
-
-/* Colonne Membre du groupe */
-#groupDepositTable th:nth-child(2),
-#groupDepositTable td:nth-child(2) {
-  min-width: 420px;
-}
-
-/* Champ membre du groupe */
-#groupDepositTable td:nth-child(2) textarea {
-  min-width: 390px;
-  width: 100%;
-  min-height: 95px;
-  font-size: 15px;
-  line-height: 1.5;
-}
-
-/* Colonne Fichier */
-#groupDepositTable th:nth-child(3),
-#groupDepositTable td:nth-child(3) {
-  min-width: 380px;
-}
-
-/* Champ fichier */
-#groupDepositTable td:nth-child(3) input {
-  min-width: 350px;
-  width: 100%;
-  font-size: 15px;
-}
-
-/* Colonne Date dépôt */
-#groupDepositTable th:nth-child(4),
-#groupDepositTable td:nth-child(4) {
-  min-width: 190px;
-}
-
-/* Colonne Status */
-#groupDepositTable th:nth-child(5),
-#groupDepositTable td:nth-child(5) {
-  min-width: 220px;
-}
-
-/* Champ statut */
-#groupDepositTable td:nth-child(5) select {
-  min-width: 190px;
-  width: 100%;
-  font-size: 15px;
-  font-weight: 700;
-}
-
-/* Colonne Date échéance */
-#groupDepositTable th:nth-child(6),
-#groupDepositTable td:nth-child(6) {
-  min-width: 190px;
-}
-
-/* Colonnes restantes */
-#groupDepositTable th:nth-child(7),
-#groupDepositTable td:nth-child(7),
-#groupDepositTable th:nth-child(8),
-#groupDepositTable td:nth-child(8),
-#groupDepositTable th:nth-child(9),
-#groupDepositTable td:nth-child(9) {
-  min-width: 210px;
-}
-
-/* Amélioration générale des champs du tableau */
-#groupDepositTable .field {
-  min-height: 48px;
-  padding: 12px 14px;
-  border-radius: 14px;
-}
-
-/* Les cellules respirent mieux */
-#groupDepositTable th,
-#groupDepositTable td {
-  padding: 16px;
-}
-
-      /* Correction affichage pleine page sur ordinateur */
-.fullscreen-subpage.active-page {
-  position: fixed;
-  inset: 18px;
-  z-index: 9998;
-  display: block;
-  overflow: auto;
-  background: var(--white);
-  border-radius: 28px;
-  padding: 28px;
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.22);
-}
-
-body.fullscreen-open {
-  overflow: hidden;
-}
-
-.fullscreen-header {
-  position: sticky;
-  top: -28px;
-  z-index: 20;
-  background: var(--white);
-  padding: 0 0 18px;
-  margin-bottom: 18px;
-  border-bottom: 1px solid var(--border);
-}
-
-.table-wrap.fullscreen-table {
-  max-width: 100%;
-  overflow-x: auto;
-  border: 1px solid var(--border);
-  border-radius: 22px;
-  background: #ffffff;
-}
-
-/* Tableau plus lisible */
-#groupDepositTable {
-  min-width: 2100px;
-  font-size: 14px;
-}
-
-#groupDepositTable th,
-#groupDepositTable td {
-  padding: 16px;
-  vertical-align: top;
-}
-
-/* Colonne Groupe */
-#groupDepositTable th:nth-child(1),
-#groupDepositTable td:nth-child(1) {
-  min-width: 145px;
-}
-
-/* Colonne Membres */
-#groupDepositTable th:nth-child(2),
-#groupDepositTable td:nth-child(2) {
-  min-width: 360px;
-}
-
-/* 5 champs étudiants propres */
-.student-fields {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-  min-width: 330px;
-}
-
-.student-name-field {
-  width: 100%;
-  min-width: 320px;
-  height: 42px;
-  margin-top: 0;
-  font-size: 14px;
-  padding: 10px 12px;
-}
-
-/* Colonne Fichier */
-#groupDepositTable th:nth-child(3),
-#groupDepositTable td:nth-child(3) {
-  min-width: 320px;
-}
-
-#groupDepositTable td:nth-child(3) input {
-  min-width: 290px;
-}
-
-/* Dates */
-#groupDepositTable th:nth-child(4),
-#groupDepositTable td:nth-child(4),
-#groupDepositTable th:nth-child(6),
-#groupDepositTable td:nth-child(6) {
-  min-width: 190px;
-}
-
-/* Statut */
-#groupDepositTable th:nth-child(5),
-#groupDepositTable td:nth-child(5) {
-  min-width: 190px;
-}
-
-#groupDepositTable td:nth-child(5) select {
-  min-width: 160px;
-}
-
-/* Colonnes restantes */
-#groupDepositTable th:nth-child(7),
-#groupDepositTable td:nth-child(7),
-#groupDepositTable th:nth-child(8),
-#groupDepositTable td:nth-child(8),
-#groupDepositTable th:nth-child(9),
-#groupDepositTable td:nth-child(9) {
-  min-width: 190px;
-}
-
-/* Champs généraux du tableau */
-#groupDepositTable .field {
-  min-height: 42px;
-  border-radius: 14px;
-}
-      
       .topbar {
         align-items: flex-start;
         flex-direction: column;
+      }
+
+      .fullscreen-subpage.active-page {
+        inset: 8px;
+        padding: 18px;
+        border-radius: 22px;
       }
     }
   </style>
@@ -967,17 +738,9 @@ body.fullscreen-open {
       </a>
 
       <nav class="nav">
-        <button class="nav-link active" type="button" onclick="showStudentView(this)">
-          Espace élève
-        </button>
-
-        <button class="nav-link" type="button" data-admin-trigger>
-          Gestion
-        </button>
-
-        <button class="nav-link logout" type="button" onclick="logout()">
-          Déconnexion
-        </button>
+        <button class="nav-link active" type="button" onclick="showStudentView(this)">Espace élève</button>
+        <button class="nav-link" type="button" data-admin-trigger>Gestion</button>
+        <button class="nav-link logout" type="button" onclick="logout()">Déconnexion</button>
       </nav>
     </header>
 
@@ -988,24 +751,20 @@ body.fullscreen-open {
             <div>
               <p class="eyebrow">Cours en ligne</p>
               <h1>📊 Étude de marché</h1>
-
               <p class="lead">
                 Un espace centralisé pour suivre le cours, ouvrir les activités, consulter les exercices,
                 organiser les groupes et déposer les livrables.
               </p>
-
               <button class="btn" type="button" onclick="document.getElementById('activites').scrollIntoView({ behavior: 'smooth' })">
                 Voir les activités
               </button>
             </div>
 
             <div class="video-box">
-         <iframe
-    src="etm.webm"
-    title="Vidéo d’introduction — Étude de marché"
-    allowfullscreen>
-  </iframe>
-
+              <video controls>
+                <source src="etm.webm" type="video/webm">
+                Votre navigateur ne supporte pas la lecture vidéo.
+              </video>
             </div>
           </div>
         </section>
@@ -1013,16 +772,12 @@ body.fullscreen-open {
         <div class="layout">
           <aside class="sidebar">
             <div class="sidebar-title">Navigation</div>
-
             <a href="#informations">Informations générales</a>
             <a href="#objectifs">Objectifs d’apprentissage</a>
             <a href="#materiel">Matériel nécessaire</a>
             <a href="#introduction">Introduction</a>
             <a href="#activites">Activités</a>
-
-            <button type="button" data-admin-trigger>
-              Gestion
-            </button>
+            <button type="button" data-admin-trigger>Gestion</button>
           </aside>
 
           <div class="page-stack">
@@ -1031,37 +786,15 @@ body.fullscreen-open {
               <h2>Présentation du cours</h2>
 
               <div class="info-grid">
-                <div class="info-card">
-                  <strong>Date</strong>
-                  <span>26-08-2024</span>
-                </div>
-
-                <div class="info-card">
-                  <strong>Durée</strong>
-                  <span>30 heures</span>
-                </div>
-
-                <div class="info-card">
-                  <strong>Niveau</strong>
-                  <span>L3</span>
-                </div>
+                <div class="info-card"><strong>Date</strong><span>26-08-2024</span></div>
+                <div class="info-card"><strong>Durée</strong><span>30 heures</span></div>
+                <div class="info-card"><strong>Niveau</strong><span>L3</span></div>
               </div>
 
               <div class="info-grid">
-                <div class="info-card">
-                  <strong>Titre du cours</strong>
-                  <span>Étude de marché</span>
-                </div>
-
-                <div class="info-card">
-                  <strong>Format</strong>
-                  <span>Formation en ligne</span>
-                </div>
-
-                <div class="info-card">
-                  <strong>Suivi</strong>
-                  <span>Activités, exercices et dépôts</span>
-                </div>
+                <div class="info-card"><strong>Titre du cours</strong><span>Étude de marché</span></div>
+                <div class="info-card"><strong>Format</strong><span>Formation en ligne</span></div>
+                <div class="info-card"><strong>Suivi</strong><span>Activités, exercices et dépôts</span></div>
               </div>
             </section>
 
@@ -1070,17 +803,9 @@ body.fullscreen-open {
               <h2>À la fin du cours, vous saurez :</h2>
 
               <div class="objectives-list">
-                <div class="objective-item">
-                  🎯 Identifier les besoins et préférences des consommateurs cibles
-                </div>
-
-                <div class="objective-item">
-                  📊 Analyser la concurrence et positionner le produit ou service sur le marché
-                </div>
-
-                <div class="objective-item">
-                  💡 Évaluer le potentiel commercial d’un nouveau produit ou service
-                </div>
+                <div class="objective-item">🎯 Identifier les besoins et préférences des consommateurs cibles</div>
+                <div class="objective-item">📊 Analyser la concurrence et positionner le produit ou service sur le marché</div>
+                <div class="objective-item">💡 Évaluer le potentiel commercial d’un nouveau produit ou service</div>
               </div>
             </section>
 
@@ -1111,9 +836,7 @@ body.fullscreen-open {
                 <p><strong>Comment convaincre de la pertinence du Product Market Fit identifié ?</strong></p>
               </div>
 
-              <p>
-                Nous allons voir ensemble comment répondre à ces questions pas à pas, et de manière simple.
-              </p>
+              <p>Nous allons voir ensemble comment répondre à ces questions pas à pas, et de manière simple.</p>
             </section>
 
             <section class="card" id="activites">
@@ -1190,990 +913,525 @@ body.fullscreen-open {
             </section>
 
             <section id="pagesActivites" class="page-stack">
-
-              
-            <article id="a1-cours" class="sub-page">
-  <div class="back-row">
-    <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
-  </div>
-
-  <p class="eyebrow">Activité 1 — Contenu de cours</p>
-  <h2>📘 Réalisez une étude de marché — Partie 1</h2>
-
-  <h3>Exprimez clairement votre besoin : le brief</h3>
-
-  <div class="callout">
-    <p><strong>💡 Tirez le maximum de ce cours</strong></p>
-    <p>
-      Dans ce chapitre, vous allez apprendre à utiliser le brief pour bien lancer un projet d’étude.
-      Le brief, que l’on appelle aussi cahier des charges, constitue la base de votre étude.
-    </p>
-  </div>
-
-  <p>
-    Que vous réalisiez vous-même le travail ou que vous le sous-traitiez, le brief sert de document
-    de référence. À l’origine d’une étude réussie, il y a toujours un brief clair.
-  </p>
-
-  <h3>Les 5 points clés d’un brief de qualité</h3>
-
-  <div class="lesson-grid">
-    <div class="lesson-box">
-      <strong>1. Établir le constat préalable</strong>
-      <p>Décrire le contexte business et marketing de départ.</p>
-    </div>
-
-    <div class="lesson-box">
-      <strong>2. Définir les objectifs</strong>
-      <p>Préciser ce que l’étude doit permettre de comprendre ou de décider.</p>
-    </div>
-
-    <div class="lesson-box">
-      <strong>3. Lister les décisions attendues</strong>
-      <p>Identifier les actions concrètes qui découleront des résultats.</p>
-    </div>
-
-    <div class="lesson-box">
-      <strong>4. Planifier le projet</strong>
-      <p>Prévoir les étapes, les délais, les validations et les contraintes.</p>
-    </div>
-
-    <div class="lesson-box">
-      <strong>5. Poser les questions clés</strong>
-      <p>Anticiper les difficultés, le budget, les cibles et les attentes internes.</p>
-    </div>
-  </div>
-
-  <h3>1. Établissez le constat préalable</h3>
-
-  <p>
-    La première chose à faire pour préparer une étude, c’est un constat business et marketing.
-    Il sert à décrire concrètement le but du projet, en l’ancrant dans la réalité de l’entreprise
-    et du marché.
-  </p>
-
-  <img class="lesson-image" src="image2.jpg" alt="Exemple de shampoing Biolessan">
-  <p class="lesson-caption">Exemple : votre shampoing Biolessan</p>
-
-  <div class="callout">
-    <p>
-      Par exemple, vous êtes analyste marché pour la marque de cosmétique bio Biolessan.
-      Votre constat préalable doit expliquer le contexte du marché, la logique du lancement,
-      le positionnement de l’entreprise et les enjeux stratégiques.
-    </p>
-  </div>
-
-  <ul>
-    <li>Décrire le contexte du marché des shampoings et des cosmétiques bio</li>
-    <li>Résumer la logique du lancement</li>
-    <li>Aborder le positionnement de l’entreprise</li>
-    <li>Préciser les enjeux stratégiques et tactiques</li>
-    <li>Formuler la raison d’être du lancement</li>
-    <li>Identifier les problématiques auxquelles l’étude devra répondre</li>
-  </ul>
-
-  <h3>2. Définissez les objectifs</h3>
-
-  <p>
-    Pour maximiser les chances de succès de l’étude, les objectifs doivent être définis avec précision.
-    Un objectif comme “améliorer la connaissance des acheteurs potentiels” reste trop vague.
-  </p>
-
-  <p>Dans le cas du shampoing, on peut décliner l’objectif en deux points :</p>
-
-  <ul>
-    <li>
-      Décrire les acheteurs potentiels du shampoing selon leurs attitudes, leurs habitudes d’achat
-      et leur fréquentation des circuits bio.
-    </li>
-    <li>
-      Lister et hiérarchiser les principales motivations d’achat.
-    </li>
-  </ul>
-
-  <h3>3. Listez les décisions et actions attendues</h3>
-
-  <p>
-    Le brief doit montrer l’intérêt opérationnel de l’étude. Il faut préciser les décisions à prendre
-    et les actions qui découleront des résultats.
-  </p>
-
-  <ul>
-    <li>Affiner le plan média de lancement</li>
-    <li>Choisir la répartition des investissements publicitaires</li>
-    <li>Rédiger un cahier des charges clair pour les prestataires</li>
-    <li>Éviter les contresens dans les choix méthodologiques</li>
-  </ul>
-
-  <h3>4. Planifiez le projet</h3>
-
-  <p>
-    La date de disponibilité des résultats est un critère déterminant. Elle peut influencer la méthode,
-    la taille de l’échantillon, le mode d’interrogation et le prestataire.
-  </p>
-
-  <img class="lesson-image" src="image10.png" alt="Planning type d'une étude quantitative">
-  <p class="lesson-caption">Exemple de planning type d’une étude quantitative</p>
-
-  <p>
-    Un rétroplanning permet de vérifier la faisabilité du projet et de repérer les étapes de validation.
-    Certaines phases nécessitent l’accord du client avant de continuer.
-  </p>
-
-  <h3>5. Posez-vous les questions clés</h3>
-
-  <p>
-    De nombreux facteurs peuvent avoir un impact sur l’étude : budget, délais, pays concernés,
-    traduction des documents, difficulté de recrutement ou attentes internes.
-  </p>
-
-  <ol>
-    <li>Que se passerait-il si je renonçais à mener cette étude ?</li>
-    <li>Quelles études existantes pourraient m’aider ?</li>
-    <li>Quel budget puis-je consacrer au projet ?</li>
-    <li>Qui sont mes clients internes ou externes, et quelles sont leurs attentes ?</li>
-  </ol>
-
-  <h3>Plan simple d’un brief</h3>
-
-  <div class="lesson-grid">
-    <div class="lesson-box"><strong>1. Contexte</strong></div>
-    <div class="lesson-box"><strong>2. Objectifs marketing</strong></div>
-    <div class="lesson-box"><strong>3. Objectifs de l’étude</strong></div>
-    <div class="lesson-box"><strong>4. Méthodologie suggérée</strong></div>
-    <div class="lesson-box"><strong>5. Planning et budget</strong></div>
-  </div>
-
-  <hr>
-
-  <h3>Choisissez votre méthodologie</h3>
-
-  <p>
-    Une fois le brief posé, il faut choisir la méthodologie adaptée. Il peut exister plusieurs manières
-    de répondre à une même problématique.
-  </p>
-
-  <p>
-    Si vous cherchez à comprendre en profondeur les motivations, une approche qualitative peut être adaptée.
-    Si vous cherchez à mesurer, comparer ou hiérarchiser, une approche quantitative sera souvent plus pertinente.
-  </p>
-
-  <div class="lesson-grid">
-    <div class="lesson-box">
-      <strong>Approche qualitative</strong>
-      <p>Comprendre, explorer, illustrer, exprimer.</p>
-    </div>
-
-    <div class="lesson-box">
-      <strong>Approche quantitative</strong>
-      <p>Mesurer, comparer, hiérarchiser, valider statistiquement.</p>
-    </div>
-  </div>
-
-  <h3>Utilisez correctement les études qualitatives</h3>
-
-  <p>
-    Les études qualitatives reposent sur une approche ouverte. Elles permettent de comprendre les perceptions,
-    les motivations profondes et la manière dont les répondants s’expriment.
-  </p>
-
-  <h4>Le focus group</h4>
-
-  <p>
-    Le focus group réunit plusieurs personnes sous la conduite d’un animateur. L’objectif est de créer
-    un échange collectif afin de faire émerger des idées, des réactions et des pistes d’amélioration.
-  </p>
-
-  <img class="lesson-image" src="image8.jpg" alt="Focus group">
-  <p class="lesson-caption">Exemple : un focus group</p>
-
-  <h4>L’entretien individuel</h4>
-
-  <p>
-    L’entretien individuel consiste à interroger une personne en face-à-face. Cette méthode est utile
-    pour traiter des sujets confidentiels, sensibles ou nécessitant une parole plus libre.
-  </p>
-
-  <img class="lesson-image" src="image1.jpg" alt="Entretien individuel">
-  <p class="lesson-caption">Exemple : un entretien individuel</p>
-
-  <h4>L’entretien à distance</h4>
-
-  <p>
-    L’entretien peut aussi être réalisé à distance, notamment lorsque les participants ne peuvent pas
-    se déplacer ou lorsqu’ils sont dispersés géographiquement.
-  </p>
-
-  <img class="lesson-image" src="image6.jpg" alt="Entretien à distance">
-  <p class="lesson-caption">Exemple : entretien à distance</p>
-
-  <h3>Utilisez correctement les études quantitatives</h3>
-
-  <p>
-    Les études quantitatives permettent de mesurer des comportements, des préférences ou des intentions
-    auprès d’un échantillon plus large.
-  </p>
-
-  <img class="lesson-image" src="image3.jpg" alt="Calcul de taille minimum d'échantillon">
-  <p class="lesson-caption">Exemple de calcul d’une taille minimum d’échantillon</p>
-
-  <p>
-    La taille de l’échantillon dépend notamment du taux de pénétration de la cible et du nombre minimum
-    de répondants nécessaires pour obtenir une analyse exploitable.
-  </p>
-
-  <h3>Exemples de questions de questionnaire</h3>
-
-  <p>
-    Un questionnaire peut contenir des questions de fréquentation, d’intention d’achat ou d’évaluation
-    sur une échelle d’accord.
-  </p>
-
-  <img class="lesson-image" src="image4.png" alt="Exemple de questions de questionnaire">
-  <p class="lesson-caption">Exemple : question sur les habitudes d’achat</p>
-
-  <img class="lesson-image" src="image5.png" alt="Exemple d'échelle d'accord">
-  <p class="lesson-caption">Exemple : échelle d’accord sur l’utilisation des shampoings</p>
-
-  <h3>Benchmark, anticipation et données de cadrage</h3>
-
-  <p>
-    Une étude de marché peut également s’appuyer sur des benchmarks, des données de cadrage,
-    des problématiques marketing courantes et des éléments d’anticipation.
-  </p>
-
-  <img class="lesson-image" src="image9.png" alt="Points clés : problématique marketing, benchmark, anticipation, données de cadrage">
-  <p class="lesson-caption">Points clés pour structurer l’étude</p>
-
-  <h3>Exemple de stimulus marketing</h3>
-
-  <p>
-    Certaines études utilisent des visuels, produits, publicités ou offres promotionnelles pour tester
-    les réactions des consommateurs.
-  </p>
-
-  <img class="lesson-image" src="image7.jpg" alt="Exemple de stimulus marketing">
-  <p class="lesson-caption">Exemple de support à tester auprès des consommateurs</p>
-
-  <div class="callout">
-    <p><strong>À retenir</strong></p>
-    <p>
-      Le brief est le point de départ de l’étude de marché. Il permet de clarifier le besoin,
-      de définir les objectifs, de cadrer les décisions attendues, de choisir la bonne méthode
-      et de planifier le projet.
-    </p>
-  </div>
-</article>
-              
-<article id="a1-groupe" class="sub-page fullscreen-subpage">
-<div class="fullscreen-header">
-  <div class="fullscreen-actions">
-    <div>
-      <p class="eyebrow">Activité 1 — Répartition</p>
-      <h2>👥 Répartition GROUPE et Dépôt (1)</h2>
-    </div>
-
-    <button class="btn secondary" type="button" onclick="closeCoursePages()">
-      ← Fermer la page
-    </button>
-  </div>
-
-  <p class="table-help">
-    Le tableau est en pleine page. Faites défiler horizontalement pour voir toutes les colonnes.
-  </p>
-</div>
-
-  <div class="callout">
-    <p><strong>Consigne</strong></p>
-    <p>
-      Chaque groupe doit préparer le livrable lié à l’Exo 1.
-      Le dépôt est attendu pour le <strong>18 juin 2026</strong>.
-    </p>
-  </div>
-
-  <div class="table-wrap fullscreen-table">
-  <table id="groupDepositTable">
-    <thead>
-      <tr>
-        <th>Groupe</th>
-        <th>Membre du groupe</th>
-        <th>Fichier</th>
-        <th>Date de dépôt exo</th>
-        <th>Status</th>
-        <th>Date d’échéance</th>
-        <th>Nombre d’étudiants</th>
-        <th>Type d’exercice</th>
-        <th>Nom de l’enseignant</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      <tr data-group="1">
-        <td>
-          <button class="btn secondary" type="button" onclick="openCoursePage('groupe-1')">
-            Groupe 1
-          </button>
-        </td>
-
-        <td>
-<div class="student-fields">
-    <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
-    <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
-    <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
-    <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
-    <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
-  </div>
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier">
-        </td>
-
-        <td>
-  <input class="field table-field date-field" data-field="depositDate" type="date">
-        </td>
-
-        <td>
-          <select class="field table-field" data-field="status">
-            <option value="En cours">En cours</option>
-            <option value="Déposé">Déposé</option>
-            <option value="À corriger">À corriger</option>
-            <option value="Validé">Validé</option>
-          </select>
-        </td>
-
-        <td>
-  <input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18">
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="studentCount" type="number" min="1" value="5">
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="exerciseType" value="quizz">
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="teacher" value="Stéphane">
-        </td>
-      </tr>
-
-      <tr data-group="2">
-        <td>
-          <button class="btn secondary" type="button" onclick="openCoursePage('groupe-2')">
-            Groupe 2
-          </button>
-        </td>
-
-        <td>
-      <div class="student-fields">
-    <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
-    <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
-    <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
-    <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
-    <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
-  </div>
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier">
-        </td>
-
-        <td>
-  <input class="field table-field date-field" data-field="depositDate" type="date">
-        </td>
-
-        <td>
-          <select class="field table-field" data-field="status">
-            <option value="En cours">En cours</option>
-            <option value="Déposé">Déposé</option>
-            <option value="À corriger">À corriger</option>
-            <option value="Validé">Validé</option>
-          </select>
-        </td>
-
-        <td>
-  <input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18">
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="studentCount" type="number" min="1" value="5">
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="exerciseType" value="quizz">
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="teacher" value="Stéphane">
-        </td>
-      </tr>
-
-      <tr data-group="3">
-        <td>
-          <button class="btn secondary" type="button" onclick="openCoursePage('groupe-3')">
-            Groupe 3
-          </button>
-        </td>
-
-        <td>
-       <div class="student-fields">
-    <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
-    <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
-    <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
-    <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
-    <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
-  </div>
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier">
-        </td>
-
-        <td>
-  <input class="field table-field date-field" data-field="depositDate" type="date">
-        </td>
-
-        <td>
-          <select class="field table-field" data-field="status">
-            <option value="En cours">En cours</option>
-            <option value="Déposé">Déposé</option>
-            <option value="À corriger">À corriger</option>
-            <option value="Validé">Validé</option>
-          </select>
-        </td>
-
-        <td>
-  <input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18">
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="studentCount" type="number" min="1" value="5">
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="exerciseType" value="quizz">
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="teacher" value="Stéphane">
-        </td>
-      </tr>
-
-      <tr data-group="4">
-        <td>
-          <button class="btn secondary" type="button" onclick="openCoursePage('groupe-4')">
-            Groupe 4
-          </button>
-        </td>
-
-        <td>
-<div class="student-fields">
-    <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
-    <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
-    <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
-    <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
-    <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
-  </div>        </td>
-
-        <td>
-          <input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier">
-        </td>
-
-        <td>
-  <input class="field table-field date-field" data-field="depositDate" type="date">
-        </td>
-
-        <td>
-          <select class="field table-field" data-field="status">
-            <option value="En cours">En cours</option>
-            <option value="Déposé">Déposé</option>
-            <option value="À corriger">À corriger</option>
-            <option value="Validé">Validé</option>
-          </select>
-        </td>
-
-        <td>
-  <input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18">
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="studentCount" type="number" min="1" value="5">
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="exerciseType" value="quizz">
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="teacher" value="Stéphane">
-        </td>
-      </tr>
-
-      <tr data-group="5">
-        <td>
-          <button class="btn secondary" type="button" onclick="openCoursePage('groupe-5')">
-            Groupe 5
-          </button>
-        </td>
-
-        <td>
-<div class="student-fields">
-    <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
-    <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
-    <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
-    <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
-    <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
-  </div>        </td>
-
-        <td>
-          <input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier">
-        </td>
-
-        <td>
-  <input class="field table-field date-field" data-field="depositDate" type="date">
-        </td>
-
-        <td>
-          <select class="field table-field" data-field="status">
-            <option value="En cours">En cours</option>
-            <option value="Déposé">Déposé</option>
-            <option value="À corriger">À corriger</option>
-            <option value="Validé">Validé</option>
-          </select>
-        </td>
-
-        <td>
-  <input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18">
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="studentCount" type="number" min="1" value="5">
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="exerciseType" value="quizz">
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="teacher" value="Stéphane">
-        </td>
-      </tr>
-
-      <tr data-group="6">
-        <td>
-          <button class="btn secondary" type="button" onclick="openCoursePage('groupe-6')">
-            Groupe 6
-          </button>
-        </td>
-
-        <td>
-<div class="student-fields">
-    <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
-    <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
-    <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
-    <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
-    <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
-  </div>        </td>
-
-        <td>
-          <input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier">
-        </td>
-
-        <td>
-  <input class="field table-field date-field" data-field="depositDate" type="date">
-        </td>
-
-        <td>
-          <select class="field table-field" data-field="status">
-            <option value="En cours">En cours</option>
-            <option value="Déposé">Déposé</option>
-            <option value="À corriger">À corriger</option>
-            <option value="Validé">Validé</option>
-          </select>
-        </td>
-
-        <td>
-  <input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18">
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="studentCount" type="number" min="1" value="5">
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="exerciseType" value="quizz">
-        </td>
-
-        <td>
-          <input class="field table-field" data-field="teacher" value="Stéphane">
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-</article>
-              
-              <article id="a2-cours" class="sub-page">
+              <article id="a1-cours" class="sub-page">
                 <div class="back-row">
                   <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
                 </div>
 
-                <p class="eyebrow">Activité 2</p>
-                <h2>📘 Contenu de cours — Maîtrisez les étapes clés d’une étude</h2>
+                <p class="eyebrow">Activité 1 — Contenu de cours</p>
+                <h2>📘 Réalisez une étude de marché — Partie 1</h2>
+                <h3>Exprimez clairement votre besoin : le brief</h3>
+
+                <div class="callout">
+                  <p><strong>💡 Tirez le maximum de ce cours</strong></p>
+                  <p>
+                    Dans ce chapitre, vous allez apprendre à utiliser le brief pour bien lancer un projet d’étude.
+                    Le brief, que l’on appelle aussi cahier des charges, constitue la base de votre étude.
+                  </p>
+                </div>
 
                 <p>
-                  Une étude de marché suit une démarche structurée. Elle part d’un besoin d’information,
-                  puis passe par la collecte, l’analyse et la formulation de recommandations.
+                  Que vous réalisiez vous-même le travail ou que vous le sous-traitiez, le brief sert de document
+                  de référence. À l’origine d’une étude réussie, il y a toujours un brief clair.
                 </p>
 
-                <h4>Étapes principales</h4>
+                <h3>Les 5 points clés d’un brief de qualité</h3>
+
+                <div class="lesson-grid">
+                  <div class="lesson-box"><strong>1. Établir le constat préalable</strong><p>Décrire le contexte business et marketing de départ.</p></div>
+                  <div class="lesson-box"><strong>2. Définir les objectifs</strong><p>Préciser ce que l’étude doit permettre de comprendre ou de décider.</p></div>
+                  <div class="lesson-box"><strong>3. Lister les décisions attendues</strong><p>Identifier les actions concrètes qui découleront des résultats.</p></div>
+                  <div class="lesson-box"><strong>4. Planifier le projet</strong><p>Prévoir les étapes, les délais, les validations et les contraintes.</p></div>
+                  <div class="lesson-box"><strong>5. Poser les questions clés</strong><p>Anticiper les difficultés, le budget, les cibles et les attentes internes.</p></div>
+                </div>
+
+                <h3>1. Établissez le constat préalable</h3>
+                <p>
+                  La première chose à faire pour préparer une étude, c’est un constat business et marketing.
+                  Il sert à décrire concrètement le but du projet, en l’ancrant dans la réalité de l’entreprise
+                  et du marché.
+                </p>
+
+                <img class="lesson-image" src="image2.jpg" alt="Exemple de shampoing Biolessan">
+                <p class="lesson-caption">Exemple : votre shampoing Biolessan</p>
+
                 <ul>
-                  <li>Définir les objectifs de l’étude</li>
-                  <li>Choisir la méthode de collecte</li>
-                  <li>Construire le questionnaire ou guide d’entretien</li>
-                  <li>Collecter les données</li>
-                  <li>Analyser les résultats</li>
-                  <li>Présenter les conclusions</li>
+                  <li>Décrire le contexte du marché des shampoings et des cosmétiques bio</li>
+                  <li>Résumer la logique du lancement</li>
+                  <li>Aborder le positionnement de l’entreprise</li>
+                  <li>Préciser les enjeux stratégiques et tactiques</li>
+                  <li>Formuler la raison d’être du lancement</li>
+                  <li>Identifier les problématiques auxquelles l’étude devra répondre</li>
                 </ul>
+
+                <h3>2. Définissez les objectifs</h3>
+                <p>
+                  Pour maximiser les chances de succès de l’étude, les objectifs doivent être définis avec précision.
+                  Un objectif comme “améliorer la connaissance des acheteurs potentiels” reste trop vague.
+                </p>
+
+                <h3>3. Listez les décisions et actions attendues</h3>
+                <p>
+                  Le brief doit montrer l’intérêt opérationnel de l’étude. Il faut préciser les décisions à prendre
+                  et les actions qui découleront des résultats.
+                </p>
+
+                <h3>4. Planifiez le projet</h3>
+                <img class="lesson-image" src="image10.png" alt="Planning type d'une étude quantitative">
+                <p class="lesson-caption">Exemple de planning type d’une étude quantitative</p>
+
+                <h3>Choisissez votre méthodologie</h3>
+                <div class="lesson-grid">
+                  <div class="lesson-box"><strong>Approche qualitative</strong><p>Comprendre, explorer, illustrer, exprimer.</p></div>
+                  <div class="lesson-box"><strong>Approche quantitative</strong><p>Mesurer, comparer, hiérarchiser, valider statistiquement.</p></div>
+                </div>
+
+                <h3>Utilisez correctement les études qualitatives</h3>
+                <h4>Le focus group</h4>
+                <img class="lesson-image" src="image8.jpg" alt="Focus group">
+                <p class="lesson-caption">Exemple : un focus group</p>
+
+                <h4>L’entretien individuel</h4>
+                <img class="lesson-image" src="image1.jpg" alt="Entretien individuel">
+                <p class="lesson-caption">Exemple : un entretien individuel</p>
+
+                <h4>L’entretien à distance</h4>
+                <img class="lesson-image" src="image6.jpg" alt="Entretien à distance">
+                <p class="lesson-caption">Exemple : entretien à distance</p>
+
+                <h3>Utilisez correctement les études quantitatives</h3>
+                <img class="lesson-image" src="image3.jpg" alt="Calcul de taille minimum d'échantillon">
+                <p class="lesson-caption">Exemple de calcul d’une taille minimum d’échantillon</p>
+
+                <img class="lesson-image" src="image4.png" alt="Exemple de questions de questionnaire">
+                <p class="lesson-caption">Exemple : question sur les habitudes d’achat</p>
+
+                <img class="lesson-image" src="image5.png" alt="Exemple d'échelle d'accord">
+                <p class="lesson-caption">Exemple : échelle d’accord sur l’utilisation des shampoings</p>
+
+                <img class="lesson-image" src="image9.png" alt="Points clés pour structurer l’étude">
+                <p class="lesson-caption">Points clés pour structurer l’étude</p>
+
+                <img class="lesson-image" src="image7.jpg" alt="Exemple de stimulus marketing">
+                <p class="lesson-caption">Exemple de support à tester auprès des consommateurs</p>
+
+                <div class="callout">
+                  <p><strong>À retenir</strong></p>
+                  <p>
+                    Le brief est le point de départ de l’étude de marché. Il permet de clarifier le besoin,
+                    de définir les objectifs, de cadrer les décisions attendues, de choisir la bonne méthode
+                    et de planifier le projet.
+                  </p>
+                </div>
               </article>
 
               <article id="a1-exercice" class="sub-page">
-  <div class="back-row">
-    <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
-  </div>
-
-  <p class="eyebrow">Activité 1 — Exercice</p>
-  <h2>✍️ Exo 1 — Briefez des professionnels pour sous-traiter votre étude</h2>
-
-  <div class="callout">
-    <p><strong>💡 Objectif de l’exercice</strong></p>
-    <p>
-      Vous devez vérifier votre capacité à préparer un projet d’étude de marché,
-      à comprendre le rôle du brief et à choisir les bonnes approches méthodologiques.
-    </p>
-  </div>
-
-  <h3>Compétence évaluée</h3>
-  <ul>
-    <li>Préparer un projet d’étude de marché</li>
-  </ul>
-
-  <section class="question-card">
-    <h3>Question 1 : Comment identifier un brief de qualité ?</h3>
-    <ul class="answer-list">
-      <li>On y trouve la raison d’être du lancement de produit.</li>
-      <li>Il comprend : un constat préalable, des objectifs, les décisions et actions découlant de l’étude, une planification, des questions clés.</li>
-      <li>Il liste les problématiques auxquelles l’étude répondra.</li>
-    </ul>
-  </section>
-
-  <section class="question-card">
-    <h3>Question 2 : Que lui répondez-vous ?</h3>
-
-    <p>
-      <strong>
-        Vous venez de présenter les résultats du test de packaging de votre nouveau shampoing à l’équipe dirigeante.
-        Le score de la meilleure proposition de packaging est de 21 % d’intention d’achat certaine et
-        36 % d’intention d’achat probable. Votre directeur financier vous demande si ce résultat est bon.
-      </strong>
-    </p>
-
-    <ul class="answer-list">
-      <li>C’est un bon résultat car le cumul des intentions d’achat certaine et probable est nettement supérieur à 50 % : 57 %.</li>
-      <li>C’est difficile de répondre dans l’absolu car il s’agit d’un nouveau produit.</li>
-      <li>C’est difficile de répondre à cette question sans benchmark.</li>
-    </ul>
-  </section>
-
-  <section class="question-card">
-    <h3>Question 3 : Votre brief est rédigé. À quelles questions clés devez-vous répondre pour le compléter et le rendre encore plus qualitatif ?</h3>
-
-    <p><em>Attention, plusieurs réponses sont possibles.</em></p>
-
-    <ul class="answer-list">
-      <li>Quels délais de réalisation ? Quelle méthodologie d’étude privilégier ?</li>
-      <li>Que se passe-t-il si vous devez renoncer à mener cette étude ? Quelles études existantes benchmarker ?</li>
-      <li>Quels sont les objectifs de l’étude ? Quelles sont les actions et décisions attendues ?</li>
-      <li>Quel budget consacrer à l’étude ? Qui en seront les clients internes et externes ?</li>
-    </ul>
-  </section>
-
-  <section class="question-card">
-    <h3>Question 4 : Quels sont les verbes qui induisent une approche qualitative ?</h3>
-
-    <p><em>Attention, plusieurs réponses sont possibles.</em></p>
-
-    <ul class="answer-list">
-      <li>Comprendre</li>
-      <li>Mesurer</li>
-      <li>Illustrer</li>
-      <li>Comparer</li>
-    </ul>
-  </section>
-
-  <section class="question-card">
-    <h3>Question 5 : Bulletin board et test de packaging</h3>
-
-    <p>
-      <strong>
-        Votre directeur marketing a assisté à une conférence internationale où une présentation mettait en valeur
-        des résultats issus d’un bulletin board. Il vous demande s’il serait intéressant de tester le futur packaging
-        de votre nouveau shampoing avec cette approche méthodologique.
-      </strong>
-    </p>
-
-    <h4>Que lui répondez-vous ?</h4>
-    <p><em>Attention, plusieurs réponses sont possibles.</em></p>
-
-    <ul class="answer-list">
-      <li>C’est intéressant d’essayer cette approche, je rédige un brief pour mettre tout cela au clair.</li>
-      <li>Cela pourrait nous donner des retours très détaillés sur ce qui plaît ou déplaît à nos clients potentiels.</li>
-      <li>Attention, cela ne nous donnera pas de résultats chiffrés fiables.</li>
-      <li>Attention, on n’a aucune expérience dans ce domaine pour les tests de packaging.</li>
-      <li>Je ne sais pas si nous aurons assez de répondants pour garantir cela.</li>
-    </ul>
-  </section>
-
-  <section class="question-card">
-    <h3>Question 6 : Tester les acheteurs d’une marque concurrente</h3>
-
-    <p>
-      <strong>
-        Vous préparez le test de packaging de votre futur shampoing.
-        Le chef de produit souhaiterait connaître les résultats spécifiquement sur les acheteurs d’une marque concurrente.
-      </strong>
-    </p>
-
-    <h4>Que lui répondez-vous ?</h4>
-    <p><em>Attention, plusieurs réponses sont possibles.</em></p>
-
-    <ul class="answer-list">
-      <li>Je dois vérifier préalablement l’incidence de cette population.</li>
-      <li>Il est préférable de se focaliser sur les acheteurs de notre marque pour le test de notre packaging.</li>
-      <li>Nous avons besoin d’un effectif minimum de 80 personnes environ pour que les résultats soient fiables.</li>
-    </ul>
-  </section>
-
-  <section class="question-card">
-    <h3>Question 7 : Focus groups ou étude quantitative ?</h3>
-
-    <p>
-      <strong>
-        L’équipe communication souhaite organiser des focus groups avec des acheteurs de shampoing dans les circuits bio
-        pour mieux cerner leurs motivations d’achat. Le chef de produit n’est pas d’accord, car une étude similaire
-        a déjà été menée il y a 18 mois. Il préfère garder son budget pour une étude quantitative prospective
-        sur les cosmétiques bio.
-      </strong>
-    </p>
-
-    <h4>Que leur répondez-vous ?</h4>
-    <p><em>Attention, plusieurs réponses sont possibles.</em></p>
-
-    <ul class="answer-list">
-      <li>Si nous ne faisons pas les focus groups, quelles seraient les conséquences ?</li>
-      <li>Est-ce que les motivations des acheteurs ont fondamentalement changé en 18 mois ?</li>
-      <li>Et si nous en profitions pour aborder les questions de prospective dans les focus groups ?</li>
-      <li>Et si nous ajoutions une ou deux questions fermées dans l’étude quantitative sur les motivations d’achat ?</li>
-    </ul>
-  </section>
-
-  <section class="question-card">
-    <h3>Question 8 : Dans quels cas utiliser les études quantitatives ?</h3>
-
-    <p><em>Attention, plusieurs réponses sont possibles.</em></p>
-
-    <ul class="answer-list">
-      <li>Pour comprendre les motivations d’achat, y compris latentes, des clients.</li>
-      <li>Pour segmenter une clientèle, évaluer le taux de pénétration d’un équipement.</li>
-      <li>Pour illustrer les usages et attitudes de consommateurs vis-à-vis d’un produit ou service.</li>
-      <li>Pour mesurer la fréquence d’achat d’un produit, comparer les profils de consommateurs.</li>
-    </ul>
-  </section>
-
-  <section class="question-card">
-    <h3>Question 9 : Qu’est-ce que le data marketing ?</h3>
-
-    <p><em>Attention, plusieurs réponses sont possibles.</em></p>
-
-    <ul class="answer-list">
-      <li>La digitalisation du commerce, des médias, de la publicité et des rapports sociaux.</li>
-      <li>La collecte, le tri et l’exploitation de masses de données à des fins marketing.</li>
-      <li>Le quali online.</li>
-      <li>Des projets d’activation, de conversion et de fidélisation des clients à partir de données.</li>
-    </ul>
-  </section>
-
-  <section class="question-card">
-    <h3>Question 10 : Quel est l’apport principal du data marketing par rapport aux études quantitatives traditionnelles ?</h3>
-
-    <p><em>Attention, plusieurs réponses sont possibles.</em></p>
-
-    <ul class="answer-list">
-      <li>C’est une solution plus rapide et moins chère.</li>
-      <li>Le volume d’information traité permet d’intégrer beaucoup plus de variables qualificatives du comportement du consommateur.</li>
-      <li>Sa méthodologie est plus simple que celle des études traditionnelles.</li>
-      <li>Il permet une connaissance des clients beaucoup plus fine.</li>
-    </ul>
-  </section>
-
-  <div class="callout">
-    <p><strong>Consigne de dépôt</strong></p>
-    <p>
-      Après avoir traité l’exercice, préparez votre réponse dans un document partagé,
-      puis transmettez le lien dans la page “Répartition groupe et dépôt 1”.
-    </p>
-  </div>
-</article>
-
-              <article id="a2-exercice" class="sub-page">
                 <div class="back-row">
                   <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
                 </div>
 
+                <p class="eyebrow">Activité 1 — Exercice</p>
+                <h2>✍️ Exo 1 — Briefez des professionnels pour sous-traiter votre étude</h2>
+
+                <div class="callout">
+                  <p><strong>💡 Objectif de l’exercice</strong></p>
+                  <p>
+                    Vous devez vérifier votre capacité à préparer un projet d’étude de marché,
+                    à comprendre le rôle du brief et à choisir les bonnes approches méthodologiques.
+                  </p>
+                </div>
+
+                <h3>Compétence évaluée</h3>
+                <ul>
+                  <li>Préparer un projet d’étude de marché</li>
+                </ul>
+
+                <section class="question-card">
+                  <h3>Question 1 : Comment identifier un brief de qualité ?</h3>
+                  <ul class="answer-list">
+                    <li>On y trouve la raison d’être du lancement de produit.</li>
+                    <li>Il comprend : un constat préalable, des objectifs, les décisions et actions découlant de l’étude, une planification, des questions clés.</li>
+                    <li>Il liste les problématiques auxquelles l’étude répondra.</li>
+                  </ul>
+                </section>
+
+                <section class="question-card">
+                  <h3>Question 2 : Que lui répondez-vous ?</h3>
+                  <p>
+                    <strong>
+                      Vous venez de présenter les résultats du test de packaging de votre nouveau shampoing.
+                      Le score de la meilleure proposition est de 21 % d’intention d’achat certaine et
+                      36 % d’intention d’achat probable.
+                    </strong>
+                  </p>
+                  <ul class="answer-list">
+                    <li>C’est un bon résultat car le cumul des intentions d’achat certaine et probable est de 57 %.</li>
+                    <li>C’est difficile de répondre dans l’absolu car il s’agit d’un nouveau produit.</li>
+                    <li>C’est difficile de répondre à cette question sans benchmark.</li>
+                  </ul>
+                </section>
+
+                <section class="question-card">
+                  <h3>Question 3 : Quelles questions clés devez-vous poser pour compléter le brief ?</h3>
+                  <ul class="answer-list">
+                    <li>Quels délais de réalisation ? Quelle méthodologie privilégier ?</li>
+                    <li>Que se passe-t-il si vous renoncez à cette étude ?</li>
+                    <li>Quels sont les objectifs de l’étude ? Quelles actions sont attendues ?</li>
+                    <li>Quel budget consacrer à l’étude ? Qui sont les clients internes et externes ?</li>
+                  </ul>
+                </section>
+
+                <section class="question-card">
+                  <h3>Question 4 : Quels verbes induisent une approche qualitative ?</h3>
+                  <ul class="answer-list">
+                    <li>Comprendre</li>
+                    <li>Illustrer</li>
+                  </ul>
+                </section>
+
+                <section class="question-card">
+                  <h3>Question 5 : Bulletin board et test de packaging</h3>
+                  <ul class="answer-list">
+                    <li>C’est intéressant d’essayer cette approche, il faut rédiger un brief.</li>
+                    <li>Cela peut donner des retours détaillés sur ce qui plaît ou déplaît.</li>
+                    <li>Attention, cela ne donnera pas de résultats chiffrés fiables.</li>
+                  </ul>
+                </section>
+
+                <section class="question-card">
+                  <h3>Question 6 : Tester les acheteurs d’une marque concurrente</h3>
+                  <ul class="answer-list">
+                    <li>Je dois vérifier préalablement l’incidence de cette population.</li>
+                    <li>Nous avons besoin d’un effectif minimum exploitable pour obtenir des résultats fiables.</li>
+                  </ul>
+                </section>
+
+                <section class="question-card">
+                  <h3>Question 7 : Focus groups ou étude quantitative ?</h3>
+                  <ul class="answer-list">
+                    <li>Que se passe-t-il si nous ne faisons pas les focus groups ?</li>
+                    <li>Les motivations ont-elles changé en 18 mois ?</li>
+                    <li>Peut-on aborder la prospective dans les focus groups ?</li>
+                    <li>Peut-on ajouter des questions fermées dans l’étude quantitative ?</li>
+                  </ul>
+                </section>
+
+                <section class="question-card">
+                  <h3>Question 8 : Dans quels cas utiliser les études quantitatives ?</h3>
+                  <ul class="answer-list">
+                    <li>Pour segmenter une clientèle.</li>
+                    <li>Pour évaluer un taux de pénétration.</li>
+                    <li>Pour mesurer une fréquence d’achat.</li>
+                    <li>Pour comparer des profils de consommateurs.</li>
+                  </ul>
+                </section>
+
+                <section class="question-card">
+                  <h3>Question 9 : Qu’est-ce que le data marketing ?</h3>
+                  <ul class="answer-list">
+                    <li>La collecte, le tri et l’exploitation de données à des fins marketing.</li>
+                    <li>Des projets d’activation, de conversion et de fidélisation à partir de données.</li>
+                  </ul>
+                </section>
+
+                <section class="question-card">
+                  <h3>Question 10 : Quel est l’apport principal du data marketing ?</h3>
+                  <ul class="answer-list">
+                    <li>Il permet d’intégrer beaucoup plus de variables comportementales.</li>
+                    <li>Il permet une connaissance client beaucoup plus fine.</li>
+                  </ul>
+                </section>
+              </article>
+
+              <article id="a1-groupe" class="sub-page fullscreen-subpage">
+                <div class="fullscreen-header">
+                  <div class="fullscreen-actions">
+                    <div>
+                      <p class="eyebrow">Activité 1 — Répartition</p>
+                      <h2>👥 Répartition GROUPE et Dépôt (1)</h2>
+                    </div>
+
+                    <button class="btn secondary" type="button" onclick="closeCoursePages()">← Fermer la page</button>
+                  </div>
+
+                  <p class="table-help">
+                    Tableau en pleine page. Faites défiler horizontalement pour voir toutes les colonnes.
+                  </p>
+                </div>
+
+                <div class="callout">
+                  <p><strong>Consigne</strong></p>
+                  <p>
+                    Chaque groupe doit préparer le livrable lié à l’Exo 1.
+                    Le dépôt est attendu pour le <strong>18 juin 2026</strong>.
+                  </p>
+                </div>
+
+                <div class="table-wrap fullscreen-table">
+                  <table id="groupDepositTable">
+                    <thead>
+                      <tr>
+                        <th>Groupe</th>
+                        <th>Membre du groupe</th>
+                        <th>Fichier</th>
+                        <th>Date de dépôt exo</th>
+                        <th>Status</th>
+                        <th>Date d’échéance</th>
+                        <th>Nombre d’étudiants</th>
+                        <th>Type d’exercice</th>
+                        <th>Nom de l’enseignant</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      <tr data-group="1">
+                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-1')">Groupe 1</button></td>
+                        <td>
+                          <div class="student-fields">
+                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+                          </div>
+                        </td>
+                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
+                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
+                        <td>
+                          <select class="field table-field" data-field="status">
+                            <option value="En cours">En cours</option>
+                            <option value="Déposé">Déposé</option>
+                            <option value="À corriger">À corriger</option>
+                            <option value="Validé">Validé</option>
+                          </select>
+                        </td>
+                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
+                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
+                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
+                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
+                      </tr>
+
+                      <tr data-group="2">
+                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-2')">Groupe 2</button></td>
+                        <td>
+                          <div class="student-fields">
+                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+                          </div>
+                        </td>
+                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
+                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
+                        <td>
+                          <select class="field table-field" data-field="status">
+                            <option value="En cours">En cours</option>
+                            <option value="Déposé">Déposé</option>
+                            <option value="À corriger">À corriger</option>
+                            <option value="Validé">Validé</option>
+                          </select>
+                        </td>
+                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
+                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
+                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
+                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
+                      </tr>
+
+                      <tr data-group="3">
+                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-3')">Groupe 3</button></td>
+                        <td>
+                          <div class="student-fields">
+                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+                          </div>
+                        </td>
+                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
+                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
+                        <td>
+                          <select class="field table-field" data-field="status">
+                            <option value="En cours">En cours</option>
+                            <option value="Déposé">Déposé</option>
+                            <option value="À corriger">À corriger</option>
+                            <option value="Validé">Validé</option>
+                          </select>
+                        </td>
+                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
+                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
+                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
+                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
+                      </tr>
+
+                      <tr data-group="4">
+                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-4')">Groupe 4</button></td>
+                        <td>
+                          <div class="student-fields">
+                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+                          </div>
+                        </td>
+                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
+                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
+                        <td>
+                          <select class="field table-field" data-field="status">
+                            <option value="En cours">En cours</option>
+                            <option value="Déposé">Déposé</option>
+                            <option value="À corriger">À corriger</option>
+                            <option value="Validé">Validé</option>
+                          </select>
+                        </td>
+                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
+                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
+                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
+                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
+                      </tr>
+
+                      <tr data-group="5">
+                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-5')">Groupe 5</button></td>
+                        <td>
+                          <div class="student-fields">
+                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+                          </div>
+                        </td>
+                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
+                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
+                        <td>
+                          <select class="field table-field" data-field="status">
+                            <option value="En cours">En cours</option>
+                            <option value="Déposé">Déposé</option>
+                            <option value="À corriger">À corriger</option>
+                            <option value="Validé">Validé</option>
+                          </select>
+                        </td>
+                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
+                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
+                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
+                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
+                      </tr>
+
+                      <tr data-group="6">
+                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-6')">Groupe 6</button></td>
+                        <td>
+                          <div class="student-fields">
+                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+                          </div>
+                        </td>
+                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
+                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
+                        <td>
+                          <select class="field table-field" data-field="status">
+                            <option value="En cours">En cours</option>
+                            <option value="Déposé">Déposé</option>
+                            <option value="À corriger">À corriger</option>
+                            <option value="Validé">Validé</option>
+                          </select>
+                        </td>
+                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
+                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
+                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
+                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+
+              <article id="groupe-1" class="sub-page">
+                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
+                <p class="eyebrow">Activité 1 — Groupe</p>
+                <h2>👥 Groupe 1</h2>
+                <p class="muted">Page dédiée au Groupe 1. Le dépôt principal se fait dans le tableau de répartition.</p>
+              </article>
+
+              <article id="groupe-2" class="sub-page">
+                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
+                <p class="eyebrow">Activité 1 — Groupe</p>
+                <h2>👥 Groupe 2</h2>
+                <p class="muted">Page dédiée au Groupe 2. Le dépôt principal se fait dans le tableau de répartition.</p>
+              </article>
+
+              <article id="groupe-3" class="sub-page">
+                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
+                <p class="eyebrow">Activité 1 — Groupe</p>
+                <h2>👥 Groupe 3</h2>
+                <p class="muted">Page dédiée au Groupe 3. Le dépôt principal se fait dans le tableau de répartition.</p>
+              </article>
+
+              <article id="groupe-4" class="sub-page">
+                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
+                <p class="eyebrow">Activité 1 — Groupe</p>
+                <h2>👥 Groupe 4</h2>
+                <p class="muted">Page dédiée au Groupe 4. Le dépôt principal se fait dans le tableau de répartition.</p>
+              </article>
+
+              <article id="groupe-5" class="sub-page">
+                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
+                <p class="eyebrow">Activité 1 — Groupe</p>
+                <h2>👥 Groupe 5</h2>
+                <p class="muted">Page dédiée au Groupe 5. Le dépôt principal se fait dans le tableau de répartition.</p>
+              </article>
+
+              <article id="groupe-6" class="sub-page">
+                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
+                <p class="eyebrow">Activité 1 — Groupe</p>
+                <h2>👥 Groupe 6</h2>
+                <p class="muted">Page dédiée au Groupe 6. Le dépôt principal se fait dans le tableau de répartition.</p>
+              </article>
+
+              <article id="a2-cours" class="sub-page">
+                <div class="back-row"><button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button></div>
+                <p class="eyebrow">Activité 2</p>
+                <h2>📘 Contenu de cours — Maîtrisez les étapes clés d’une étude</h2>
+                <p>Une étude de marché suit une démarche structurée : objectifs, méthode, collecte, analyse et recommandations.</p>
+              </article>
+
+              <article id="a2-exercice" class="sub-page">
+                <div class="back-row"><button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button></div>
                 <p class="eyebrow">Activité 2</p>
                 <h2>✍️ Exo 2 — Méthodologie de l’étude</h2>
-
-                <p>
-                  Construisez la méthodologie de votre étude.
-                </p>
-
-                <h4>Travail demandé</h4>
-                <ul>
-                  <li>Choisir une méthode : sondage, entretien, observation ou recherche documentaire</li>
-                  <li>Définir le nombre de personnes à interroger</li>
-                  <li>Rédiger les questions principales</li>
-                  <li>Expliquer comment les données seront collectées</li>
-                  <li>Expliquer comment les résultats seront analysés</li>
-                </ul>
+                <p>Construisez la méthodologie de votre étude.</p>
               </article>
 
               <article id="a2-groupe" class="sub-page">
-                <div class="back-row">
-                  <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
-                </div>
-
+                <div class="back-row"><button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button></div>
                 <p class="eyebrow">Activité 2</p>
                 <h2>👥 Répartition groupe et dépôt 2</h2>
-
-                <div class="table-wrap">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Groupe</th>
-                        <th>Membres</th>
-                        <th>Méthode choisie</th>
-                        <th>Lien du dépôt</th>
-                        <th>Statut</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      <tr>
-                        <td>Groupe 1</td>
-                        <td>À compléter</td>
-                        <td>À compléter</td>
-                        <td>À compléter</td>
-                        <td><span class="tag">En attente</span></td>
-                      </tr>
-
-                      <tr>
-                        <td>Groupe 2</td>
-                        <td>À compléter</td>
-                        <td>À compléter</td>
-                        <td>À compléter</td>
-                        <td><span class="tag">En attente</span></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                <p>À compléter.</p>
               </article>
 
               <article id="a3-cours" class="sub-page">
-                <div class="back-row">
-                  <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
-                </div>
-
+                <div class="back-row"><button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button></div>
                 <p class="eyebrow">Activité 3</p>
                 <h2>📘 Contenu de cours — Donnez de la crédibilité à vos résultats</h2>
-
-                <p>
-                  Une étude de marché doit être crédible. Les résultats doivent être appuyés par des données,
-                  des sources fiables et une interprétation claire.
-                </p>
-
-                <h4>Points clés</h4>
-                <ul>
-                  <li>Présenter les données de manière claire</li>
-                  <li>Utiliser des chiffres, tableaux ou graphiques</li>
-                  <li>Justifier les conclusions</li>
-                  <li>Relier les résultats aux décisions marketing</li>
-                  <li>Éviter les affirmations non prouvées</li>
-                </ul>
+                <p>Les résultats doivent être appuyés par des données, des sources fiables et une interprétation claire.</p>
               </article>
 
               <article id="a3-exercice" class="sub-page">
-                <div class="back-row">
-                  <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
-                </div>
-
+                <div class="back-row"><button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button></div>
                 <p class="eyebrow">Activité 3</p>
                 <h2>✍️ Exo 3 — Crédibiliser les résultats</h2>
-
-                <p>
-                  Préparez une synthèse crédible de vos résultats.
-                </p>
-
-                <h4>Travail demandé</h4>
-                <ul>
-                  <li>Présenter les résultats principaux</li>
-                  <li>Ajouter au moins un tableau ou graphique</li>
-                  <li>Identifier les tendances importantes</li>
-                  <li>Expliquer ce que les résultats signifient pour le projet</li>
-                  <li>Formuler des recommandations</li>
-                </ul>
+                <p>Préparez une synthèse crédible de vos résultats.</p>
               </article>
 
               <article id="a3-groupe" class="sub-page">
-                <div class="back-row">
-                  <button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button>
-                </div>
-
+                <div class="back-row"><button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button></div>
                 <p class="eyebrow">Activité 3</p>
                 <h2>👥 Répartition groupe et dépôt 3</h2>
-
-                <div class="table-wrap">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Groupe</th>
-                        <th>Membres</th>
-                        <th>Résultat attendu</th>
-                        <th>Lien du dépôt</th>
-                        <th>Statut</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      <tr>
-                        <td>Groupe 1</td>
-                        <td>À compléter</td>
-                        <td>Synthèse des résultats</td>
-                        <td>À compléter</td>
-                        <td><span class="tag">En attente</span></td>
-                      </tr>
-
-                      <tr>
-                        <td>Groupe 2</td>
-                        <td>À compléter</td>
-                        <td>Synthèse des résultats</td>
-                        <td>À compléter</td>
-                        <td><span class="tag">En attente</span></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                <p>À compléter.</p>
               </article>
             </section>
           </div>
@@ -2184,7 +1442,6 @@ body.fullscreen-open {
         <section class="hero">
           <p class="eyebrow">Gestion</p>
           <h1>Administration</h1>
-
           <p class="lead">
             Cet espace est réservé à l’administrateur. Il permettra de gérer les activités,
             les contenus, les exercices, les groupes, les dépôts et les élèves.
@@ -2206,9 +1463,7 @@ body.fullscreen-open {
               <textarea class="field" rows="4" placeholder="Description de l’activité"></textarea>
             </label>
 
-            <button class="btn" type="button">
-              Enregistrer
-            </button>
+            <button class="btn" type="button">Enregistrer</button>
           </section>
 
           <section class="card">
@@ -2225,40 +1480,9 @@ body.fullscreen-open {
               <textarea class="field" rows="4" placeholder="Liste des membres"></textarea>
             </label>
 
-            <button class="btn" type="button">
-              Ajouter le groupe
-            </button>
+            <button class="btn" type="button">Ajouter le groupe</button>
           </section>
         </div>
-
-        <section class="card" style="margin-top: 24px;">
-          <p class="eyebrow">Dépôts</p>
-          <h2>Tableau de suivi</h2>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Activité</th>
-                  <th>Groupe</th>
-                  <th>Dépôt</th>
-                  <th>Statut</th>
-                  <th>Feedback</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <tr>
-                  <td>Activité 1</td>
-                  <td>Groupe 1</td>
-                  <td>À compléter</td>
-                  <td><span class="tag">En attente</span></td>
-                  <td>À corriger</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
       </section>
     </main>
 
@@ -2274,16 +1498,12 @@ body.fullscreen-open {
     const SUPABASE_URL = "https://xlyhujiebervldzoxouk.supabase.co";
     const SUPABASE_KEY = "sb_publishable_IqLPvaAeDZoDlYKE-m_Fxw_29Zbnhh_";
 
-    const supabaseClient = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentProfile = null;
 
     async function protectSite() {
       const loading = document.getElementById("authLoading");
-
       const { data, error } = await supabaseClient.auth.getSession();
 
       if (error || !data.session) {
@@ -2341,10 +1561,11 @@ body.fullscreen-open {
         button.classList.add("active");
       }
 
+      document.body.classList.remove("fullscreen-open");
       adminView.classList.remove("active-view");
       studentView.classList.add("active-view");
     }
-    
+
     async function openAdminView(button) {
       const isAdmin = await isCurrentUserAdmin();
 
@@ -2363,6 +1584,7 @@ body.fullscreen-open {
         button.classList.add("active");
       }
 
+      document.body.classList.remove("fullscreen-open");
       studentView.classList.remove("active-view");
       adminView.classList.add("active-view");
 
@@ -2384,6 +1606,12 @@ body.fullscreen-open {
       if (selectedPage) {
         selectedPage.classList.add("active-page");
 
+        if (selectedPage.classList.contains("fullscreen-subpage")) {
+          document.body.classList.add("fullscreen-open");
+        } else {
+          document.body.classList.remove("fullscreen-open");
+        }
+
         selectedPage.scrollIntoView({
           behavior: "smooth",
           block: "start"
@@ -2398,9 +1626,88 @@ body.fullscreen-open {
         page.classList.remove("active-page");
       });
 
+      document.body.classList.remove("fullscreen-open");
+
       document.getElementById("activites").scrollIntoView({
         behavior: "smooth",
         block: "start"
+      });
+    }
+
+    function saveGroupDepositTable() {
+      const rows = document.querySelectorAll("#groupDepositTable tbody tr");
+      const data = [];
+
+      rows.forEach(row => {
+        const groupNumber = row.dataset.group;
+        const fields = row.querySelectorAll(".table-field");
+
+        const rowData = {
+          group: groupNumber
+        };
+
+        fields.forEach(field => {
+          rowData[field.dataset.field] = field.value;
+        });
+
+        data.push(rowData);
+      });
+
+      localStorage.setItem("activity1GroupDeposits", JSON.stringify(data));
+    }
+
+    function loadGroupDepositTable() {
+      const savedData = localStorage.getItem("activity1GroupDeposits");
+
+      if (!savedData) {
+        return;
+      }
+
+      const data = JSON.parse(savedData);
+
+      data.forEach(rowData => {
+        const row = document.querySelector(`#groupDepositTable tbody tr[data-group="${rowData.group}"]`);
+
+        if (!row) {
+          return;
+        }
+
+        const fields = row.querySelectorAll(".table-field");
+
+        fields.forEach(field => {
+          if (rowData[field.dataset.field] !== undefined) {
+            field.value = rowData[field.dataset.field];
+          }
+        });
+      });
+    }
+
+    function openDatePicker(input) {
+      if (input.showPicker) {
+        try {
+          input.showPicker();
+        } catch (error) {
+          console.warn("Calendrier non ouvert automatiquement :", error);
+        }
+      }
+    }
+
+    function initGroupDepositTable() {
+      loadGroupDepositTable();
+
+      const fields = document.querySelectorAll("#groupDepositTable .table-field");
+
+      fields.forEach(field => {
+        field.addEventListener("input", saveGroupDepositTable);
+        field.addEventListener("change", saveGroupDepositTable);
+      });
+
+      const dateFields = document.querySelectorAll('#groupDepositTable input[type="date"]');
+
+      dateFields.forEach(dateField => {
+        dateField.addEventListener("click", function() {
+          openDatePicker(dateField);
+        });
       });
     }
 
@@ -2418,83 +1725,7 @@ body.fullscreen-open {
       }
     });
 
-function saveGroupDepositTable() {
-  const rows = document.querySelectorAll("#groupDepositTable tbody tr");
-  const data = [];
-
-  rows.forEach(row => {
-    const groupNumber = row.dataset.group;
-    const fields = row.querySelectorAll(".table-field");
-
-    const rowData = {
-      group: groupNumber
-    };
-
-    fields.forEach(field => {
-      rowData[field.dataset.field] = field.value;
-    });
-
-    data.push(rowData);
-  });
-
-  localStorage.setItem("activity1GroupDeposits", JSON.stringify(data));
-}
-
-function loadGroupDepositTable() {
-  const savedData = localStorage.getItem("activity1GroupDeposits");
-
-  if (!savedData) {
-    return;
-  }
-
-  const data = JSON.parse(savedData);
-
-  data.forEach(rowData => {
-    const row = document.querySelector(`#groupDepositTable tbody tr[data-group="${rowData.group}"]`);
-
-    if (!row) {
-      return;
-    }
-
-    const fields = row.querySelectorAll(".table-field");
-
-    fields.forEach(field => {
-      if (rowData[field.dataset.field] !== undefined) {
-        field.value = rowData[field.dataset.field];
-      }
-    });
-  });
-}
-
-function initGroupDepositTable() {
-  loadGroupDepositTable();
-
-  const fields = document.querySelectorAll("#groupDepositTable .table-field");
-
-  fields.forEach(field => {
-    field.addEventListener("input", saveGroupDepositTable);
-    field.addEventListener("change", saveGroupDepositTable);
-  });
-
-  const dateFields = document.querySelectorAll('#groupDepositTable input[type="date"]');
-
-  dateFields.forEach(dateField => {
-    dateField.addEventListener("click", function() {
-      if (dateField.showPicker) {
-        dateField.showPicker();
-      }
-    });
-
-    dateField.addEventListener("focus", function() {
-      if (dateField.showPicker) {
-        dateField.showPicker();
-      }
-    });
-  });
-}
-
-document.addEventListener("DOMContentLoaded", initGroupDepositTable);
-    
+    initGroupDepositTable();
     protectSite();
   </script>
 </body>
