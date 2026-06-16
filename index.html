@@ -1406,12 +1406,255 @@
                 <p>Construisez la méthodologie de votre étude.</p>
               </article>
 
-              <article id="a2-groupe" class="sub-page">
-                <div class="back-row"><button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button></div>
-                <p class="eyebrow">Activité 2</p>
-                <h2>👥 Répartition groupe et dépôt 2</h2>
-                <p>À compléter.</p>
+              <article id="a1-groupe" class="sub-page fullscreen-subpage">
+                <div class="fullscreen-header">
+                  <div class="fullscreen-actions">
+                    <div>
+                      <p class="eyebrow">Activité 1 — Répartition</p>
+                      <h2>👥 Répartition GROUPE et Dépôt (2)</h2>
+                    </div>
+
+                    <button class="btn secondary" type="button" onclick="closeCoursePages()">← Fermer la page</button>
+                  </div>
+
+                  <p class="table-help">
+                    Tableau en pleine page. Faites défiler horizontalement pour voir toutes les colonnes.
+                  </p>
+                </div>
+
+                <div class="callout">
+                  <p><strong>Consigne</strong></p>
+                  <p>
+                    Chaque groupe doit préparer le livrable lié à l’Exo 2.
+                    Le dépôt est attendu pour le <strong>21 juin 2026</strong>.
+                  </p>
+                </div>
+
+                <div class="table-wrap fullscreen-table">
+                  <table id="groupDepositTable">
+                    <thead>
+                      <tr>
+                        <th>Groupe</th>
+                        <th>Membre du groupe</th>
+                        <th>Fichier</th>
+                        <th>Date de dépôt exo</th>
+                        <th>Status</th>
+                        <th>Date d’échéance</th>
+                        <th>Nombre d’étudiants</th>
+                        <th>Type d’exercice</th>
+                        <th>Nom de l’enseignant</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      <tr data-group="1">
+                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-1')">Groupe 1</button></td>
+                        <td>
+                          <div class="student-fields">
+                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+                          </div>
+                        </td>
+                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
+                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
+                        <td>
+                          <select class="field table-field" data-field="status">
+                            <option value="En cours">En cours</option>
+                            <option value="Déposé">Déposé</option>
+                            <option value="À corriger">À corriger</option>
+                            <option value="Validé">Validé</option>
+                          </select>
+                        </td>
+                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
+                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
+                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
+                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
+                      </tr>
+
+                      <tr data-group="2">
+                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-2')">Groupe 2</button></td>
+                        <td>
+                          <div class="student-fields">
+                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+                          </div>
+                        </td>
+                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
+                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
+                        <td>
+                          <select class="field table-field" data-field="status">
+                            <option value="En cours">En cours</option>
+                            <option value="Déposé">Déposé</option>
+                            <option value="À corriger">À corriger</option>
+                            <option value="Validé">Validé</option>
+                          </select>
+                        </td>
+                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
+                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
+                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
+                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
+                      </tr>
+
+                      <tr data-group="3">
+                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-3')">Groupe 3</button></td>
+                        <td>
+                          <div class="student-fields">
+                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+                          </div>
+                        </td>
+                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
+                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
+                        <td>
+                          <select class="field table-field" data-field="status">
+                            <option value="En cours">En cours</option>
+                            <option value="Déposé">Déposé</option>
+                            <option value="À corriger">À corriger</option>
+                            <option value="Validé">Validé</option>
+                          </select>
+                        </td>
+                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
+                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
+                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
+                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
+                      </tr>
+
+                      <tr data-group="4">
+                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-4')">Groupe 4</button></td>
+                        <td>
+                          <div class="student-fields">
+                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+                          </div>
+                        </td>
+                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
+                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
+                        <td>
+                          <select class="field table-field" data-field="status">
+                            <option value="En cours">En cours</option>
+                            <option value="Déposé">Déposé</option>
+                            <option value="À corriger">À corriger</option>
+                            <option value="Validé">Validé</option>
+                          </select>
+                        </td>
+                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
+                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
+                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
+                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
+                      </tr>
+
+                      <tr data-group="5">
+                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-5')">Groupe 5</button></td>
+                        <td>
+                          <div class="student-fields">
+                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+                          </div>
+                        </td>
+                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
+                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
+                        <td>
+                          <select class="field table-field" data-field="status">
+                            <option value="En cours">En cours</option>
+                            <option value="Déposé">Déposé</option>
+                            <option value="À corriger">À corriger</option>
+                            <option value="Validé">Validé</option>
+                          </select>
+                        </td>
+                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
+                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
+                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
+                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
+                      </tr>
+
+                      <tr data-group="6">
+                        <td><button class="btn secondary" type="button" onclick="openCoursePage('groupe-6')">Groupe 6</button></td>
+                        <td>
+                          <div class="student-fields">
+                            <input class="field table-field student-name-field" data-field="student1" placeholder="Étudiant 1">
+                            <input class="field table-field student-name-field" data-field="student2" placeholder="Étudiant 2">
+                            <input class="field table-field student-name-field" data-field="student3" placeholder="Étudiant 3">
+                            <input class="field table-field student-name-field" data-field="student4" placeholder="Étudiant 4">
+                            <input class="field table-field student-name-field" data-field="student5" placeholder="Étudiant 5">
+                          </div>
+                        </td>
+                        <td><input class="field table-field" data-field="file" type="url" placeholder="Lien du fichier"></td>
+                        <td><input class="field table-field date-field" data-field="depositDate" type="date"></td>
+                        <td>
+                          <select class="field table-field" data-field="status">
+                            <option value="En cours">En cours</option>
+                            <option value="Déposé">Déposé</option>
+                            <option value="À corriger">À corriger</option>
+                            <option value="Validé">Validé</option>
+                          </select>
+                        </td>
+                        <td><input class="field table-field date-field" data-field="deadlineDate" type="date" value="2026-06-18"></td>
+                        <td><input class="field table-field" data-field="studentCount" type="number" min="1" value="5"></td>
+                        <td><input class="field table-field" data-field="exerciseType" value="quizz"></td>
+                        <td><input class="field table-field" data-field="teacher" value="Stéphane"></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </article>
+
+              <article id="groupe-1" class="sub-page">
+                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
+                <p class="eyebrow">Activité 2 — Groupe</p>
+                <h2>👥 Groupe 1</h2>
+                <p class="muted">Page dédiée au Groupe 1. Le dépôt principal se fait dans le tableau de répartition.</p>
+              </article>
+
+              <article id="groupe-2" class="sub-page">
+                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
+                <p class="eyebrow">Activité 2 — Groupe</p>
+                <h2>👥 Groupe 2</h2>
+                <p class="muted">Page dédiée au Groupe 2. Le dépôt principal se fait dans le tableau de répartition.</p>
+              </article>
+
+              <article id="groupe-3" class="sub-page">
+                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
+                <p class="eyebrow">Activité 2 — Groupe</p>
+                <h2>👥 Groupe 3</h2>
+                <p class="muted">Page dédiée au Groupe 3. Le dépôt principal se fait dans le tableau de répartition.</p>
+              </article>
+
+              <article id="groupe-4" class="sub-page">
+                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
+                <p class="eyebrow">Activité 2 — Groupe</p>
+                <h2>👥 Groupe 4</h2>
+                <p class="muted">Page dédiée au Groupe 4. Le dépôt principal se fait dans le tableau de répartition.</p>
+              </article>
+
+              <article id="groupe-5" class="sub-page">
+                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
+                <p class="eyebrow">Activité 2 — Groupe</p>
+                <h2>👥 Groupe 5</h2>
+                <p class="muted">Page dédiée au Groupe 5. Le dépôt principal se fait dans le tableau de répartition.</p>
+              </article>
+
+              <article id="groupe-6" class="sub-page">
+                <div class="back-row"><button class="btn secondary" type="button" onclick="openCoursePage('a1-groupe')">← Retour à la répartition</button></div>
+                <p class="eyebrow">Activité 2 — Groupe</p>
+                <h2>👥 Groupe 6</h2>
+                <p class="muted">Page dédiée au Groupe 6. Le dépôt principal se fait dans le tableau de répartition.</p>
+              </article>
+
 
               <article id="a3-cours" class="sub-page">
                 <div class="back-row"><button class="btn secondary" type="button" onclick="closeCoursePages()">← Retour aux activités</button></div>
