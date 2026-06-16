@@ -1373,6 +1373,71 @@
           </div>
         </section>
       </section>
+      <article id="final-exam" class="sub-page">
+  <div class="fullscreen-header">
+    <div class="fullscreen-actions">
+      <div>
+        <p class="eyebrow">Examen final — Étude de marché</p>
+        <h2>🧾 Examen final</h2>
+      </div>
+      <button class="btn secondary" type="button" onclick="closeCoursePages()">← Fermer la page</button>
+    </div>
+  </div>
+
+  <div id="finalExamIntro" class="callout">
+    <p><strong>📅 Date de l’examen</strong></p>
+    <p>
+      L’examen final est programmé le <strong>30 juin 2026 à 10h00 précise</strong>,
+      heure Madagascar.
+    </p>
+    <p>
+      Le bouton de démarrage sera actif uniquement pendant la minute de 10h00.
+      Dès que vous cliquez sur “Commencer l’examen”, le compte à rebours démarre.
+    </p>
+
+    <div style="margin-top:16px;">
+      <label for="finalExamStudentName"><strong>Nom complet de l’étudiant</strong></label>
+      <input id="finalExamStudentName" type="text" placeholder="Ex : Rakoto Stéphane" style="width:100%; margin-top:8px;">
+    </div>
+
+    <div id="finalExamGateMessage" class="callout" style="margin-top:16px;">
+      Vérification de l’heure d’ouverture...
+    </div>
+
+    <button id="finalExamStartBtn" class="btn" type="button" onclick="startFinalExam()" disabled>
+      Commencer l’examen
+    </button>
+  </div>
+
+  <div id="finalExamRunning" style="display:none;">
+    <div class="callout" style="position:sticky; top:0; z-index:30;">
+      <p><strong>⏱ Temps restant</strong></p>
+      <h2 id="finalExamTimer" style="margin:0;">60:00</h2>
+      <p id="finalExamProgressText">Répondez à toutes les questions avant la fin du temps.</p>
+    </div>
+
+    <form id="finalExamForm" class="notion-course-content" onsubmit="submitFinalExam(event)">
+      <div id="finalExamQuestions"></div>
+
+      <div class="callout" style="margin-top:28px;">
+        <p><strong>✅ Envoi final</strong></p>
+        <p>
+          Une seule tentative est autorisée. Après validation, votre résultat sera envoyé à l’enseignant.
+        </p>
+        <button class="btn" type="submit">
+          Envoyer mon examen
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div id="finalExamDone" class="callout" style="display:none;">
+    <p><strong>✅ Examen envoyé</strong></p>
+    <p>
+      Votre résultat a été enregistré. Vous ne pouvez plus repasser cet examen avec ce compte.
+    </p>
+  </div>
+</article>
     </main>
 
     <footer class="footer">
@@ -2010,6 +2075,547 @@
     initTrackingListeners();
     loadAllTrackingTables();
     protectSite();
+
+    <script>
+/* ======================================================
+   EXAMEN FINAL — Étude de marché
+   Ouverture : 30 juin 2026 à 10h00, Madagascar UTC+3
+   ====================================================== */
+
+const FINAL_EXAM_START_AT = new Date("2026-06-30T10:00:00+03:00");
+
+// Ici, l’examen est cliquable seulement pendant la minute de 10h00.
+// Si tu veux donner 5 minutes de tolérance, remplace 10:01 par 10:05.
+const FINAL_EXAM_LATEST_START_AT = new Date("2026-06-30T10:01:00+03:00");
+
+const FINAL_EXAM_DURATION_MINUTES = 60;
+
+let finalExamInterval = null;
+let finalExamCurrentUser = null;
+
+const FINAL_EXAM_QUESTIONS = [
+  {
+    type: "multi",
+    question: "1. Quels éléments doit contenir un brief d’étude de marché de qualité ?",
+    options: [
+      "Un constat préalable",
+      "Des objectifs clairs",
+      "Les décisions ou actions attendues après l’étude",
+      "Uniquement le logo de l’entreprise"
+    ],
+    answer: [0, 1, 2]
+  },
+  {
+    type: "single",
+    question: "2. Quelle est la bonne succession des grandes étapes d’une étude de marché ?",
+    options: [
+      "Analyse, terrain, questionnaire, restitution, échantillon",
+      "Questionnaire, échantillon, terrain, analyse, restitution",
+      "Échantillon, restitution, terrain, questionnaire, analyse",
+      "Budget, design, publicité, vente, reporting"
+    ],
+    answer: [1]
+  },
+  {
+    type: "multi",
+    question: "3. Dans quels cas utilise-t-on surtout une étude qualitative ?",
+    options: [
+      "Comprendre des motivations",
+      "Explorer des perceptions",
+      "Illustrer des comportements",
+      "Mesurer statistiquement une fréquence d’achat"
+    ],
+    answer: [0, 1, 2]
+  },
+  {
+    type: "multi",
+    question: "4. Dans quels cas utilise-t-on surtout une étude quantitative ?",
+    options: [
+      "Mesurer une intention d’achat",
+      "Comparer des profils de consommateurs",
+      "Évaluer une fréquence ou un taux",
+      "Recueillir uniquement des récits très détaillés"
+    ],
+    answer: [0, 1, 2]
+  },
+  {
+    type: "single",
+    question: "5. À quoi servent les questions de screening dans un questionnaire ?",
+    options: [
+      "À décorer le questionnaire",
+      "À vérifier que le répondant correspond bien à la cible",
+      "À remplacer l’analyse statistique",
+      "À présenter les résultats"
+    ],
+    answer: [1]
+  },
+  {
+    type: "single",
+    question: "6. Que permet la méthode des quotas ?",
+    options: [
+      "Répliquer certaines caractéristiques de la population cible dans l’échantillon",
+      "Supprimer toutes les questions ouvertes",
+      "Garantir que tous les répondants pensent pareil",
+      "Éviter de définir une cible"
+    ],
+    answer: [0]
+  },
+  {
+    type: "single",
+    question: "7. Quel risque apparaît si l’échantillon provient d’une source trop spécifique ou non représentative ?",
+    options: [
+      "Un risque de biais",
+      "Un gain automatique de fiabilité",
+      "Une absence totale d’erreur",
+      "Une meilleure neutralité"
+    ],
+    answer: [0]
+  },
+  {
+    type: "single",
+    question: "8. Une marge d’erreur de 5 % signifie que :",
+    options: [
+      "Les résultats sont toujours faux",
+      "Le résultat observé peut varier autour de la valeur réelle estimée",
+      "L’étude est qualitative",
+      "Il faut interroger exactement 5 personnes"
+    ],
+    answer: [1]
+  },
+  {
+    type: "multi",
+    question: "9. Quels critères permettent de décider si l’on peut réaliser l’étude en interne ?",
+    options: [
+      "Le contexte",
+      "Les compétences disponibles",
+      "La capacité en temps et ressources",
+      "La couleur du logo"
+    ],
+    answer: [0, 1, 2]
+  },
+  {
+    type: "single",
+    question: "10. Si l’étude est nominative et repose sur une base de contacts, quelle règle devient importante ?",
+    options: [
+      "Le RGPD",
+      "La règle des 4P uniquement",
+      "La typographie",
+      "Le choix d’un slogan"
+    ],
+    answer: [0]
+  },
+  {
+    type: "multi",
+    question: "11. Quels principes renforcent la déontologie des études ?",
+    options: [
+      "La transparence",
+      "La protection des données personnelles",
+      "L’éthique",
+      "La manipulation volontaire des réponses"
+    ],
+    answer: [0, 1, 2]
+  },
+  {
+    type: "multi",
+    question: "12. Quelles sont les règles d’or pour crédibiliser des résultats ?",
+    options: [
+      "Être transparent",
+      "Assurer la traçabilité des données",
+      "Être rigoureux",
+      "Rester objectif"
+    ],
+    answer: [0, 1, 2, 3]
+  },
+  {
+    type: "single",
+    question: "13. Face à des décideurs externes qui connaissent peu le marché, l’objectif principal est souvent de :",
+    options: [
+      "Convaincre en allant à l’essentiel",
+      "Montrer tous les détails techniques",
+      "Éviter toute conclusion",
+      "Changer la méthodologie pendant la présentation"
+    ],
+    answer: [0]
+  },
+  {
+    type: "single",
+    question: "14. Face à des décideurs internes, l’objectif principal est souvent de :",
+    options: [
+      "Obtenir une prise de décision",
+      "Faire un cours magistral",
+      "Masquer les limites de l’étude",
+      "Éviter les recommandations"
+    ],
+    answer: [0]
+  },
+  {
+    type: "single",
+    question: "15. Face à des spécialistes, l’attitude recommandée est de :",
+    options: [
+      "Challenger ses résultats et démontrer leur pertinence",
+      "Rester très vague",
+      "Ne montrer aucun chiffre",
+      "Supprimer les détails techniques"
+    ],
+    answer: [0]
+  },
+  {
+    type: "multi",
+    question: "16. Quelles pratiques améliorent la visualisation des résultats ?",
+    options: [
+      "Éviter la 3D inutile",
+      "Garder des axes équilibrés",
+      "Limiter la gymnastique oculaire",
+      "Multiplier les effets graphiques complexes"
+    ],
+    answer: [0, 1, 2]
+  },
+  {
+    type: "single",
+    question: "17. À quoi sert le test du Trifecta ?",
+    options: [
+      "À évaluer la qualité d’une représentation graphique",
+      "À choisir un nom de marque",
+      "À remplacer une étude terrain",
+      "À calculer automatiquement un budget"
+    ],
+    answer: [0]
+  },
+  {
+    type: "multi",
+    question: "18. Pour présenter une analyse qualitative, il est utile de :",
+    options: [
+      "Structurer le storytelling",
+      "Rappeler les sources",
+      "Utiliser des verbatims ou illustrations pertinentes",
+      "Inventer des citations plus convaincantes"
+    ],
+    answer: [0, 1, 2]
+  },
+  {
+    type: "single",
+    question: "19. Pourquoi faut-il distinguer rapport et présentation ?",
+    options: [
+      "La présentation doit être plus synthétique et orientée vers les messages clés",
+      "Le rapport doit toujours être oral",
+      "La présentation doit contenir toutes les données brutes",
+      "Il n’y a aucune différence"
+    ],
+    answer: [0]
+  },
+  {
+    type: "multi",
+    question: "20. Pendant une présentation de résultats, à quels marqueurs faut-il être attentif ?",
+    options: [
+      "Rythme",
+      "Compréhension",
+      "Feedback et interrogations",
+      "Confusion volontaire"
+    ],
+    answer: [0, 1, 2]
+  }
+];
+
+function finalExamUserKey(suffix) {
+  const id = finalExamCurrentUser && finalExamCurrentUser.id ? finalExamCurrentUser.id : "guest";
+  return "finalExam_" + suffix + "_" + id;
+}
+
+function formatFinalExamTime(ms) {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+  const seconds = String(totalSeconds % 60).padStart(2, "0");
+  return minutes + ":" + seconds;
+}
+
+function isSameAnswer(selected, expected) {
+  const a = [...selected].map(Number).sort((x, y) => x - y);
+  const b = [...expected].map(Number).sort((x, y) => x - y);
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+async function initFinalExam() {
+  if (!document.getElementById("finalExamGateMessage")) {
+    return;
+  }
+
+  try {
+    const { data } = await supabaseClient.auth.getUser();
+    finalExamCurrentUser = data && data.user ? data.user : null;
+  } catch (e) {
+    finalExamCurrentUser = null;
+  }
+
+  renderFinalExamQuestions();
+  refreshFinalExamGate();
+
+  setInterval(refreshFinalExamGate, 1000);
+
+  const submitted = localStorage.getItem(finalExamUserKey("submitted"));
+  const startedAt = localStorage.getItem(finalExamUserKey("startedAt"));
+
+  if (submitted === "true") {
+    showFinalExamDone();
+    return;
+  }
+
+  if (startedAt) {
+    showFinalExamRunning();
+    startFinalExamCountdown();
+  }
+}
+
+function refreshFinalExamGate() {
+  const message = document.getElementById("finalExamGateMessage");
+  const button = document.getElementById("finalExamStartBtn");
+
+  if (!message || !button) return;
+
+  const now = new Date();
+  const submitted = localStorage.getItem(finalExamUserKey("submitted"));
+  const startedAt = localStorage.getItem(finalExamUserKey("startedAt"));
+
+  if (submitted === "true") {
+    message.innerHTML = "✅ Vous avez déjà envoyé cet examen.";
+    button.disabled = true;
+    return;
+  }
+
+  if (startedAt) {
+    message.innerHTML = "⏱ Examen en cours. Le compte à rebours continue.";
+    button.disabled = true;
+    return;
+  }
+
+  if (now < FINAL_EXAM_START_AT) {
+    const remaining = FINAL_EXAM_START_AT - now;
+    message.innerHTML = "🔒 Examen fermé pour le moment.<br>Ouverture dans : <strong>" + formatFinalExamTime(remaining) + "</strong>";
+    button.disabled = true;
+    return;
+  }
+
+  if (now >= FINAL_EXAM_START_AT && now < FINAL_EXAM_LATEST_START_AT) {
+    message.innerHTML = "✅ L’examen est ouvert. Cliquez maintenant pour commencer.";
+    button.disabled = false;
+    return;
+  }
+
+  message.innerHTML = "⛔ Le créneau de démarrage est dépassé. L’examen était cliquable à 10h00 précise.";
+  button.disabled = true;
+}
+
+function renderFinalExamQuestions() {
+  const container = document.getElementById("finalExamQuestions");
+  if (!container) return;
+
+  container.innerHTML = FINAL_EXAM_QUESTIONS.map((q, index) => {
+    const inputType = q.type === "multi" ? "checkbox" : "radio";
+    const optionsHtml = q.options.map((option, optionIndex) => {
+      return `
+        <label style="display:block; padding:10px 12px; margin:8px 0; border:1px solid var(--border); border-radius:14px; background:#fff;">
+          <input type="${inputType}" name="final_q_${index}" value="${optionIndex}">
+          ${option}
+        </label>
+      `;
+    }).join("");
+
+    return `
+      <div class="callout" style="margin:18px 0;">
+        <p><strong>${q.question}</strong></p>
+        ${q.type === "multi" ? "<p><em>Plusieurs réponses possibles.</em></p>" : "<p><em>Une seule réponse possible.</em></p>"}
+        ${optionsHtml}
+      </div>
+    `;
+  }).join("");
+}
+
+async function startFinalExam() {
+  const now = new Date();
+
+  if (now < FINAL_EXAM_START_AT || now >= FINAL_EXAM_LATEST_START_AT) {
+    alert("L’examen ne peut être démarré que le 30 juin à 10h00 précise.");
+    refreshFinalExamGate();
+    return;
+  }
+
+  const { data } = await supabaseClient.auth.getUser();
+  finalExamCurrentUser = data && data.user ? data.user : null;
+
+  if (!finalExamCurrentUser) {
+    alert("Vous devez être connecté pour commencer l’examen.");
+    return;
+  }
+
+  const nameInput = document.getElementById("finalExamStudentName");
+  const fullName = nameInput ? nameInput.value.trim() : "";
+
+  if (!fullName) {
+    alert("Veuillez renseigner votre nom complet avant de commencer.");
+    return;
+  }
+
+  localStorage.setItem(finalExamUserKey("startedAt"), now.toISOString());
+  localStorage.setItem(finalExamUserKey("fullName"), fullName);
+
+  showFinalExamRunning();
+  startFinalExamCountdown();
+}
+
+function showFinalExamRunning() {
+  const intro = document.getElementById("finalExamIntro");
+  const running = document.getElementById("finalExamRunning");
+  const done = document.getElementById("finalExamDone");
+
+  if (intro) intro.style.display = "none";
+  if (running) running.style.display = "block";
+  if (done) done.style.display = "none";
+}
+
+function showFinalExamDone() {
+  const intro = document.getElementById("finalExamIntro");
+  const running = document.getElementById("finalExamRunning");
+  const done = document.getElementById("finalExamDone");
+
+  if (intro) intro.style.display = "none";
+  if (running) running.style.display = "none";
+  if (done) done.style.display = "block";
+}
+
+function startFinalExamCountdown() {
+  if (finalExamInterval) clearInterval(finalExamInterval);
+
+  finalExamInterval = setInterval(() => {
+    const startedAtRaw = localStorage.getItem(finalExamUserKey("startedAt"));
+    if (!startedAtRaw) return;
+
+    const startedAt = new Date(startedAtRaw);
+    const endAt = new Date(startedAt.getTime() + FINAL_EXAM_DURATION_MINUTES * 60 * 1000);
+    const now = new Date();
+    const remaining = endAt - now;
+
+    const timer = document.getElementById("finalExamTimer");
+    if (timer) timer.textContent = formatFinalExamTime(remaining);
+
+    if (remaining <= 0) {
+      clearInterval(finalExamInterval);
+      autoSubmitFinalExam();
+    }
+  }, 1000);
+}
+
+function collectFinalExamAnswers() {
+  let score = 0;
+  const answers = [];
+
+  FINAL_EXAM_QUESTIONS.forEach((q, index) => {
+    const checked = Array.from(document.querySelectorAll(`input[name="final_q_${index}"]:checked`))
+      .map(input => Number(input.value));
+
+    const correct = isSameAnswer(checked, q.answer);
+    if (correct) score++;
+
+    answers.push({
+      question_number: index + 1,
+      question: q.question,
+      selected_indexes: checked,
+      selected_answers: checked.map(i => q.options[i]),
+      correct: correct
+    });
+  });
+
+  return {
+    score,
+    total: FINAL_EXAM_QUESTIONS.length,
+    percentage: Number(((score / FINAL_EXAM_QUESTIONS.length) * 100).toFixed(2)),
+    answers
+  };
+}
+
+async function submitFinalExam(event) {
+  if (event) event.preventDefault();
+
+  const confirmation = confirm("Confirmer l’envoi de votre examen ? Une seule tentative est autorisée.");
+  if (!confirmation) return;
+
+  await sendFinalExamResult(false);
+}
+
+async function autoSubmitFinalExam() {
+  alert("Temps écoulé. Votre examen va être envoyé automatiquement.");
+  await sendFinalExamResult(true);
+}
+
+async function sendFinalExamResult(autoSubmitted) {
+  const submitted = localStorage.getItem(finalExamUserKey("submitted"));
+  if (submitted === "true") {
+    showFinalExamDone();
+    return;
+  }
+
+  const { data } = await supabaseClient.auth.getUser();
+  finalExamCurrentUser = data && data.user ? data.user : null;
+
+  if (!finalExamCurrentUser) {
+    alert("Erreur : utilisateur non connecté. Le résultat n’a pas été envoyé.");
+    return;
+  }
+
+  const startedAtRaw = localStorage.getItem(finalExamUserKey("startedAt"));
+  if (!startedAtRaw) {
+    alert("Erreur : l’heure de début est introuvable.");
+    return;
+  }
+
+  const startedAt = new Date(startedAtRaw);
+  const now = new Date();
+  const durationSeconds = Math.floor((now - startedAt) / 1000);
+
+  const result = collectFinalExamAnswers();
+  const fullName = localStorage.getItem(finalExamUserKey("fullName")) || "";
+
+  const payload = {
+    user_id: finalExamCurrentUser.id,
+    email: finalExamCurrentUser.email,
+    full_name: fullName,
+    started_at: startedAt.toISOString(),
+    submitted_at: now.toISOString(),
+    score: result.score,
+    total: result.total,
+    percentage: result.percentage,
+    duration_seconds: durationSeconds,
+    answers: {
+      auto_submitted: autoSubmitted,
+      items: result.answers
+    },
+    user_agent: navigator.userAgent
+  };
+
+  const { error } = await supabaseClient
+    .from("final_exam_results")
+    .insert(payload);
+
+  if (error) {
+    console.error(error);
+
+    if (String(error.message || "").includes("duplicate")) {
+      alert("Un résultat existe déjà pour ce compte. Une seule tentative est autorisée.");
+      localStorage.setItem(finalExamUserKey("submitted"), "true");
+      showFinalExamDone();
+      return;
+    }
+
+    alert("Erreur : le résultat n’a pas été envoyé. Vérifiez Supabase/RLS.");
+    return;
+  }
+
+  localStorage.setItem(finalExamUserKey("submitted"), "true");
+  alert("Examen envoyé. Votre résultat a été enregistré.");
+  showFinalExamDone();
+}
+
+document.addEventListener("DOMContentLoaded", initFinalExam);
+</script>
+
   </script>
 </body>
 </html>
