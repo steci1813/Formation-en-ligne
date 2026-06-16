@@ -736,6 +736,94 @@ body.fullscreen-open {
 #groupDepositTable input[type="date"] {
   background: #ffffff;
 }
+
+      /* Agrandir les colonnes importantes du tableau Répartition */
+#groupDepositTable {
+  min-width: 2300px;
+}
+
+/* Colonne Groupe */
+#groupDepositTable th:nth-child(1),
+#groupDepositTable td:nth-child(1) {
+  min-width: 150px;
+}
+
+/* Colonne Membre du groupe */
+#groupDepositTable th:nth-child(2),
+#groupDepositTable td:nth-child(2) {
+  min-width: 420px;
+}
+
+/* Champ membre du groupe */
+#groupDepositTable td:nth-child(2) textarea {
+  min-width: 390px;
+  width: 100%;
+  min-height: 95px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* Colonne Fichier */
+#groupDepositTable th:nth-child(3),
+#groupDepositTable td:nth-child(3) {
+  min-width: 380px;
+}
+
+/* Champ fichier */
+#groupDepositTable td:nth-child(3) input {
+  min-width: 350px;
+  width: 100%;
+  font-size: 15px;
+}
+
+/* Colonne Date dépôt */
+#groupDepositTable th:nth-child(4),
+#groupDepositTable td:nth-child(4) {
+  min-width: 190px;
+}
+
+/* Colonne Status */
+#groupDepositTable th:nth-child(5),
+#groupDepositTable td:nth-child(5) {
+  min-width: 220px;
+}
+
+/* Champ statut */
+#groupDepositTable td:nth-child(5) select {
+  min-width: 190px;
+  width: 100%;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* Colonne Date échéance */
+#groupDepositTable th:nth-child(6),
+#groupDepositTable td:nth-child(6) {
+  min-width: 190px;
+}
+
+/* Colonnes restantes */
+#groupDepositTable th:nth-child(7),
+#groupDepositTable td:nth-child(7),
+#groupDepositTable th:nth-child(8),
+#groupDepositTable td:nth-child(8),
+#groupDepositTable th:nth-child(9),
+#groupDepositTable td:nth-child(9) {
+  min-width: 210px;
+}
+
+/* Amélioration générale des champs du tableau */
+#groupDepositTable .field {
+  min-height: 48px;
+  padding: 12px 14px;
+  border-radius: 14px;
+}
+
+/* Les cellules respirent mieux */
+#groupDepositTable th,
+#groupDepositTable td {
+  padding: 16px;
+}
       
       .topbar {
         align-items: flex-start;
