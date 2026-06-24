@@ -4,21 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Espace client | Calendrier éditorial</title>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <style>
     :root {
-      --bg: #f6f4ef;
+      --bg: #f6f2ea;
       --panel: #ffffff;
       --panel-soft: #fbfaf7;
-      --text: #161616;
-      --muted: #6b7280;
-      --border: #e8e2d7;
+      --text: #171717;
+      --muted: #667085;
+      --border: #e5dfd4;
+      --border-strong: #d4c7b6;
       --primary: #111827;
       --primary-soft: #f0ede7;
       --accent: #b88746;
-      --accent-2: #7a542f;
+      --accent-soft: #f7efe3;
       --danger: #b42318;
       --danger-soft: #fee4e2;
       --success: #067647;
@@ -32,455 +31,162 @@
     }
 
     * { box-sizing: border-box; }
-
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at top left, rgba(184, 135, 70, 0.14), transparent 34%),
+        radial-gradient(circle at top left, rgba(184, 135, 70, 0.16), transparent 34%),
         linear-gradient(135deg, #f7f3eb 0%, #fbfaf8 45%, #f2eee8 100%);
       min-height: 100vh;
     }
 
-    a { color: inherit; }
     button, input, select, textarea { font: inherit; }
+    a { color: inherit; }
     .hidden { display: none !important; }
 
-    .page-shell {
-      width: min(1480px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 28px 0 56px;
-    }
+    .page-shell { width: min(1560px, calc(100% - 28px)); margin: 0 auto; padding: 24px 0 54px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 22px; }
+    .brand { display: flex; align-items: center; gap: 13px; }
+    .brand-logo { width: 48px; height: 48px; border-radius: 16px; display: grid; place-items: center; color: #fff; font-weight: 950; background: linear-gradient(135deg, #111827, #3b2d20 55%, #b88746); box-shadow: var(--shadow); }
+    .brand h1 { margin: 0; font-size: clamp(20px, 3vw, 31px); letter-spacing: -0.04em; }
+    .brand p { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+    .top-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      margin-bottom: 26px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-    }
-
-    .brand-logo {
-      width: 46px;
-      height: 46px;
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      color: #fff;
-      font-weight: 900;
-      background: linear-gradient(135deg, #111827, #3b2d20 55%, #b88746);
-      box-shadow: var(--shadow);
-    }
-
-    .brand h1 {
-      margin: 0;
-      font-size: clamp(20px, 3vw, 31px);
-      letter-spacing: -0.04em;
-    }
-
-    .brand p {
-      margin: 2px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .top-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .btn {
-      border: 0;
-      cursor: pointer;
-      border-radius: 999px;
-      padding: 11px 15px;
-      font-weight: 850;
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: 0.18s ease;
-      text-decoration: none;
-      white-space: nowrap;
-    }
-
+    .btn { border: 0; cursor: pointer; border-radius: 999px; padding: 11px 15px; font-weight: 850; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.18s ease; text-decoration: none; white-space: nowrap; }
     .btn:hover { transform: translateY(-1px); }
     .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 12px 25px rgba(17, 24, 39, 0.18); }
     .btn-soft { background: var(--primary-soft); color: var(--primary); border: 1px solid var(--border); }
     .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--border); }
     .btn-danger { background: var(--danger-soft); color: var(--danger); }
     .btn-success { background: var(--success-soft); color: var(--success); }
-
-    .grid { display: grid; gap: 18px; }
-    .hero { grid-template-columns: 1.3fr 0.7fr; align-items: stretch; margin-bottom: 18px; }
-
-    .card {
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid rgba(232, 226, 215, 0.95);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
-    }
-
-    .hero-main {
-      padding: 28px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-main::after {
-      content: "";
-      position: absolute;
-      width: 210px;
-      height: 210px;
-      right: -72px;
-      top: -90px;
-      border-radius: 50%;
-      background: rgba(184, 135, 70, 0.16);
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      border-radius: 999px;
-      background: #f7efe3;
-      color: var(--accent-2);
-      padding: 8px 12px;
-      font-size: 13px;
-      font-weight: 950;
-      margin-bottom: 16px;
-    }
-
-    .hero-main h2 {
-      margin: 0;
-      font-size: clamp(28px, 5vw, 48px);
-      line-height: 0.98;
-      letter-spacing: -0.055em;
-      max-width: 820px;
-    }
-
-    .hero-main p {
-      margin: 16px 0 0;
-      color: var(--muted);
-      max-width: 860px;
-      line-height: 1.65;
-    }
-
-    .profile-card {
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 18px;
-    }
-
-    .profile-row { display: flex; align-items: center; gap: 12px; }
-    .avatar {
-      width: 54px;
-      height: 54px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #111827, #b88746);
-      color: #fff;
-      display: grid;
-      place-items: center;
-      font-size: 20px;
-      font-weight: 900;
-      flex: 0 0 auto;
-    }
-
-    .profile-row h3, .profile-row p { margin: 0; }
-    .profile-row p { color: var(--muted); font-size: 14px; margin-top: 2px; overflow-wrap: anywhere; }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 8px 11px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 950;
-      width: fit-content;
-      border: 1px solid transparent;
-      white-space: nowrap;
-    }
-
-    .pill.success { background: var(--success-soft); color: var(--success); }
-    .pill.warning { background: var(--warning-soft); color: var(--warning); }
-    .pill.info { background: var(--info-soft); color: var(--info); }
-    .pill.danger { background: var(--danger-soft); color: var(--danger); }
-    .pill.neutral { background: #f2f4f7; color: #344054; }
-    .pill.gold { background: #f7efe3; color: var(--accent-2); }
-
-    .stats { grid-template-columns: repeat(4, 1fr); margin-bottom: 18px; }
-    .stat-card { padding: 18px; }
-    .stat-card span { color: var(--muted); font-size: 13px; font-weight: 850; }
-    .stat-card strong { display: block; margin-top: 8px; font-size: 30px; letter-spacing: -0.04em; }
-
-    .toolbar {
-      padding: 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      justify-content: space-between;
-      margin-bottom: 18px;
-      position: sticky;
-      top: 8px;
-      z-index: 20;
-    }
-
-    .filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex: 1; }
-
-    .field, .textarea, .select {
-      width: 100%;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.96);
-      border-radius: 16px;
-      padding: 12px 13px;
-      outline: none;
-      color: var(--text);
-      transition: 0.18s ease;
-    }
-
-    .field:focus, .textarea:focus, .select:focus {
-      border-color: rgba(184, 135, 70, 0.8);
-      box-shadow: 0 0 0 4px rgba(184, 135, 70, 0.13);
-    }
-
-    .filters .field, .filters .select {
-      max-width: 230px;
-      border-radius: 999px;
-      padding: 10px 13px;
-      font-size: 14px;
-    }
-
-    .admin-panel {
-      margin-bottom: 18px;
-      padding: 18px;
-      border: 1px solid rgba(184, 135, 70, 0.35);
-      background: rgba(255, 252, 247, 0.96);
-    }
-
-    .section-title {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .section-title h3 { margin: 0; font-size: 19px; letter-spacing: -0.02em; }
-    .section-title p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
-
-    .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-    .form-grid .full { grid-column: 1 / -1; }
-    .form-grid .span-2 { grid-column: span 2; }
-
-    .form-label { display: grid; gap: 7px; color: #344054; font-size: 13px; font-weight: 900; }
-    .textarea { min-height: 86px; resize: vertical; line-height: 1.55; }
-
-    .post-actions { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; margin-top: 10px; }
-
-    .board-card { padding: 18px; }
-    .board-help { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; color: var(--muted); font-size: 13px; }
-
-    .year-group, .month-group, .week-group {
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      background: #fff;
-      margin-bottom: 14px;
-      overflow: hidden;
-    }
-
-    .year-group > summary, .month-group > summary, .week-group > summary {
-      cursor: pointer;
-      list-style: none;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 14px 16px;
-      font-weight: 950;
-    }
-
-    .year-group > summary::-webkit-details-marker,
-    .month-group > summary::-webkit-details-marker,
-    .week-group > summary::-webkit-details-marker { display: none; }
-
-    .year-group > summary { background: #111827; color: #fff; font-size: 18px; }
-    .month-group { margin: 12px; }
-    .month-group > summary { background: #f7efe3; color: var(--accent-2); }
-    .week-group { margin: 10px; }
-    .week-group > summary { background: #f9fafb; color: #344054; }
-
-    .table-wrap { overflow-x: auto; border-top: 1px solid var(--border); }
-    .monday-table { width: 100%; min-width: 1900px; border-collapse: collapse; }
-    .monday-table th, .monday-table td {
-      border-bottom: 1px solid var(--border);
-      border-right: 1px solid var(--border);
-      padding: 10px;
-      vertical-align: top;
-      background: #fff;
-    }
-
-    .monday-table th {
-      position: sticky;
-      top: 76px;
-      z-index: 10;
-      background: #f9fafb;
-      color: #667085;
-      text-transform: uppercase;
-      font-size: 11px;
-      letter-spacing: 0.04em;
-      text-align: left;
-      white-space: nowrap;
-    }
-
-    .monday-table th:first-child, .monday-table td:first-child {
-      position: sticky;
-      left: 0;
-      z-index: 11;
-      box-shadow: 8px 0 18px rgba(17, 24, 39, 0.05);
-    }
-
-    .monday-table th:first-child { background: #f9fafb; }
-    .monday-table td:first-child { background: #fff; }
-
-    .table-field, .table-select, .table-textarea {
-      width: 100%;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 9px 10px;
-      background: #fff;
-      color: var(--text);
-      outline: none;
-      font-size: 13px;
-    }
-
-    .table-textarea {
-      min-height: 74px;
-      resize: vertical;
-      line-height: 1.45;
-    }
-
-    .title-field { min-width: 190px; min-height: 48px; font-weight: 800; }
-    .copy-field { min-width: 320px; min-height: 118px; }
-    .asset-field { min-width: 220px; }
-    .comment-field { min-width: 260px; min-height: 92px; }
-    .assign-field { min-width: 160px; }
-
-    .table-field:disabled,
-    .table-select:disabled,
-    .table-textarea:disabled {
-      opacity: 0.72;
-      background: #f9fafb;
-      cursor: not-allowed;
-    }
-
-    .validation-stack { display: grid; gap: 8px; min-width: 160px; }
-    .check-line {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      font-weight: 900;
-      color: #344054;
-      white-space: nowrap;
-    }
-
-    .check-line input { width: 16px; height: 16px; accent-color: var(--success); }
-    .row-actions { display: grid; gap: 8px; min-width: 118px; }
     .mini-btn { padding: 8px 10px; font-size: 12px; }
 
-    .asset-link {
-      padding: 8px 10px;
-      border-radius: 12px;
-      background: #f7efe3;
-      color: var(--accent-2);
-      border: 1px solid rgba(184, 135, 70, 0.25);
-      text-decoration: none;
-      font-weight: 900;
-      font-size: 12px;
-      overflow-wrap: anywhere;
-    }
+    .grid { display: grid; gap: 18px; }
+    .hero { grid-template-columns: 1.35fr 0.65fr; align-items: stretch; margin-bottom: 18px; }
+    .card { background: rgba(255,255,255,0.92); border: 1px solid rgba(229, 223, 212, 0.96); border-radius: var(--radius); box-shadow: var(--shadow); backdrop-filter: blur(12px); }
+    .hero-main { padding: 28px; position: relative; overflow: hidden; }
+    .hero-main::after { content: ""; position: absolute; width: 210px; height: 210px; right: -72px; top: -90px; border-radius: 50%; background: rgba(184, 135, 70, 0.16); }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; background: var(--accent-soft); color: #7a542f; padding: 8px 12px; font-size: 13px; font-weight: 950; margin-bottom: 16px; }
+    .hero-main h2 { margin: 0; font-size: clamp(28px, 5vw, 48px); line-height: 0.98; letter-spacing: -0.055em; max-width: 900px; }
+    .hero-main p { margin: 16px 0 0; color: var(--muted); max-width: 900px; line-height: 1.65; }
 
-    .empty-state, .state-screen { text-align: center; padding: 36px 18px; color: var(--muted); }
-    .empty-state strong, .state-screen strong { display: block; color: var(--text); font-size: 20px; margin-bottom: 6px; letter-spacing: -0.03em; }
-
-    .state-screen {
-      max-width: 560px;
-      margin: 90px auto;
-      background: rgba(255,255,255,0.9);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
-
-    .toast {
-      position: fixed;
-      right: 18px;
-      bottom: 18px;
-      max-width: 440px;
-      background: #111827;
-      color: #fff;
-      padding: 14px 16px;
-      border-radius: 18px;
-      box-shadow: 0 18px 35px rgba(17, 24, 39, 0.25);
-      z-index: 100;
-      transform: translateY(16px);
-      opacity: 0;
-      pointer-events: none;
-      transition: 0.2s ease;
-      font-weight: 800;
-      line-height: 1.4;
-    }
-
-    .toast.show { transform: translateY(0); opacity: 1; }
+    .profile-card { padding: 24px; display: flex; flex-direction: column; justify-content: space-between; gap: 18px; }
+    .profile-row { display: flex; align-items: center; gap: 12px; }
+    .avatar { width: 54px; height: 54px; border-radius: 20px; background: linear-gradient(135deg, #111827, #b88746); color: #fff; display: grid; place-items: center; font-size: 20px; font-weight: 950; flex: 0 0 auto; }
+    .profile-card h3 { margin: 0; font-size: 20px; }
+    .profile-card p { margin: 3px 0 0; color: var(--muted); font-size: 14px; word-break: break-all; }
+    .small { font-size: 13px; line-height: 1.55; }
     .muted { color: var(--muted); }
-    .small { font-size: 13px; }
 
-    @media (max-width: 1100px) {
-      .hero { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: repeat(4, minmax(150px, 1fr)); margin-bottom: 18px; }
+    .stat-card { padding: 18px; }
+    .stat-card span { color: var(--muted); font-weight: 750; font-size: 13px; }
+    .stat-card strong { display: block; margin-top: 8px; font-size: 30px; letter-spacing: -0.04em; }
+
+    .section-title { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; padding: 22px 22px 0; }
+    .section-title h3 { margin: 0; font-size: 22px; letter-spacing: -0.03em; }
+    .section-title p { margin: 7px 0 0; color: var(--muted); line-height: 1.55; }
+
+    .toolbar { padding: 16px; margin-bottom: 18px; position: sticky; top: 10px; z-index: 20; }
+    .filters { display: grid; grid-template-columns: minmax(220px, 1fr) repeat(4, minmax(150px, 210px)); gap: 10px; align-items: center; }
+    .manager-bar { padding: 18px; margin-bottom: 18px; display: grid; grid-template-columns: minmax(240px, 1fr) auto auto; gap: 12px; align-items: end; }
+    .manager-bar label { display: grid; gap: 7px; font-weight: 850; font-size: 13px; color: var(--muted); }
+
+    .quick-table-card { margin-bottom: 18px; overflow: hidden; }
+    .quick-table-title { padding: 18px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .quick-table-title h3 { margin: 0; font-size: 18px; }
+    .quick-table-title p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+
+    .field, .select, .textarea { width: 100%; border: 1px solid var(--border); border-radius: 14px; padding: 11px 12px; background: #fff; color: var(--text); outline: none; transition: 0.15s ease; }
+    .textarea { min-height: 90px; resize: vertical; line-height: 1.45; }
+    .field:focus, .select:focus, .textarea:focus, .table-field:focus, .table-select:focus, .table-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(184, 135, 70, 0.12); }
+
+    .board-card { overflow: hidden; }
+    .board-help { padding: 14px 22px 18px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--muted); font-size: 13px; }
+    .board-group { padding: 0 18px 18px; }
+    details.group { border: 1px solid var(--border); border-radius: 18px; background: #fff; margin-bottom: 12px; overflow: hidden; }
+    details.group > summary { cursor: pointer; padding: 14px 16px; font-weight: 950; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #fbfaf7; }
+    details.group details.group { margin: 12px; }
+    .summary-count { color: var(--muted); font-weight: 750; font-size: 13px; }
+
+    .table-wrap { overflow-x: auto; border-top: 1px solid var(--border); background: #fff; }
+    table.monday-table { width: 100%; min-width: 2200px; border-collapse: separate; border-spacing: 0; }
+    .monday-table th, .monday-table td { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 10px; vertical-align: top; background: #fff; }
+    .monday-table th { position: sticky; top: 78px; z-index: 4; background: #f9fafb; color: var(--muted); text-transform: uppercase; letter-spacing: 0.055em; font-size: 11px; white-space: nowrap; }
+    .monday-table th:first-child, .monday-table td:first-child { position: sticky; left: 0; z-index: 3; min-width: 260px; box-shadow: 8px 0 18px rgba(17, 24, 39, 0.04); }
+    .monday-table th:first-child { z-index: 5; background: #f9fafb; }
+    .monday-table td:first-child { background: #fff; }
+    .quick-row td { background: #fffdf8; }
+    .quick-row td:first-child { background: #fffdf8; }
+    .monday-table tr:hover td { background: #fffdf8; }
+
+    .table-field, .table-select, .table-textarea { width: 100%; border: 1px solid transparent; border-radius: 12px; padding: 9px 10px; background: #f9fafb; color: var(--text); outline: none; min-height: 39px; }
+    .table-textarea { min-height: 78px; resize: vertical; line-height: 1.45; }
+    .title-field { min-height: 72px; font-weight: 850; }
+    .copy-field { min-height: 130px; min-width: 320px; }
+    .asset-field { min-width: 250px; }
+    .assign-field { min-width: 150px; }
+    .comment-field { min-height: 105px; min-width: 250px; }
+    .table-field:disabled, .table-select:disabled, .table-textarea:disabled { opacity: 0.78; cursor: not-allowed; }
+
+    .pill { display: inline-flex; width: fit-content; align-items: center; gap: 6px; border-radius: 999px; padding: 6px 10px; font-size: 12px; font-weight: 900; white-space: nowrap; }
+    .pill.gold { background: var(--accent-soft); color: #7a542f; }
+    .pill.info { background: var(--info-soft); color: var(--info); }
+    .pill.success { background: var(--success-soft); color: var(--success); }
+    .pill.warning { background: var(--warning-soft); color: var(--warning); }
+    .pill.danger { background: var(--danger-soft); color: var(--danger); }
+    .pill.neutral { background: #f2f4f7; color: #344054; }
+    .check-line { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 750; color: #344054; margin: 7px 0; }
+    .check-line input { width: 17px; height: 17px; accent-color: #111827; }
+    .validation-stack { display: grid; gap: 4px; min-width: 155px; }
+    .row-actions { display: flex; flex-direction: column; gap: 8px; min-width: 124px; }
+    .asset-link { color: var(--info); font-weight: 850; font-size: 13px; text-decoration: none; }
+    .asset-link:hover { text-decoration: underline; }
+
+    .empty-state { padding: 30px; text-align: center; color: var(--muted); }
+    .state-screen { min-height: 100vh; display: grid; place-items: center; padding: 24px; text-align: center; }
+    .state-box { width: min(560px, 100%); background: #fff; border: 1px solid var(--border); border-radius: 26px; padding: 28px; box-shadow: var(--shadow); }
+    .state-box strong { display: block; font-size: 24px; margin-bottom: 8px; }
+    .state-box p { color: var(--muted); line-height: 1.6; }
+    .state-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+
+    .toast { position: fixed; right: 18px; bottom: 18px; z-index: 100; width: min(420px, calc(100% - 36px)); background: #111827; color: #fff; border-radius: 18px; padding: 14px 16px; box-shadow: var(--shadow); transform: translateY(18px); opacity: 0; pointer-events: none; transition: 0.18s ease; font-weight: 750; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 980px) {
+      .topbar, .hero { grid-template-columns: 1fr; }
+      .topbar { flex-direction: column; align-items: flex-start; }
       .stats { grid-template-columns: repeat(2, 1fr); }
-      .form-grid { grid-template-columns: repeat(2, 1fr); }
-      .form-grid .span-2 { grid-column: span 2; }
+      .filters, .manager-bar { grid-template-columns: 1fr; }
+      .toolbar { position: static; }
+      .monday-table th { top: 0; }
     }
-
-    @media (max-width: 680px) {
-      .page-shell { width: min(100% - 20px, 1480px); padding-top: 18px; }
-      .topbar { align-items: flex-start; flex-direction: column; }
-      .top-actions { width: 100%; justify-content: flex-start; }
-      .hero-main, .profile-card, .admin-panel, .board-card { padding: 16px; }
-      .stats, .form-grid { grid-template-columns: 1fr; }
-      .form-grid .span-2 { grid-column: span 1; }
-      .filters { display: grid; grid-template-columns: 1fr; }
-      .filters .field, .filters .select { max-width: 100%; }
-      .toolbar { position: static; flex-direction: column; align-items: stretch; }
+    @media (max-width: 560px) {
+      .page-shell { width: min(100% - 18px, 1560px); }
+      .stats { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
+  <section id="stateScreen" class="state-screen">
+    <div class="state-box">
+      <strong id="stateTitle">Chargement...</strong>
+      <p id="stateMessage">Vérification de ton accès à l’espace client.</p>
+      <div id="stateActions" class="state-actions"></div>
+    </div>
+  </section>
+
   <main id="app" class="page-shell hidden">
     <header class="topbar">
       <div class="brand">
         <div class="brand-logo">CM</div>
         <div>
           <h1>Espace client</h1>
-          <p>Calendrier éditorial façon Monday, validations et productions.</p>
+          <p>Calendrier éditorial façon Monday</p>
         </div>
       </div>
-
       <div class="top-actions">
         <a class="btn btn-soft" href="index.html">← Retour formation</a>
         <button class="btn btn-outline" id="refreshBtn" type="button">Actualiser</button>
@@ -491,13 +197,12 @@
     <section class="grid hero">
       <div class="card hero-main">
         <span class="eyebrow">✦ Community Management</span>
-        <h2>Calendrier éditorial modifiable directement dans le site.</h2>
+        <h2>Écris et modifie tes posts directement dans le tableau.</h2>
         <p>
-          Les publications sont classées par année, mois et semaine. Tu peux suivre le CM assigné,
-          le graphiste, la production textuelle, la production visuelle, les dates, les statuts et les champs à valider.
+          Clique dans une cellule, écris, puis quitte la cellule : la ligne se sauvegarde automatiquement.
+          Le calendrier est classé par année, mois et semaine, avec CM, graphiste, production textuelle, production visuelle et validations.
         </p>
       </div>
-
       <aside class="card profile-card">
         <div class="profile-row">
           <div class="avatar" id="avatarInitials">C</div>
@@ -508,135 +213,92 @@
         </div>
         <div>
           <span id="accessBadge" class="pill success">Accès actif</span>
-          <p class="muted small" style="margin: 12px 0 0;">
-            Modifie les lignes directement depuis le tableau. Les champs se sauvegardent automatiquement depuis le site.
-          </p>
+          <p class="muted small" style="margin-top:12px;">Tu peux travailler ici sans ouvrir Supabase. Supabase sert seulement à garder les données enregistrées en arrière-plan.</p>
         </div>
       </aside>
     </section>
 
     <section class="grid stats">
-      <article class="card stat-card">
-        <span>Total publications</span>
-        <strong id="statTotal">0</strong>
-      </article>
-      <article class="card stat-card">
-        <span>À valider</span>
-        <strong id="statToValidate">0</strong>
-      </article>
-      <article class="card stat-card">
-        <span>Validées</span>
-        <strong id="statValidated">0</strong>
-      </article>
-      <article class="card stat-card">
-        <span>Programmées / publiées</span>
-        <strong id="statProgrammed">0</strong>
-      </article>
+      <article class="card stat-card"><span>Total publications</span><strong id="statTotal">0</strong></article>
+      <article class="card stat-card"><span>À valider</span><strong id="statToValidate">0</strong></article>
+      <article class="card stat-card"><span>Validées</span><strong id="statValidated">0</strong></article>
+      <article class="card stat-card"><span>Programmées / publiées</span><strong id="statProgrammed">0</strong></article>
     </section>
 
-    <section id="adminPanel" class="card admin-panel hidden">
-      <div class="section-title">
+    <section id="managerBar" class="card manager-bar hidden">
+      <label>
+        Client utilisé pour les nouvelles lignes
+        <input class="field" id="newClientEmail" type="email" placeholder="client@email.com" />
+      </label>
+      <button class="btn btn-primary" id="addBlankRowBtn" type="button">+ Nouvelle ligne vide</button>
+      <button class="btn btn-outline" id="scrollQuickRowBtn" type="button">Écrire une ligne rapide</button>
+    </section>
+
+    <section class="card quick-table-card" id="quickRowSection">
+      <div class="quick-table-title">
         <div>
-          <h3>Ajouter une ligne au calendrier</h3>
-          <p>Visible pour les comptes admin / gestionnaire. Les lignes ajoutées apparaissent ensuite dans le tableau classé par année, mois et semaine.</p>
+          <h3>Ligne rapide</h3>
+          <p>Écris directement ici comme dans Monday, puis clique sur “Ajouter cette ligne”.</p>
         </div>
+        <span class="pill gold">Nouvelle publication</span>
       </div>
-
-      <form id="postForm" class="form-grid">
-        <label class="form-label">
-          Email du client
-          <input class="field" id="formClientEmail" type="email" placeholder="client@email.com" required />
-        </label>
-
-        <label class="form-label">
-          Plateforme
-          <select class="select" id="formPlatform">
-            <option value="Instagram">Instagram</option>
-            <option value="Facebook">Facebook</option>
-            <option value="LinkedIn">LinkedIn</option>
-            <option value="TikTok">TikTok</option>
-            <option value="Pinterest">Pinterest</option>
-            <option value="Autre">Autre</option>
-          </select>
-        </label>
-
-        <label class="form-label">
-          Date
-          <input class="field" id="formDate" type="date" />
-        </label>
-
-        <label class="form-label">
-          Heure
-          <input class="field" id="formTime" type="time" />
-        </label>
-
-        <label class="form-label span-2">
-          Titre de la publication
-          <input class="field" id="formTitle" type="text" placeholder="Ex : Post lancement offre spéciale" required />
-        </label>
-
-        <label class="form-label">
-          CM assigné
-          <input class="field" id="formCmAssigned" type="text" placeholder="Ex : Stéph" />
-        </label>
-
-        <label class="form-label">
-          Graphiste assigné
-          <input class="field" id="formGraphisteAssigned" type="text" placeholder="Ex : Designer / graphiste" />
-        </label>
-
-        <label class="form-label span-2">
-          Production textuelle
-          <textarea class="textarea" id="formCaption" placeholder="Texte de publication, accroche, hashtags, CTA..."></textarea>
-        </label>
-
-        <label class="form-label span-2">
-          Production visuelle / lien Canva ou Drive
-          <input class="field" id="formVisualUrl" type="url" placeholder="https://drive.google.com/..." />
-          <input class="field" id="formFileUrl" type="url" placeholder="Lien fichier complémentaire" />
-        </label>
-
-        <label class="form-label span-2">
-          Note interne / information pour le client
-          <textarea class="textarea" id="formAdminNote" placeholder="Ex : visuel Canva à vérifier, date proposée selon les insights..."></textarea>
-        </label>
-
-        <label class="form-label">
-          Champ à valider
-          <span class="check-line" style="padding: 12px 0;">
-            <input id="formReadyForValidation" type="checkbox" checked />
-            Envoyer à validation
-          </span>
-        </label>
-
-        <div class="full post-actions">
-          <button class="btn btn-primary" type="submit">Ajouter au calendrier</button>
-          <button class="btn btn-outline" id="resetFormBtn" type="button">Réinitialiser</button>
-        </div>
-      </form>
+      <div class="table-wrap">
+        <table class="monday-table">
+          <thead>
+            <tr>
+              <th>Publication</th>
+              <th>Client</th>
+              <th>Date</th>
+              <th>Heure</th>
+              <th>Plateforme</th>
+              <th>CM assigné</th>
+              <th>Graphiste</th>
+              <th>Production textuelle</th>
+              <th>Production visuelle</th>
+              <th>Champ à valider</th>
+              <th>Statut</th>
+              <th>Validations</th>
+              <th>Commentaire</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="quick-row">
+              <td><textarea class="table-textarea title-field" id="quickTitle" placeholder="Titre du post / idée de contenu"></textarea></td>
+              <td><input class="table-field" id="quickClientEmail" type="email" placeholder="client@email.com" /></td>
+              <td><input class="table-field" id="quickDate" type="date" /></td>
+              <td><input class="table-field" id="quickTime" type="time" /></td>
+              <td><select class="table-select" id="quickPlatform"></select></td>
+              <td><input class="table-field assign-field" id="quickCm" type="text" placeholder="CM" /></td>
+              <td><input class="table-field assign-field" id="quickGraphiste" type="text" placeholder="Graphiste" /></td>
+              <td><textarea class="table-textarea copy-field" id="quickCaption" placeholder="Production textuelle : accroche, légende, CTA, hashtags..."></textarea></td>
+              <td>
+                <input class="table-field asset-field" id="quickVisualUrl" type="url" placeholder="Lien Canva / visuel" />
+                <input class="table-field asset-field" id="quickFileUrl" style="margin-top:8px;" type="url" placeholder="Lien Drive / fichier" />
+              </td>
+              <td><label class="check-line"><input id="quickReady" type="checkbox" checked /> À valider</label></td>
+              <td><select class="table-select" id="quickStatus"></select></td>
+              <td>
+                <div class="validation-stack">
+                  <label class="check-line"><input id="quickTextValidated" type="checkbox" /> Texte validé</label>
+                  <label class="check-line"><input id="quickVisualValidated" type="checkbox" /> Visuel validé</label>
+                  <label class="check-line"><input id="quickDateValidated" type="checkbox" /> Date validée</label>
+                </div>
+              </td>
+              <td><textarea class="table-textarea comment-field" id="quickComment" placeholder="Commentaire client / note"></textarea></td>
+              <td><button class="btn btn-primary mini-btn" id="createQuickRowBtn" type="button">Ajouter cette ligne</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <section class="card toolbar">
       <div class="filters">
         <input class="field" id="searchInput" type="search" placeholder="Rechercher : titre, CM, graphiste, texte..." />
-        <select class="select" id="statusFilter">
-          <option value="all">Tous les statuts</option>
-          <option value="brouillon">Brouillon</option>
-          <option value="a_valider">À valider</option>
-          <option value="modification_demandee">Modification demandée</option>
-          <option value="valide">Validé</option>
-          <option value="programme">Programmé</option>
-          <option value="publie">Publié</option>
-        </select>
-        <select class="select" id="platformFilter">
-          <option value="all">Toutes les plateformes</option>
-          <option value="Instagram">Instagram</option>
-          <option value="Facebook">Facebook</option>
-          <option value="LinkedIn">LinkedIn</option>
-          <option value="TikTok">TikTok</option>
-          <option value="Pinterest">Pinterest</option>
-          <option value="Autre">Autre</option>
-        </select>
+        <select class="select" id="clientFilter"><option value="all">Tous les clients</option></select>
+        <select class="select" id="statusFilter"></select>
+        <select class="select" id="platformFilter"></select>
         <select class="select" id="validationFilter">
           <option value="all">Toutes les validations</option>
           <option value="ready">Champ à valider</option>
@@ -644,42 +306,32 @@
           <option value="complete">Tout validé</option>
         </select>
       </div>
-      <span class="pill gold" id="visibleCount">0 élément</span>
     </section>
 
     <section class="card board-card">
       <div class="section-title">
         <div>
           <h3>Calendrier éditorial</h3>
-          <p>Classement automatique : année → mois → semaine. Les cellules sont modifiables directement.</p>
+          <p>Les cellules sont directement modifiables. Classement automatique : année → mois → semaine.</p>
         </div>
-        <div class="post-actions" style="margin-top:0;">
+        <div class="top-actions">
+          <span class="pill gold" id="visibleCount">0 élément</span>
           <button class="btn btn-outline" id="openAllBtn" type="button">Tout ouvrir</button>
           <button class="btn btn-outline" id="closeAllBtn" type="button">Tout fermer</button>
         </div>
       </div>
       <div class="board-help">
         <span class="pill info">Style Monday</span>
-        <span>Les textes et liens se sauvegardent quand tu quittes la cellule.</span>
-        <span>Les dates, statuts et validations se sauvegardent dès changement.</span>
+        <span>Texte et liens : sauvegarde quand tu quittes la cellule.</span>
+        <span>Date, statut, plateforme, cases : sauvegarde immédiate.</span>
       </div>
-      <div id="calendarBoard" style="margin-top:16px;"></div>
+      <div id="calendarBoard" class="board-group"></div>
     </section>
   </main>
-
-  <section id="stateScreen" class="state-screen">
-    <strong id="stateTitle">Chargement...</strong>
-    <p id="stateMessage">Vérification de ton accès à l’espace client.</p>
-    <div id="stateActions" class="post-actions" style="justify-content:center;"></div>
-  </section>
 
   <div class="toast" id="toast"></div>
 
   <script>
-    /************************************************************
-     * CONFIGURATION SUPABASE
-     * Même configuration que le fichier index.html du projet Formation-en-ligne.
-     ************************************************************/
     const SUPABASE_URL = "https://xlyhujiebervldzoxouk.supabase.co";
     const SUPABASE_KEY = "sb_publishable_IqLPvaAeDZoDlYKE-m_Fxw_29Zbnhh_";
     const ADMIN_EMAIL = "rakotomanga41@gmail.com";
@@ -692,7 +344,6 @@
       programme: "Programmé",
       publie: "Publié"
     };
-
     const STATUS_CLASS = {
       brouillon: "neutral",
       a_valider: "warning",
@@ -701,7 +352,6 @@
       programme: "info",
       publie: "success"
     };
-
     const PLATFORMS = ["Instagram", "Facebook", "LinkedIn", "TikTok", "Pinterest", "Autre"];
     const DIRECT_FIELDS = [
       "client_email", "title", "platform", "publication_date", "publication_time",
@@ -714,88 +364,70 @@
     let supabaseClient = null;
     let currentUser = null;
     let currentAccess = null;
+    let clientSpaces = [];
     let allPosts = [];
+    let toastTimer = null;
 
     const $ = (selector) => document.querySelector(selector);
-
     document.addEventListener("DOMContentLoaded", initClientSpace);
 
     async function initClientSpace() {
+      fillStaticSelects();
       bindEvents();
 
       try {
         supabaseClient = await getSupabaseClient();
-
         if (!supabaseClient) {
-          showBlockedState(
-            "Supabase non chargé",
-            "La bibliothèque Supabase n’a pas pu être chargée. Vérifie la connexion internet ou recharge la page avec Ctrl + F5.",
-            true
-          );
+          showBlockedState("Supabase non chargé", "La bibliothèque Supabase n’a pas pu être chargée. Recharge la page avec Ctrl + F5.", true);
           return;
         }
 
         const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
         if (sessionError) throw sessionError;
-
         currentUser = sessionData?.session?.user || null;
 
         if (!currentUser) {
-          showBlockedState(
-            "Connexion requise",
-            "Connecte-toi d’abord pour accéder à cet espace privé.",
-            true
-          );
+          showBlockedState("Connexion requise", "Connecte-toi d’abord pour accéder à cet espace privé.", true);
           return;
         }
 
         await verifyClientAccess();
+        await loadClientSpaces();
+        applyAccessToUi();
         await loadPosts();
 
         $("#stateScreen").classList.add("hidden");
         $("#app").classList.remove("hidden");
       } catch (error) {
         console.error(error);
-        showBlockedState(
-          "Erreur de chargement",
-          error?.message || "Impossible de charger l’espace client pour le moment.",
-          true
-        );
+        if (error?.message !== "Accès non autorisé") {
+          showBlockedState("Erreur de chargement", error?.message || "Impossible de charger l’espace client pour le moment.", true);
+        }
       }
     }
 
     async function getSupabaseClient() {
       if (window.supabaseClient) return window.supabaseClient;
-
-      if (!window.supabase?.createClient) {
-        await loadSupabaseScript();
-      }
-
+      if (!window.supabase?.createClient) await loadSupabaseScript();
       if (!window.supabase?.createClient) return null;
-
       window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       return window.supabaseClient;
     }
 
     function loadSupabaseScript() {
       return new Promise((resolve) => {
-        if (window.supabase?.createClient) {
-          resolve();
-          return;
-        }
-
-        const existingScript = document.querySelector('script[src*="supabase-js"]');
-        if (existingScript) {
-          existingScript.addEventListener("load", () => resolve(), { once: true });
-          existingScript.addEventListener("error", () => resolve(), { once: true });
+        if (window.supabase?.createClient) return resolve();
+        const existing = document.querySelector('script[src*="supabase-js"]');
+        if (existing) {
+          existing.addEventListener("load", resolve, { once: true });
+          existing.addEventListener("error", resolve, { once: true });
           setTimeout(resolve, 2500);
           return;
         }
-
         const script = document.createElement("script");
         script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-        script.onload = () => resolve();
-        script.onerror = () => resolve();
+        script.onload = resolve;
+        script.onerror = resolve;
         document.head.appendChild(script);
         setTimeout(resolve, 2500);
       });
@@ -803,7 +435,6 @@
 
     async function verifyClientAccess() {
       const email = normalizeEmail(currentUser.email);
-
       const { data, error } = await supabaseClient
         .from("client_spaces")
         .select("*")
@@ -815,69 +446,77 @@
 
       if (!data) {
         if (email === ADMIN_EMAIL) {
-          currentAccess = {
-            client_name: "Administrateur",
-            client_email: ADMIN_EMAIL,
-            is_active: true,
-            role: "admin",
-            can_manage: true
-          };
-          updateProfile();
-          toggleAdminPanel();
+          currentAccess = { client_name: "Administrateur", client_email: ADMIN_EMAIL, is_active: true, role: "admin", can_manage: true };
           return;
         }
-
-        showBlockedState(
-          "Accès réservé",
-          "Ton email n’est pas autorisé à consulter cette page. Demande à l’administrateur de t’ajouter dans client_spaces.",
-          true
-        );
+        showBlockedState("Accès réservé", "Ton email n’est pas autorisé à consulter cette page. Demande à l’administrateur de t’ajouter dans client_spaces.", true);
         throw new Error("Accès non autorisé");
       }
 
       currentAccess = data;
-      updateProfile();
-      toggleAdminPanel();
     }
 
-    function updateProfile() {
-      const name = currentAccess.client_name || currentUser.email || "Client";
-      const email = currentUser.email || currentAccess.client_email;
-      const initials = getInitials(name || email);
+    async function loadClientSpaces() {
+      if (!isManager()) {
+        clientSpaces = [currentAccess];
+        return;
+      }
 
+      const { data, error } = await supabaseClient
+        .from("client_spaces")
+        .select("*")
+        .eq("is_active", true)
+        .order("client_name", { ascending: true });
+
+      if (error) {
+        console.warn(error);
+        clientSpaces = [currentAccess];
+        return;
+      }
+      clientSpaces = data || [];
+    }
+
+    function applyAccessToUi() {
+      const name = currentAccess.client_name || currentUser.email || "Client";
+      const email = normalizeEmail(currentUser.email || currentAccess.client_email);
       $("#clientName").textContent = name;
       $("#clientEmail").textContent = email;
-      $("#avatarInitials").textContent = initials;
+      $("#avatarInitials").textContent = getInitials(name || email);
 
       if (isManager()) {
         $("#accessBadge").className = "pill gold";
         $("#accessBadge").textContent = "Accès gestionnaire";
+        $("#managerBar").classList.remove("hidden");
+      } else {
+        $("#accessBadge").className = "pill success";
+        $("#accessBadge").textContent = "Accès client";
+        $("#managerBar").classList.add("hidden");
       }
+
+      const defaultEmail = isManager()
+        ? (normalizeEmail(currentAccess.client_email) || email)
+        : email;
+      $("#newClientEmail").value = defaultEmail;
+      $("#quickClientEmail").value = defaultEmail;
+      $("#quickClientEmail").disabled = !isManager();
     }
 
     function isManager() {
       return Boolean(
         currentAccess?.can_manage === true ||
         currentAccess?.is_admin === true ||
-        currentAccess?.role === "admin" ||
-        currentAccess?.role === "manager" ||
-        currentAccess?.type === "admin" ||
+        ["admin", "manager"].includes(String(currentAccess?.role || "").toLowerCase()) ||
+        String(currentAccess?.type || "").toLowerCase() === "admin" ||
         normalizeEmail(currentUser?.email) === ADMIN_EMAIL
       );
     }
 
-    function toggleAdminPanel() {
-      const panel = $("#adminPanel");
-      if (isManager()) {
-        panel.classList.remove("hidden");
-        $("#formClientEmail").value = currentAccess.client_email || currentUser.email || "";
-      } else {
-        panel.classList.add("hidden");
-      }
+    function canEditPost(post) {
+      if (isManager()) return true;
+      return normalizeEmail(post.client_email) === normalizeEmail(currentUser?.email);
     }
 
     async function loadPosts() {
-      const manager = isManager();
       let query = supabaseClient
         .from("editorial_posts")
         .select("*")
@@ -885,13 +524,10 @@
         .order("publication_time", { ascending: true, nullsFirst: false })
         .order("created_at", { ascending: false });
 
-      if (!manager) {
-        query = query.ilike("client_email", normalizeEmail(currentUser.email));
-      }
+      if (!isManager()) query = query.ilike("client_email", normalizeEmail(currentUser.email));
 
       const { data, error } = await query;
       if (error) throw error;
-
       allPosts = (data || []).map(normalizePost);
       renderEverything();
     }
@@ -908,101 +544,104 @@
     }
 
     function renderEverything() {
-      const filteredPosts = getFilteredPosts();
-      updateStats();
-      renderCalendarBoard(filteredPosts);
-      updateVisibleCount(filteredPosts.length);
+      renderClientFilter();
+      renderStats();
+      renderBoard();
+    }
+
+    function renderClientFilter() {
+      const filter = $("#clientFilter");
+      if (!filter) return;
+      const previous = filter.value || "all";
+
+      if (!isManager()) {
+        filter.innerHTML = `<option value="${escapeAttribute(normalizeEmail(currentUser.email))}">Mon espace</option>`;
+        filter.value = normalizeEmail(currentUser.email);
+        filter.disabled = true;
+        return;
+      }
+
+      const emails = Array.from(new Set([
+        ...clientSpaces.map((item) => normalizeEmail(item.client_email)).filter(Boolean),
+        ...allPosts.map((post) => normalizeEmail(post.client_email)).filter(Boolean)
+      ])).sort();
+
+      filter.disabled = false;
+      filter.innerHTML = `<option value="all">Tous les clients</option>` + emails.map((email) => `<option value="${escapeAttribute(email)}">${escapeHtml(labelForClient(email))}</option>`).join("");
+      filter.value = emails.includes(previous) || previous === "all" ? previous : "all";
+    }
+
+    function labelForClient(email) {
+      const found = clientSpaces.find((item) => normalizeEmail(item.client_email) === normalizeEmail(email));
+      return found?.client_name ? `${found.client_name} · ${email}` : email;
     }
 
     function getFilteredPosts() {
-      const search = $("#searchInput").value.trim().toLowerCase();
-      const status = $("#statusFilter").value;
-      const platform = $("#platformFilter").value;
-      const validation = $("#validationFilter").value;
+      const search = normalizeSearch($("#searchInput")?.value || "");
+      const client = $("#clientFilter")?.value || "all";
+      const status = $("#statusFilter")?.value || "all";
+      const platform = $("#platformFilter")?.value || "all";
+      const validation = $("#validationFilter")?.value || "all";
 
       return allPosts.filter((post) => {
         const parsed = parseAdminNote(post.admin_note);
         const meta = withDefaultMeta(parsed.meta, post);
-        const haystack = [
-          post.title,
-          post.platform,
-          post.caption_text,
-          post.admin_note,
-          post.client_comment,
-          post.client_email,
-          meta.cm_assigned,
-          meta.graphiste_assigned,
-          post.visual_url,
-          post.file_url
-        ].join(" ").toLowerCase();
+        const haystack = normalizeSearch([
+          post.client_email, post.title, post.platform, post.caption_text,
+          post.visual_url, post.file_url, post.client_comment, parsed.note,
+          meta.cm_assigned, meta.graphiste_assigned
+        ].filter(Boolean).join(" "));
+        const complete = post.text_validated && post.visual_validated && post.date_validated;
 
-        const allValidated = post.text_validated && post.visual_validated && post.date_validated;
-        const matchesSearch = !search || haystack.includes(search);
-        const matchesStatus = status === "all" || post.status === status;
-        const matchesPlatform = platform === "all" || post.platform === platform;
-        const matchesValidation =
-          validation === "all" ||
-          (validation === "ready" && meta.ready_for_validation) ||
-          (validation === "missing" && !allValidated) ||
-          (validation === "complete" && allValidated);
-
-        return matchesSearch && matchesStatus && matchesPlatform && matchesValidation;
+        if (search && !haystack.includes(search)) return false;
+        if (client !== "all" && normalizeEmail(post.client_email) !== normalizeEmail(client)) return false;
+        if (status !== "all" && post.status !== status) return false;
+        if (platform !== "all" && post.platform !== platform) return false;
+        if (validation === "ready" && !meta.ready_for_validation) return false;
+        if (validation === "missing" && complete) return false;
+        if (validation === "complete" && !complete) return false;
+        return true;
       });
     }
 
-    function updateStats() {
-      const total = allPosts.length;
-      const toValidate = allPosts.filter((post) => {
+    function renderStats() {
+      const posts = getFilteredPosts();
+      const toValidate = posts.filter((post) => {
         const meta = withDefaultMeta(parseAdminNote(post.admin_note).meta, post);
-        return meta.ready_for_validation || ["a_valider", "modification_demandee", "brouillon"].includes(post.status);
+        return meta.ready_for_validation || ["a_valider", "modification_demandee"].includes(post.status);
       }).length;
-      const validated = allPosts.filter((p) => p.status === "valide" || (p.text_validated && p.visual_validated && p.date_validated)).length;
-      const programmed = allPosts.filter((p) => ["programme", "publie"].includes(p.status)).length;
-
-      $("#statTotal").textContent = total;
+      const validated = posts.filter((post) => post.status === "valide" || (post.text_validated && post.visual_validated && post.date_validated)).length;
+      const programmed = posts.filter((post) => ["programme", "publie"].includes(post.status)).length;
+      $("#statTotal").textContent = posts.length;
       $("#statToValidate").textContent = toValidate;
       $("#statValidated").textContent = validated;
       $("#statProgrammed").textContent = programmed;
+      $("#visibleCount").textContent = `${posts.length} élément${posts.length > 1 ? "s" : ""}`;
     }
 
-    function updateVisibleCount(count) {
-      $("#visibleCount").textContent = `${count} ${count > 1 ? "éléments" : "élément"}`;
-    }
-
-    function renderCalendarBoard(posts) {
+    function renderBoard() {
       const container = $("#calendarBoard");
+      const posts = getFilteredPosts().sort(comparePostsByDate);
 
       if (!posts.length) {
         container.innerHTML = `
           <div class="empty-state">
-            <strong>Aucune publication trouvée</strong>
-            <p>Le calendrier est vide ou aucun élément ne correspond aux filtres.</p>
-          </div>
-        `;
+            <strong>Aucune ligne dans le calendrier.</strong>
+            <p>Utilise la “Ligne rapide” ou le bouton “+ Nouvelle ligne vide” pour commencer à écrire tes posts directement sur le site.</p>
+          </div>`;
         return;
       }
 
-      const sorted = [...posts].sort(comparePostsByDate);
-      const grouped = groupByYearMonthWeek(sorted);
-
-      container.innerHTML = Object.entries(grouped).map(([yearLabel, yearData]) => `
-        <details class="year-group" open>
-          <summary>
-            <span>${escapeHtml(yearLabel)}</span>
-            <span>${yearData.count} ${yearData.count > 1 ? "publications" : "publication"}</span>
-          </summary>
-          ${Object.entries(yearData.months).map(([monthLabel, monthData]) => `
-            <details class="month-group" open>
-              <summary>
-                <span>${escapeHtml(monthLabel)}</span>
-                <span>${monthData.count}</span>
-              </summary>
-              ${Object.entries(monthData.weeks).map(([weekLabel, weekPosts]) => `
-                <details class="week-group" open>
-                  <summary>
-                    <span>${escapeHtml(weekLabel)}</span>
-                    <span>${weekPosts.length}</span>
-                  </summary>
+      const grouped = groupByYearMonthWeek(posts);
+      container.innerHTML = Object.entries(grouped).map(([year, yearData]) => `
+        <details class="group" open>
+          <summary><span>${escapeHtml(year)}</span><span class="summary-count">${yearData.count} publication${yearData.count > 1 ? "s" : ""}</span></summary>
+          ${Object.entries(yearData.months).map(([month, monthData]) => `
+            <details class="group" open>
+              <summary><span>${escapeHtml(month)}</span><span class="summary-count">${monthData.count}</span></summary>
+              ${Object.entries(monthData.weeks).map(([week, weekPosts]) => `
+                <details class="group" open>
+                  <summary><span>${escapeHtml(week)}</span><span class="summary-count">${weekPosts.length}</span></summary>
                   ${tableTemplate(weekPosts)}
                 </details>
               `).join("")}
@@ -1018,7 +657,8 @@
           <table class="monday-table">
             <thead>
               <tr>
-                <th>Titre</th>
+                <th>Publication</th>
+                <th>Client</th>
                 <th>Date</th>
                 <th>Heure</th>
                 <th>Plateforme</th>
@@ -1029,132 +669,105 @@
                 <th>Champ à valider</th>
                 <th>Statut</th>
                 <th>Validations</th>
-                <th>Commentaire client</th>
+                <th>Commentaire</th>
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody>
-              ${posts.map(rowTemplate).join("")}
-            </tbody>
+            <tbody>${posts.map(rowTemplate).join("")}</tbody>
           </table>
-        </div>
-      `;
+        </div>`;
     }
 
     function rowTemplate(post) {
       const parsed = parseAdminNote(post.admin_note);
       const meta = withDefaultMeta(parsed.meta, post);
       const status = post.status || "a_valider";
-      const manager = isManager();
-      const managerDisabled = manager ? "" : "disabled";
-      const canDelete = manager ? "" : "hidden";
+      const editable = canEditPost(post);
+      const disabled = editable ? "" : "disabled";
+      const managerOnlyDisabled = isManager() ? "" : "disabled";
+      const deleteButton = isManager() ? `<button class="btn btn-danger mini-btn" type="button" data-delete-post>Supprimer</button>` : "";
+      const clientField = isManager()
+        ? `<input class="table-field" type="email" data-direct-field="client_email" value="${escapeAttribute(post.client_email || "")}" ${managerOnlyDisabled}>`
+        : `<span class="pill info">${escapeHtml(post.client_email || "client")}</span>`;
 
       return `
         <tr data-post-row="${escapeAttribute(post.id)}">
           <td>
-            <textarea class="table-textarea title-field" data-direct-field="title" ${managerDisabled}>${escapeHtml(post.title || "")}</textarea>
-            <div style="margin-top:8px;">
+            <textarea class="table-textarea title-field" data-direct-field="title" placeholder="Titre / idée de publication" ${disabled}>${escapeHtml(post.title || "")}</textarea>
+            <div style="margin-top:8px; display:grid; gap:6px;">
               <span class="pill ${STATUS_CLASS[status] || "neutral"}">${escapeHtml(STATUS_LABELS[status] || status)}</span>
-              ${manager ? `<span class="pill info" style="margin-top:6px;">${escapeHtml(post.client_email || "client")}</span>` : ""}
             </div>
           </td>
-          <td><input class="table-field" type="date" data-direct-field="publication_date" value="${escapeAttribute(post.publication_date || "")}" ${managerDisabled}></td>
-          <td><input class="table-field" type="time" data-direct-field="publication_time" value="${escapeAttribute(formatInputTime(post.publication_time))}" ${managerDisabled}></td>
-          <td>${platformSelect(post.platform, managerDisabled)}</td>
-          <td><input class="table-field assign-field" type="text" data-meta-field="cm_assigned" value="${escapeAttribute(meta.cm_assigned || "")}" placeholder="CM" ${managerDisabled}></td>
-          <td><input class="table-field assign-field" type="text" data-meta-field="graphiste_assigned" value="${escapeAttribute(meta.graphiste_assigned || "")}" placeholder="Graphiste" ${managerDisabled}></td>
-          <td><textarea class="table-textarea copy-field" data-direct-field="caption_text" placeholder="Production textuelle..." ${managerDisabled}>${escapeHtml(post.caption_text || "")}</textarea></td>
+          <td>${clientField}</td>
+          <td><input class="table-field" type="date" data-direct-field="publication_date" value="${escapeAttribute(post.publication_date || "")}" ${disabled}></td>
+          <td><input class="table-field" type="time" data-direct-field="publication_time" value="${escapeAttribute(formatInputTime(post.publication_time))}" ${disabled}></td>
+          <td>${platformSelect(post.platform, disabled)}</td>
+          <td><input class="table-field assign-field" type="text" data-meta-field="cm_assigned" value="${escapeAttribute(meta.cm_assigned || "")}" placeholder="CM" ${disabled}></td>
+          <td><input class="table-field assign-field" type="text" data-meta-field="graphiste_assigned" value="${escapeAttribute(meta.graphiste_assigned || "")}" placeholder="Graphiste" ${disabled}></td>
+          <td><textarea class="table-textarea copy-field" data-direct-field="caption_text" placeholder="Production textuelle : accroche, légende, CTA, hashtags..." ${disabled}>${escapeHtml(post.caption_text || "")}</textarea></td>
           <td>
-            <input class="table-field asset-field" type="url" data-direct-field="visual_url" value="${escapeAttribute(post.visual_url || "")}" placeholder="Lien Canva / visuel" ${managerDisabled}>
-            <input class="table-field asset-field" style="margin-top:8px;" type="url" data-direct-field="file_url" value="${escapeAttribute(post.file_url || "")}" placeholder="Lien fichier / Drive" ${managerDisabled}>
+            <input class="table-field asset-field" type="url" data-direct-field="visual_url" value="${escapeAttribute(post.visual_url || "")}" placeholder="Lien Canva / visuel" ${disabled}>
+            <input class="table-field asset-field" style="margin-top:8px;" type="url" data-direct-field="file_url" value="${escapeAttribute(post.file_url || "")}" placeholder="Lien Drive / fichier" ${disabled}>
             ${post.visual_url ? `<a class="asset-link" style="margin-top:8px; display:block;" href="${escapeAttribute(post.visual_url)}" target="_blank" rel="noopener">Ouvrir visuel ↗</a>` : ""}
           </td>
-          <td>
-            <label class="check-line">
-              <input type="checkbox" data-meta-field="ready_for_validation" ${meta.ready_for_validation ? "checked" : ""} ${managerDisabled}>
-              À valider
-            </label>
-          </td>
-          <td>${statusSelect(status, managerDisabled)}</td>
+          <td><label class="check-line"><input type="checkbox" data-meta-field="ready_for_validation" ${meta.ready_for_validation ? "checked" : ""} ${disabled}> À valider</label></td>
+          <td>${statusSelect(status, disabled)}</td>
           <td>
             <div class="validation-stack">
-              <label class="check-line"><input type="checkbox" data-direct-field="text_validated" ${post.text_validated ? "checked" : ""}> Texte validé</label>
-              <label class="check-line"><input type="checkbox" data-direct-field="visual_validated" ${post.visual_validated ? "checked" : ""}> Visuel validé</label>
-              <label class="check-line"><input type="checkbox" data-direct-field="date_validated" ${post.date_validated ? "checked" : ""}> Date validée</label>
+              <label class="check-line"><input type="checkbox" data-direct-field="text_validated" ${post.text_validated ? "checked" : ""} ${disabled}> Texte validé</label>
+              <label class="check-line"><input type="checkbox" data-direct-field="visual_validated" ${post.visual_validated ? "checked" : ""} ${disabled}> Visuel validé</label>
+              <label class="check-line"><input type="checkbox" data-direct-field="date_validated" ${post.date_validated ? "checked" : ""} ${disabled}> Date validée</label>
             </div>
           </td>
-          <td><textarea class="table-textarea comment-field" data-direct-field="client_comment" placeholder="Commentaire ou modification à demander...">${escapeHtml(post.client_comment || "")}</textarea></td>
+          <td><textarea class="table-textarea comment-field" data-direct-field="client_comment" placeholder="Commentaire ou modification demandée" ${disabled}>${escapeHtml(post.client_comment || "")}</textarea></td>
           <td>
             <div class="row-actions">
-              <button class="btn btn-success mini-btn" type="button" data-quick-validate>Tout valider</button>
-              <button class="btn btn-danger mini-btn ${canDelete}" type="button" data-delete-post>Supprimer</button>
+              <button class="btn btn-success mini-btn" type="button" data-quick-validate ${disabled}>Tout valider</button>
+              ${deleteButton}
             </div>
           </td>
-        </tr>
-      `;
+        </tr>`;
     }
 
-    function platformSelect(current, disabledAttr) {
-      return `
-        <select class="table-select" data-direct-field="platform" ${disabledAttr}>
-          ${PLATFORMS.map((platform) => `<option value="${escapeAttribute(platform)}" ${platform === current ? "selected" : ""}>${escapeHtml(platform)}</option>`).join("")}
-        </select>
-      `;
+    function platformSelect(current, disabledAttr = "") {
+      return `<select class="table-select" data-direct-field="platform" ${disabledAttr}>${PLATFORMS.map((platform) => `<option value="${escapeAttribute(platform)}" ${platform === current ? "selected" : ""}>${escapeHtml(platform)}</option>`).join("")}</select>`;
     }
 
-    function statusSelect(current, disabledAttr) {
-      return `
-        <select class="table-select" data-direct-field="status" ${disabledAttr}>
-          ${Object.entries(STATUS_LABELS).map(([key, label]) => `<option value="${key}" ${key === current ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}
-        </select>
-      `;
+    function statusSelect(current, disabledAttr = "") {
+      return `<select class="table-select" data-direct-field="status" ${disabledAttr}>${Object.entries(STATUS_LABELS).map(([key, label]) => `<option value="${key}" ${key === current ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>`;
+    }
+
+    function fillStaticSelects() {
+      const platformOptions = `<option value="all">Toutes les plateformes</option>` + PLATFORMS.map((item) => `<option value="${item}">${item}</option>`).join("");
+      $("#platformFilter").innerHTML = platformOptions;
+      $("#quickPlatform").innerHTML = PLATFORMS.map((item) => `<option value="${item}">${item}</option>`).join("");
+
+      const statusOptions = `<option value="all">Tous les statuts</option>` + Object.entries(STATUS_LABELS).map(([key, label]) => `<option value="${key}">${label}</option>`).join("");
+      $("#statusFilter").innerHTML = statusOptions;
+      $("#quickStatus").innerHTML = Object.entries(STATUS_LABELS).map(([key, label]) => `<option value="${key}" ${key === "a_valider" ? "selected" : ""}>${label}</option>`).join("");
     }
 
     function groupByYearMonthWeek(posts) {
       const grouped = {};
-
       posts.forEach((post) => {
         const keys = getDateGroupKeys(post.publication_date);
-
         if (!grouped[keys.year]) grouped[keys.year] = { count: 0, months: {} };
         if (!grouped[keys.year].months[keys.month]) grouped[keys.year].months[keys.month] = { count: 0, weeks: {} };
         if (!grouped[keys.year].months[keys.month].weeks[keys.week]) grouped[keys.year].months[keys.month].weeks[keys.week] = [];
-
         grouped[keys.year].count += 1;
         grouped[keys.year].months[keys.month].count += 1;
         grouped[keys.year].months[keys.month].weeks[keys.week].push(post);
       });
-
       return grouped;
     }
 
     function getDateGroupKeys(dateValue) {
-      if (!dateValue) {
-        return {
-          year: "Sans date",
-          month: "Dates à définir",
-          week: "Semaine à définir"
-        };
-      }
-
+      if (!dateValue) return { year: "Sans date", month: "Dates à définir", week: "Semaine à définir" };
       const date = new Date(`${dateValue}T00:00:00`);
-      if (Number.isNaN(date.getTime())) {
-        return {
-          year: "Sans date",
-          month: "Dates à définir",
-          week: "Semaine à définir"
-        };
-      }
-
+      if (Number.isNaN(date.getTime())) return { year: "Sans date", month: "Dates à définir", week: "Semaine à définir" };
       const year = String(date.getFullYear());
       const month = date.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
-      const week = getISOWeekLabel(date);
-
-      return {
-        year,
-        month: month.charAt(0).toUpperCase() + month.slice(1),
-        week
-      };
+      return { year, month: month.charAt(0).toUpperCase() + month.slice(1), week: getISOWeekLabel(date) };
     }
 
     function getISOWeekLabel(date) {
@@ -1163,13 +776,11 @@
       target.setUTCDate(target.getUTCDate() + 4 - dayNumber);
       const yearStart = new Date(Date.UTC(target.getUTCFullYear(), 0, 1));
       const weekNumber = Math.ceil((((target - yearStart) / 86400000) + 1) / 7);
-
       const weekStart = new Date(date);
       const localDay = weekStart.getDay() || 7;
       weekStart.setDate(weekStart.getDate() - localDay + 1);
       const weekEnd = new Date(weekStart);
       weekEnd.setDate(weekStart.getDate() + 6);
-
       return `Semaine ${weekNumber} · ${shortDate(weekStart)} → ${shortDate(weekEnd)}`;
     }
 
@@ -1183,6 +794,10 @@
       const input = event.target.closest("[data-direct-field], [data-meta-field]");
       if (!input || input.disabled) return;
 
+      const row = input.closest("[data-post-row]");
+      const postId = row?.dataset.postRow;
+      if (!postId) return;
+
       const isBlurEvent = event.type === "focusout";
       const isChangeEvent = event.type === "change";
       const tagName = input.tagName.toLowerCase();
@@ -1193,39 +808,31 @@
       if (isChangeEvent && !shouldSaveOnChange) return;
       if (isBlurEvent && !shouldSaveOnBlur) return;
 
-      const row = input.closest("[data-post-row]");
-      const postId = row?.dataset.postRow;
-      if (!postId) return;
-
-      if (input.dataset.directField) {
-        await saveDirectField(postId, input.dataset.directField, getInputValue(input));
-      } else if (input.dataset.metaField) {
-        await saveMetaField(postId, input.dataset.metaField, getInputValue(input));
+      try {
+        if (input.dataset.directField) await saveDirectField(postId, input.dataset.directField, getInputValue(input));
+        if (input.dataset.metaField) await saveMetaField(postId, input.dataset.metaField, getInputValue(input));
+      } catch (error) {
+        console.error(error);
       }
     }
 
     async function saveDirectField(postId, field, value) {
       if (!DIRECT_FIELDS.includes(field)) return;
-
       const post = allPosts.find((item) => item.id === postId);
-      if (!post) return;
+      if (!post || !canEditPost(post)) return;
 
-      const currentValue = normalizeComparableValue(post[field]);
-      const nextValue = normalizeComparableValue(value);
-      if (currentValue === nextValue) return;
+      if (field === "client_email" && !isManager()) return;
+      const normalizedValue = normalizeDbValue(field, value);
+      if (normalizeComparableValue(post[field]) === normalizeComparableValue(normalizedValue)) return;
 
-      const updates = { [field]: normalizeDbValue(field, value) };
+      const updates = { [field]: normalizedValue };
 
       if (["text_validated", "visual_validated", "date_validated"].includes(field)) {
         const finalText = field === "text_validated" ? Boolean(value) : Boolean(post.text_validated);
         const finalVisual = field === "visual_validated" ? Boolean(value) : Boolean(post.visual_validated);
         const finalDate = field === "date_validated" ? Boolean(value) : Boolean(post.date_validated);
-
-        if (finalText && finalVisual && finalDate) {
-          updates.status = "valide";
-        } else if (post.status === "valide") {
-          updates.status = "a_valider";
-        }
+        if (finalText && finalVisual && finalDate) updates.status = "valide";
+        else if (post.status === "valide") updates.status = "a_valider";
       }
 
       await updatePost(postId, updates, "Champ enregistré.");
@@ -1233,36 +840,18 @@
 
     async function saveMetaField(postId, field, value) {
       if (!META_FIELDS.includes(field)) return;
-
       const post = allPosts.find((item) => item.id === postId);
-      if (!post) return;
+      if (!post || !canEditPost(post)) return;
 
       const parsed = parseAdminNote(post.admin_note);
       const meta = withDefaultMeta(parsed.meta, post);
       const normalizedValue = field === "ready_for_validation" ? Boolean(value) : String(value || "").trim();
-
       if (String(meta[field] ?? "") === String(normalizedValue ?? "")) return;
 
       meta[field] = normalizedValue;
-
-      const updates = {
-        admin_note: buildAdminNote(parsed.note, meta)
-      };
-
-      if (field === "ready_for_validation" && normalizedValue === true && post.status === "brouillon") {
-        updates.status = "a_valider";
-      }
-
+      const updates = { admin_note: buildAdminNote(parsed.note, meta) };
+      if (field === "ready_for_validation" && normalizedValue === true && post.status === "brouillon") updates.status = "a_valider";
       await updatePost(postId, updates, "Champ enregistré.");
-    }
-
-    async function quickValidate(postId) {
-      await updatePost(postId, {
-        text_validated: true,
-        visual_validated: true,
-        date_validated: true,
-        status: "valide"
-      }, "Publication validée.");
     }
 
     async function updatePost(postId, updates, successMessage) {
@@ -1274,114 +863,142 @@
         .single();
 
       if (error) {
-        toast(error.message || "Mise à jour impossible.");
+        toast(error.message || "Mise à jour impossible. Vérifie les policies RLS de editorial_posts.");
         throw error;
       }
 
       allPosts = allPosts.map((post) => post.id === postId ? normalizePost({ ...post, ...(data || updates) }) : post);
       renderEverything();
-      toast(successMessage || "Mise à jour enregistrée.");
+      toast(successMessage || "Enregistré.");
     }
 
-    async function deletePost(postId) {
-      if (!isManager()) return;
-
-      const ok = confirm("Supprimer cette publication du calendrier ?");
-      if (!ok) return;
-
-      const { error } = await supabaseClient
+    async function createPost(payload, successMessage = "Ligne ajoutée au calendrier.") {
+      const { data, error } = await supabaseClient
         .from("editorial_posts")
-        .delete()
-        .eq("id", postId);
+        .insert(payload)
+        .select("*")
+        .single();
 
       if (error) {
-        toast(error.message || "Suppression impossible.");
-        return;
+        toast(error.message || "Création impossible. Vérifie les policies RLS de editorial_posts.");
+        throw error;
       }
 
-      allPosts = allPosts.filter((post) => post.id !== postId);
+      allPosts = [normalizePost(data), ...allPosts];
       renderEverything();
-      toast("Publication supprimée.");
+      toast(successMessage);
+      return data;
     }
 
-    async function handlePostFormSubmit(event) {
-      event.preventDefault();
-
-      if (!isManager()) {
-        toast("Action réservée au gestionnaire.");
-        return;
-      }
-
-      const clientEmail = normalizeEmail($("#formClientEmail").value);
-      const title = $("#formTitle").value.trim();
-
-      if (!clientEmail || !title) {
-        toast("L’email du client et le titre sont obligatoires.");
-        return;
-      }
-
+    async function createBlankPost() {
       try {
-        const ready = $("#formReadyForValidation").checked;
-        const meta = {
-          cm_assigned: $("#formCmAssigned").value.trim(),
-          graphiste_assigned: $("#formGraphisteAssigned").value.trim(),
-          ready_for_validation: ready
-        };
-
+        const clientEmail = getNewLineClientEmail();
+        if (!clientEmail) return toast("Email client obligatoire pour créer une ligne.");
         const payload = {
           client_email: clientEmail,
-          title,
-          platform: $("#formPlatform").value,
-          publication_date: $("#formDate").value || null,
-          publication_time: $("#formTime").value || null,
-          caption_text: $("#formCaption").value.trim() || null,
-          visual_url: $("#formVisualUrl").value.trim() || null,
-          file_url: $("#formFileUrl").value.trim() || null,
-          admin_note: buildAdminNote($("#formAdminNote").value.trim(), meta),
-          status: ready ? "a_valider" : "brouillon",
+          title: "Nouvelle publication",
+          platform: "Instagram",
+          publication_date: null,
+          publication_time: null,
+          caption_text: null,
+          visual_url: null,
+          file_url: null,
+          client_comment: null,
+          admin_note: buildAdminNote("", { cm_assigned: "", graphiste_assigned: "", ready_for_validation: false }),
+          status: "brouillon",
           text_validated: false,
           visual_validated: false,
           date_validated: false
         };
-
-        const { data, error } = await supabaseClient
-          .from("editorial_posts")
-          .insert(payload)
-          .select("*")
-          .single();
-
-        if (error) throw error;
-
-        allPosts = [normalizePost(data), ...allPosts];
-        $("#postForm").reset();
-        $("#formClientEmail").value = clientEmail;
-        $("#formReadyForValidation").checked = true;
-        renderEverything();
-        toast("Ligne ajoutée au calendrier.");
+        await createPost(payload, "Ligne vide créée. Tu peux maintenant écrire directement dans le tableau.");
       } catch (error) {
         console.error(error);
-        toast(error.message || "Impossible d’ajouter la ligne.");
       }
     }
 
+    async function createQuickRow() {
+      try {
+        const clientEmail = normalizeEmail($("#quickClientEmail").value || getNewLineClientEmail());
+        if (!clientEmail) return toast("Email client obligatoire.");
+
+        const textValidated = $("#quickTextValidated").checked;
+        const visualValidated = $("#quickVisualValidated").checked;
+        const dateValidated = $("#quickDateValidated").checked;
+        let status = $("#quickStatus").value || "a_valider";
+        if (textValidated && visualValidated && dateValidated) status = "valide";
+
+        const payload = {
+          client_email: clientEmail,
+          title: $("#quickTitle").value.trim() || "Nouvelle publication",
+          platform: $("#quickPlatform").value || "Instagram",
+          publication_date: $("#quickDate").value || null,
+          publication_time: $("#quickTime").value || null,
+          caption_text: $("#quickCaption").value.trim() || null,
+          visual_url: $("#quickVisualUrl").value.trim() || null,
+          file_url: $("#quickFileUrl").value.trim() || null,
+          client_comment: $("#quickComment").value.trim() || null,
+          admin_note: buildAdminNote("", {
+            cm_assigned: $("#quickCm").value.trim(),
+            graphiste_assigned: $("#quickGraphiste").value.trim(),
+            ready_for_validation: $("#quickReady").checked
+          }),
+          status,
+          text_validated: textValidated,
+          visual_validated: visualValidated,
+          date_validated: dateValidated
+        };
+
+        await createPost(payload);
+        resetQuickRow(clientEmail);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    async function quickValidate(postId) {
+      const post = allPosts.find((item) => item.id === postId);
+      if (!post || !canEditPost(post)) return;
+      await updatePost(postId, { text_validated: true, visual_validated: true, date_validated: true, status: "valide" }, "Publication validée.");
+    }
+
+    async function deletePost(postId) {
+      if (!isManager()) return;
+      if (!confirm("Supprimer cette ligne du calendrier ?")) return;
+      const { error } = await supabaseClient.from("editorial_posts").delete().eq("id", postId);
+      if (error) return toast(error.message || "Suppression impossible.");
+      allPosts = allPosts.filter((post) => post.id !== postId);
+      renderEverything();
+      toast("Ligne supprimée.");
+    }
+
+    function getNewLineClientEmail() {
+      if (isManager()) return normalizeEmail($("#newClientEmail").value || $("#quickClientEmail").value || currentAccess.client_email || currentUser.email);
+      return normalizeEmail(currentUser.email);
+    }
+
+    function resetQuickRow(clientEmail) {
+      ["#quickTitle", "#quickDate", "#quickTime", "#quickCm", "#quickGraphiste", "#quickCaption", "#quickVisualUrl", "#quickFileUrl", "#quickComment"].forEach((selector) => { const el = $(selector); if (el) el.value = ""; });
+      $("#quickClientEmail").value = clientEmail || getNewLineClientEmail();
+      $("#quickPlatform").value = "Instagram";
+      $("#quickStatus").value = "a_valider";
+      $("#quickReady").checked = true;
+      $("#quickTextValidated").checked = false;
+      $("#quickVisualValidated").checked = false;
+      $("#quickDateValidated").checked = false;
+    }
+
     function bindEvents() {
-      $("#refreshBtn")?.addEventListener("click", async () => {
-        try {
-          await loadPosts();
-          toast("Données actualisées.");
-        } catch (error) {
-          toast(error.message || "Actualisation impossible.");
-        }
-      });
-
+      $("#refreshBtn")?.addEventListener("click", async () => { await loadPosts(); toast("Données actualisées."); });
       $("#logoutBtn")?.addEventListener("click", logout);
-      $("#postForm")?.addEventListener("submit", handlePostFormSubmit);
-      $("#resetFormBtn")?.addEventListener("click", () => {
-        $("#postForm").reset();
-        $("#formReadyForValidation").checked = true;
+      $("#addBlankRowBtn")?.addEventListener("click", createBlankPost);
+      $("#createQuickRowBtn")?.addEventListener("click", createQuickRow);
+      $("#scrollQuickRowBtn")?.addEventListener("click", () => $("#quickRowSection")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+
+      $("#newClientEmail")?.addEventListener("input", () => {
+        if (isManager()) $("#quickClientEmail").value = normalizeEmail($("#newClientEmail").value);
       });
 
-      ["#searchInput", "#statusFilter", "#platformFilter", "#validationFilter"].forEach((selector) => {
+      ["#searchInput", "#clientFilter", "#statusFilter", "#platformFilter", "#validationFilter"].forEach((selector) => {
         $(selector)?.addEventListener("input", renderEverything);
         $(selector)?.addEventListener("change", renderEverything);
       });
@@ -1392,14 +1009,8 @@
         const row = event.target.closest("[data-post-row]");
         if (!row) return;
         const postId = row.dataset.postRow;
-
-        if (event.target.closest("[data-quick-validate]")) {
-          await quickValidate(postId);
-        }
-
-        if (event.target.closest("[data-delete-post]")) {
-          await deletePost(postId);
-        }
+        if (event.target.closest("[data-quick-validate]")) await quickValidate(postId);
+        if (event.target.closest("[data-delete-post]")) await deletePost(postId);
       });
 
       $("#openAllBtn")?.addEventListener("click", () => setAllDetailsOpen(true));
@@ -1407,97 +1018,53 @@
     }
 
     function setAllDetailsOpen(open) {
-      document.querySelectorAll("#calendarBoard details").forEach((details) => {
-        details.open = open;
-      });
+      document.querySelectorAll("#calendarBoard details").forEach((details) => { details.open = open; });
     }
 
     async function logout() {
-      try {
-        await supabaseClient?.auth?.signOut();
-      } catch (error) {
-        console.warn(error);
-      }
+      try { await supabaseClient?.auth?.signOut(); } catch (error) { console.warn(error); }
       window.location.href = "login.html";
     }
 
     function showBlockedState(title, message, showButtons = false) {
-      $("#app").classList.add("hidden");
-      $("#stateScreen").classList.remove("hidden");
+      $("#app")?.classList.add("hidden");
+      $("#stateScreen")?.classList.remove("hidden");
       $("#stateTitle").textContent = title;
       $("#stateMessage").textContent = message;
-
-      if (showButtons) {
-        $("#stateActions").innerHTML = `
-          <a class="btn btn-primary" href="login.html">Se connecter</a>
-          <a class="btn btn-soft" href="index.html">Retour au site</a>
-        `;
-      }
+      $("#stateActions").innerHTML = showButtons ? `
+        <a class="btn btn-primary" href="login.html">Se connecter</a>
+        <a class="btn btn-outline" href="index.html">Retour au site</a>
+      ` : "";
     }
 
     function toast(message) {
-      const box = $("#toast");
-      box.textContent = message;
-      box.classList.add("show");
-      clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(() => box.classList.remove("show"), 3200);
+      const el = $("#toast");
+      el.textContent = message;
+      el.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove("show"), 3200);
     }
 
     function parseAdminNote(value) {
       const raw = String(value || "");
       const match = raw.match(META_REGEX);
+      if (!match) return { note: raw.trim(), meta: {} };
       const note = raw.replace(META_REGEX, "").trim();
-      let meta = {};
+      try { return { note, meta: JSON.parse(fromBase64(match[1])) || {} }; }
+      catch { return { note, meta: {} }; }
+    }
 
-      if (match?.[1]) {
-        try {
-          meta = JSON.parse(decodeBase64Unicode(match[1]));
-        } catch (error) {
-          console.warn("Métadonnées CM illisibles", error);
-        }
-      }
-
-      return { note, meta };
+    function buildAdminNote(note, meta) {
+      return `${String(note || "").trim()}\n<!--CM_META:${toBase64(JSON.stringify(meta || {}))}-->`;
     }
 
     function withDefaultMeta(meta, post) {
       const status = post?.status || "a_valider";
       return {
-        ...meta,
-        cm_assigned: String(meta?.cm_assigned || ""),
-        graphiste_assigned: String(meta?.graphiste_assigned || ""),
-        ready_for_validation: Boolean(meta?.ready_for_validation === true || meta?.ready_for_validation === "true" || status === "a_valider" || status === "modification_demandee")
+        cm_assigned: meta?.cm_assigned || "",
+        graphiste_assigned: meta?.graphiste_assigned || "",
+        ready_for_validation: typeof meta?.ready_for_validation === "boolean" ? meta.ready_for_validation : ["a_valider", "modification_demandee"].includes(status)
       };
-    }
-
-    function buildAdminNote(note, meta) {
-      const cleanNote = String(note || "").trim();
-      const cleanMeta = Object.fromEntries(
-        Object.entries(meta || {}).filter(([, value]) => {
-          if (value === false || value === null || value === undefined) return false;
-          if (typeof value === "string" && !value.trim()) return false;
-          return true;
-        })
-      );
-
-      const metaKeys = Object.keys(cleanMeta);
-      if (!metaKeys.length) return cleanNote || null;
-
-      const encoded = encodeBase64Unicode(JSON.stringify(cleanMeta));
-      return `${cleanNote ? `${cleanNote}\n\n` : ""}<!--CM_META:${encoded}-->`;
-    }
-
-    function encodeBase64Unicode(value) {
-      const bytes = new TextEncoder().encode(value);
-      let binary = "";
-      bytes.forEach((byte) => binary += String.fromCharCode(byte));
-      return btoa(binary);
-    }
-
-    function decodeBase64Unicode(value) {
-      const binary = atob(value);
-      const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
-      return new TextDecoder().decode(bytes);
     }
 
     function getInputValue(input) {
@@ -1508,40 +1075,21 @@
 
     function normalizeDbValue(field, value) {
       if (["text_validated", "visual_validated", "date_validated"].includes(field)) return Boolean(value);
-      if (["publication_date", "publication_time", "caption_text", "visual_url", "file_url", "client_comment"].includes(field)) {
-        return String(value || "").trim() || null;
-      }
+      if (["publication_date", "publication_time", "caption_text", "visual_url", "file_url", "client_comment"].includes(field)) return String(value || "").trim() || null;
       if (field === "client_email") return normalizeEmail(value);
       return String(value || "").trim();
     }
 
     function normalizeComparableValue(value) {
-      if (value === null || value === undefined) return "";
-      if (typeof value === "boolean") return String(value);
-      return String(value).trim();
+      if (typeof value === "boolean") return value ? "true" : "false";
+      return String(value ?? "").trim();
     }
 
-    function normalizeEmail(value) {
-      return String(value || "").trim().toLowerCase();
-    }
-
-    function formatInputTime(value) {
-      if (!value) return "";
-      return String(value).slice(0, 5);
-    }
-
-    function shortDate(date) {
-      return date.toLocaleDateString("fr-FR", { day: "2-digit", month: "short" });
-    }
-
-    function getInitials(value) {
-      return String(value || "C")
-        .split(/[\s@._-]+/)
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((part) => part[0]?.toUpperCase())
-        .join("") || "C";
-    }
+    function normalizeEmail(value) { return String(value || "").trim().toLowerCase(); }
+    function normalizeSearch(value) { return String(value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
+    function shortDate(date) { return date.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" }); }
+    function formatInputTime(value) { return value ? String(value).slice(0, 5) : ""; }
+    function getInitials(value) { return String(value || "C").trim().split(/\s+/).slice(0,2).map((part) => part[0]?.toUpperCase()).join("") || "C"; }
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -1551,9 +1099,13 @@
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
     }
+    function escapeAttribute(value) { return escapeHtml(value); }
 
-    function escapeAttribute(value) {
-      return escapeHtml(value).replaceAll("`", "&#096;");
+    function toBase64(value) {
+      return btoa(unescape(encodeURIComponent(value)));
+    }
+    function fromBase64(value) {
+      return decodeURIComponent(escape(atob(value)));
     }
   </script>
 </body>
