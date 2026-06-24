@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Espace client | Community Management</title>
+  <title>Espace client | Calendrier éditorial</title>
 
-  <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -32,9 +31,7 @@
       --radius: 22px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -46,23 +43,12 @@
       min-height: 100vh;
     }
 
-    a {
-      color: inherit;
-    }
-
-    button,
-    input,
-    select,
-    textarea {
-      font: inherit;
-    }
-
-    .hidden {
-      display: none !important;
-    }
+    a { color: inherit; }
+    button, input, select, textarea { font: inherit; }
+    .hidden { display: none !important; }
 
     .page-shell {
-      width: min(1240px, calc(100% - 32px));
+      width: min(1480px, calc(100% - 32px));
       margin: 0 auto;
       padding: 28px 0 56px;
     }
@@ -118,7 +104,7 @@
       cursor: pointer;
       border-radius: 999px;
       padding: 11px 15px;
-      font-weight: 800;
+      font-weight: 850;
       font-size: 14px;
       display: inline-flex;
       align-items: center;
@@ -126,54 +112,22 @@
       gap: 8px;
       transition: 0.18s ease;
       text-decoration: none;
+      white-space: nowrap;
     }
 
-    .btn:hover {
-      transform: translateY(-1px);
-    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 12px 25px rgba(17, 24, 39, 0.18); }
+    .btn-soft { background: var(--primary-soft); color: var(--primary); border: 1px solid var(--border); }
+    .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--border); }
+    .btn-danger { background: var(--danger-soft); color: var(--danger); }
+    .btn-success { background: var(--success-soft); color: var(--success); }
 
-    .btn-primary {
-      background: var(--primary);
-      color: #fff;
-      box-shadow: 0 12px 25px rgba(17, 24, 39, 0.18);
-    }
-
-    .btn-soft {
-      background: var(--primary-soft);
-      color: var(--primary);
-      border: 1px solid var(--border);
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: var(--primary);
-      border: 1px solid var(--border);
-    }
-
-    .btn-danger {
-      background: var(--danger-soft);
-      color: var(--danger);
-    }
-
-    .btn-success {
-      background: var(--success-soft);
-      color: var(--success);
-    }
-
-    .grid {
-      display: grid;
-      gap: 18px;
-    }
-
-    .hero {
-      grid-template-columns: 1.2fr 0.8fr;
-      align-items: stretch;
-      margin-bottom: 18px;
-    }
+    .grid { display: grid; gap: 18px; }
+    .hero { grid-template-columns: 1.3fr 0.7fr; align-items: stretch; margin-bottom: 18px; }
 
     .card {
-      background: rgba(255, 255, 255, 0.88);
-      border: 1px solid rgba(232, 226, 215, 0.9);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(232, 226, 215, 0.95);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       backdrop-filter: blur(12px);
@@ -205,7 +159,7 @@
       color: var(--accent-2);
       padding: 8px 12px;
       font-size: 13px;
-      font-weight: 900;
+      font-weight: 950;
       margin-bottom: 16px;
     }
 
@@ -214,13 +168,13 @@
       font-size: clamp(28px, 5vw, 48px);
       line-height: 0.98;
       letter-spacing: -0.055em;
-      max-width: 760px;
+      max-width: 820px;
     }
 
     .hero-main p {
       margin: 16px 0 0;
       color: var(--muted);
-      max-width: 700px;
+      max-width: 860px;
       line-height: 1.65;
     }
 
@@ -232,12 +186,7 @@
       gap: 18px;
     }
 
-    .profile-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
+    .profile-row { display: flex; align-items: center; gap: 12px; }
     .avatar {
       width: 54px;
       height: 54px;
@@ -251,17 +200,8 @@
       flex: 0 0 auto;
     }
 
-    .profile-row h3,
-    .profile-row p {
-      margin: 0;
-    }
-
-    .profile-row p {
-      color: var(--muted);
-      font-size: 14px;
-      margin-top: 2px;
-      overflow-wrap: anywhere;
-    }
+    .profile-row h3, .profile-row p { margin: 0; }
+    .profile-row p { color: var(--muted); font-size: 14px; margin-top: 2px; overflow-wrap: anywhere; }
 
     .pill {
       display: inline-flex;
@@ -270,7 +210,7 @@
       padding: 8px 11px;
       border-radius: 999px;
       font-size: 12px;
-      font-weight: 900;
+      font-weight: 950;
       width: fit-content;
       border: 1px solid transparent;
       white-space: nowrap;
@@ -283,27 +223,10 @@
     .pill.neutral { background: #f2f4f7; color: #344054; }
     .pill.gold { background: #f7efe3; color: var(--accent-2); }
 
-    .stats {
-      grid-template-columns: repeat(4, 1fr);
-      margin-bottom: 18px;
-    }
-
-    .stat-card {
-      padding: 18px;
-    }
-
-    .stat-card span {
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-    .stat-card strong {
-      display: block;
-      margin-top: 8px;
-      font-size: 30px;
-      letter-spacing: -0.04em;
-    }
+    .stats { grid-template-columns: repeat(4, 1fr); margin-bottom: 18px; }
+    .stat-card { padding: 18px; }
+    .stat-card span { color: var(--muted); font-size: 13px; font-weight: 850; }
+    .stat-card strong { display: block; margin-top: 8px; font-size: 30px; letter-spacing: -0.04em; }
 
     .toolbar {
       padding: 14px;
@@ -312,22 +235,17 @@
       gap: 10px;
       justify-content: space-between;
       margin-bottom: 18px;
+      position: sticky;
+      top: 8px;
+      z-index: 20;
     }
 
-    .filters {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      flex: 1;
-    }
+    .filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex: 1; }
 
-    .field,
-    .textarea,
-    .select {
+    .field, .textarea, .select {
       width: 100%;
       border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.96);
       border-radius: 16px;
       padding: 12px 13px;
       outline: none;
@@ -335,209 +253,16 @@
       transition: 0.18s ease;
     }
 
-    .field:focus,
-    .textarea:focus,
-    .select:focus {
+    .field:focus, .textarea:focus, .select:focus {
       border-color: rgba(184, 135, 70, 0.8);
       box-shadow: 0 0 0 4px rgba(184, 135, 70, 0.13);
     }
 
-    .filters .field,
-    .filters .select {
+    .filters .field, .filters .select {
       max-width: 230px;
       border-radius: 999px;
       padding: 10px 13px;
       font-size: 14px;
-    }
-
-    .content-layout {
-      display: grid;
-      grid-template-columns: 1fr 380px;
-      gap: 18px;
-      align-items: start;
-    }
-
-    .section-card {
-      padding: 18px;
-    }
-
-    .section-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .section-title h3 {
-      margin: 0;
-      font-size: 19px;
-      letter-spacing: -0.02em;
-    }
-
-    .section-title p {
-      margin: 4px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .posts {
-      display: grid;
-      gap: 14px;
-    }
-
-    .post-card {
-      border: 1px solid var(--border);
-      background: var(--panel-soft);
-      border-radius: 20px;
-      padding: 16px;
-    }
-
-    .post-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 14px;
-      align-items: flex-start;
-      margin-bottom: 12px;
-    }
-
-    .post-title {
-      margin: 0;
-      font-size: 17px;
-      letter-spacing: -0.02em;
-    }
-
-    .post-meta {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 9px;
-    }
-
-    .post-body {
-      display: grid;
-      grid-template-columns: 1fr 260px;
-      gap: 14px;
-      align-items: start;
-    }
-
-    .caption-box {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 13px;
-      color: #2f2f2f;
-      line-height: 1.55;
-      white-space: pre-wrap;
-      min-height: 92px;
-    }
-
-    .assets-box {
-      display: grid;
-      gap: 8px;
-    }
-
-    .asset-link {
-      display: block;
-      padding: 10px 12px;
-      border-radius: 14px;
-      background: #fff;
-      border: 1px solid var(--border);
-      color: var(--primary);
-      text-decoration: none;
-      font-weight: 800;
-      font-size: 13px;
-      overflow-wrap: anywhere;
-    }
-
-    .validation-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin: 14px 0;
-    }
-
-    .check-tile {
-      border: 1px solid var(--border);
-      background: #fff;
-      border-radius: 16px;
-      padding: 12px;
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      font-weight: 900;
-      font-size: 13px;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .check-tile input {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--success);
-    }
-
-    .comment-area {
-      display: grid;
-      gap: 9px;
-    }
-
-    .textarea {
-      min-height: 86px;
-      resize: vertical;
-      line-height: 1.55;
-    }
-
-    .post-actions {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-
-    .calendar-list {
-      display: grid;
-      gap: 10px;
-    }
-
-    .calendar-day {
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      overflow: hidden;
-      background: #fff;
-    }
-
-    .calendar-date {
-      padding: 12px 14px;
-      background: #f7efe3;
-      color: var(--accent-2);
-      font-weight: 950;
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .calendar-items {
-      display: grid;
-      gap: 0;
-    }
-
-    .calendar-item {
-      padding: 12px 14px;
-      border-top: 1px solid var(--border);
-      display: grid;
-      gap: 6px;
-    }
-
-    .calendar-item strong {
-      font-size: 14px;
-    }
-
-    .calendar-item span {
-      color: var(--muted);
-      font-size: 13px;
     }
 
     .admin-panel {
@@ -547,39 +272,151 @@
       background: rgba(255, 252, 247, 0.96);
     }
 
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
+    .section-title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
       gap: 12px;
+      margin-bottom: 14px;
     }
 
-    .form-grid .full {
-      grid-column: 1 / -1;
+    .section-title h3 { margin: 0; font-size: 19px; letter-spacing: -0.02em; }
+    .section-title p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+
+    .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .form-grid .full { grid-column: 1 / -1; }
+    .form-grid .span-2 { grid-column: span 2; }
+
+    .form-label { display: grid; gap: 7px; color: #344054; font-size: 13px; font-weight: 900; }
+    .textarea { min-height: 86px; resize: vertical; line-height: 1.55; }
+
+    .post-actions { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; margin-top: 10px; }
+
+    .board-card { padding: 18px; }
+    .board-help { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; color: var(--muted); font-size: 13px; }
+
+    .year-group, .month-group, .week-group {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: #fff;
+      margin-bottom: 14px;
+      overflow: hidden;
     }
 
-    .form-label {
-      display: grid;
-      gap: 7px;
-      color: #344054;
-      font-size: 13px;
-      font-weight: 900;
+    .year-group > summary, .month-group > summary, .week-group > summary {
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      font-weight: 950;
     }
 
-    .empty-state,
-    .state-screen {
-      text-align: center;
-      padding: 36px 18px;
-      color: var(--muted);
+    .year-group > summary::-webkit-details-marker,
+    .month-group > summary::-webkit-details-marker,
+    .week-group > summary::-webkit-details-marker { display: none; }
+
+    .year-group > summary { background: #111827; color: #fff; font-size: 18px; }
+    .month-group { margin: 12px; }
+    .month-group > summary { background: #f7efe3; color: var(--accent-2); }
+    .week-group { margin: 10px; }
+    .week-group > summary { background: #f9fafb; color: #344054; }
+
+    .table-wrap { overflow-x: auto; border-top: 1px solid var(--border); }
+    .monday-table { width: 100%; min-width: 1900px; border-collapse: collapse; }
+    .monday-table th, .monday-table td {
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      padding: 10px;
+      vertical-align: top;
+      background: #fff;
     }
 
-    .empty-state strong,
-    .state-screen strong {
-      display: block;
+    .monday-table th {
+      position: sticky;
+      top: 76px;
+      z-index: 10;
+      background: #f9fafb;
+      color: #667085;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .monday-table th:first-child, .monday-table td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 11;
+      box-shadow: 8px 0 18px rgba(17, 24, 39, 0.05);
+    }
+
+    .monday-table th:first-child { background: #f9fafb; }
+    .monday-table td:first-child { background: #fff; }
+
+    .table-field, .table-select, .table-textarea {
+      width: 100%;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 9px 10px;
+      background: #fff;
       color: var(--text);
-      font-size: 20px;
-      margin-bottom: 6px;
-      letter-spacing: -0.03em;
+      outline: none;
+      font-size: 13px;
     }
+
+    .table-textarea {
+      min-height: 74px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    .title-field { min-width: 190px; min-height: 48px; font-weight: 800; }
+    .copy-field { min-width: 320px; min-height: 118px; }
+    .asset-field { min-width: 220px; }
+    .comment-field { min-width: 260px; min-height: 92px; }
+    .assign-field { min-width: 160px; }
+
+    .table-field:disabled,
+    .table-select:disabled,
+    .table-textarea:disabled {
+      opacity: 0.72;
+      background: #f9fafb;
+      cursor: not-allowed;
+    }
+
+    .validation-stack { display: grid; gap: 8px; min-width: 160px; }
+    .check-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 900;
+      color: #344054;
+      white-space: nowrap;
+    }
+
+    .check-line input { width: 16px; height: 16px; accent-color: var(--success); }
+    .row-actions { display: grid; gap: 8px; min-width: 118px; }
+    .mini-btn { padding: 8px 10px; font-size: 12px; }
+
+    .asset-link {
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: #f7efe3;
+      color: var(--accent-2);
+      border: 1px solid rgba(184, 135, 70, 0.25);
+      text-decoration: none;
+      font-weight: 900;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .empty-state, .state-screen { text-align: center; padding: 36px 18px; color: var(--muted); }
+    .empty-state strong, .state-screen strong { display: block; color: var(--text); font-size: 20px; margin-bottom: 6px; letter-spacing: -0.03em; }
 
     .state-screen {
       max-width: 560px;
@@ -594,13 +431,13 @@
       position: fixed;
       right: 18px;
       bottom: 18px;
-      max-width: 420px;
+      max-width: 440px;
       background: #111827;
       color: #fff;
       padding: 14px 16px;
       border-radius: 18px;
       box-shadow: 0 18px 35px rgba(17, 24, 39, 0.25);
-      z-index: 50;
+      z-index: 100;
       transform: translateY(16px);
       opacity: 0;
       pointer-events: none;
@@ -609,74 +446,27 @@
       line-height: 1.4;
     }
 
-    .toast.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .muted { color: var(--muted); }
+    .small { font-size: 13px; }
 
-    .muted {
-      color: var(--muted);
-    }
-
-    .small {
-      font-size: 13px;
-    }
-
-    @media (max-width: 980px) {
-      .hero,
-      .content-layout,
-      .post-body {
-        grid-template-columns: 1fr;
-      }
-
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
+    @media (max-width: 1100px) {
+      .hero { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .form-grid { grid-template-columns: repeat(2, 1fr); }
+      .form-grid .span-2 { grid-column: span 2; }
     }
 
     @media (max-width: 680px) {
-      .page-shell {
-        width: min(100% - 20px, 1240px);
-        padding-top: 18px;
-      }
-
-      .topbar {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .top-actions {
-        width: 100%;
-        justify-content: flex-start;
-      }
-
-      .hero-main,
-      .profile-card,
-      .section-card,
-      .admin-panel {
-        padding: 16px;
-      }
-
-      .stats,
-      .validation-grid,
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .filters .field,
-      .filters .select {
-        max-width: 100%;
-      }
-
-      .toolbar {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .filters {
-        display: grid;
-        grid-template-columns: 1fr;
-      }
+      .page-shell { width: min(100% - 20px, 1480px); padding-top: 18px; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .top-actions { width: 100%; justify-content: flex-start; }
+      .hero-main, .profile-card, .admin-panel, .board-card { padding: 16px; }
+      .stats, .form-grid { grid-template-columns: 1fr; }
+      .form-grid .span-2 { grid-column: span 1; }
+      .filters { display: grid; grid-template-columns: 1fr; }
+      .filters .field, .filters .select { max-width: 100%; }
+      .toolbar { position: static; flex-direction: column; align-items: stretch; }
     }
   </style>
 </head>
@@ -687,7 +477,7 @@
         <div class="brand-logo">CM</div>
         <div>
           <h1>Espace client</h1>
-          <p>Calendrier éditorial, fichiers, validations et retours.</p>
+          <p>Calendrier éditorial façon Monday, validations et productions.</p>
         </div>
       </div>
 
@@ -701,10 +491,10 @@
     <section class="grid hero">
       <div class="card hero-main">
         <span class="eyebrow">✦ Community Management</span>
-        <h2>Tout ton contenu à valider, au même endroit.</h2>
+        <h2>Calendrier éditorial modifiable directement dans le site.</h2>
         <p>
-          Retrouve les publications prévues, les textes, les visuels, les fichiers de production,
-          les dates de publication et les validations nécessaires avant programmation.
+          Les publications sont classées par année, mois et semaine. Tu peux suivre le CM assigné,
+          le graphiste, la production textuelle, la production visuelle, les dates, les statuts et les champs à valider.
         </p>
       </div>
 
@@ -719,7 +509,7 @@
         <div>
           <span id="accessBadge" class="pill success">Accès actif</span>
           <p class="muted small" style="margin: 12px 0 0;">
-            Les modifications sont enregistrées directement dans Supabase.
+            Modifie les lignes directement depuis le tableau. Les champs se sauvegardent automatiquement depuis le site.
           </p>
         </div>
       </aside>
@@ -727,7 +517,7 @@
 
     <section class="grid stats">
       <article class="card stat-card">
-        <span>Publications</span>
+        <span>Total publications</span>
         <strong id="statTotal">0</strong>
       </article>
       <article class="card stat-card">
@@ -747,8 +537,8 @@
     <section id="adminPanel" class="card admin-panel hidden">
       <div class="section-title">
         <div>
-          <h3>Créer une publication client</h3>
-          <p>Visible uniquement si ton accès est marqué admin / gestionnaire.</p>
+          <h3>Ajouter une ligne au calendrier</h3>
+          <p>Visible pour les comptes admin / gestionnaire. Les lignes ajoutées apparaissent ensuite dans le tableau classé par année, mois et semaine.</p>
         </div>
       </div>
 
@@ -770,40 +560,53 @@
           </select>
         </label>
 
-        <label class="form-label full">
+        <label class="form-label">
+          Date
+          <input class="field" id="formDate" type="date" />
+        </label>
+
+        <label class="form-label">
+          Heure
+          <input class="field" id="formTime" type="time" />
+        </label>
+
+        <label class="form-label span-2">
           Titre de la publication
           <input class="field" id="formTitle" type="text" placeholder="Ex : Post lancement offre spéciale" required />
         </label>
 
         <label class="form-label">
-          Date de publication
-          <input class="field" id="formDate" type="date" />
+          CM assigné
+          <input class="field" id="formCmAssigned" type="text" placeholder="Ex : Stéph" />
         </label>
 
         <label class="form-label">
-          Heure de publication
-          <input class="field" id="formTime" type="time" />
+          Graphiste assigné
+          <input class="field" id="formGraphisteAssigned" type="text" placeholder="Ex : Designer / graphiste" />
         </label>
 
-        <label class="form-label full">
-          Texte de publication
-          <textarea class="textarea" id="formCaption" placeholder="Colle ici la production textuelle..."></textarea>
+        <label class="form-label span-2">
+          Production textuelle
+          <textarea class="textarea" id="formCaption" placeholder="Texte de publication, accroche, hashtags, CTA..."></textarea>
         </label>
 
-        <label class="form-label">
-          Lien visuel / Canva / Drive
+        <label class="form-label span-2">
+          Production visuelle / lien Canva ou Drive
           <input class="field" id="formVisualUrl" type="url" placeholder="https://drive.google.com/..." />
+          <input class="field" id="formFileUrl" type="url" placeholder="Lien fichier complémentaire" />
         </label>
 
-        <label class="form-label">
-          Lien fichier Google Drive
-          <input class="field" id="formFileUrl" type="url" placeholder="https://drive.google.com/..." />
-          <span class="muted small">Colle ici le lien du fichier de production : texte, visuel, dossier Drive, Canva, PDF, etc.</span>
-        </label>
-
-        <label class="form-label full">
+        <label class="form-label span-2">
           Note interne / information pour le client
           <textarea class="textarea" id="formAdminNote" placeholder="Ex : visuel Canva à vérifier, date proposée selon les insights..."></textarea>
+        </label>
+
+        <label class="form-label">
+          Champ à valider
+          <span class="check-line" style="padding: 12px 0;">
+            <input id="formReadyForValidation" type="checkbox" checked />
+            Envoyer à validation
+          </span>
         </label>
 
         <div class="full post-actions">
@@ -815,7 +618,7 @@
 
     <section class="card toolbar">
       <div class="filters">
-        <input class="field" id="searchInput" type="search" placeholder="Rechercher une publication..." />
+        <input class="field" id="searchInput" type="search" placeholder="Rechercher : titre, CM, graphiste, texte..." />
         <select class="select" id="statusFilter">
           <option value="all">Tous les statuts</option>
           <option value="brouillon">Brouillon</option>
@@ -834,30 +637,33 @@
           <option value="Pinterest">Pinterest</option>
           <option value="Autre">Autre</option>
         </select>
+        <select class="select" id="validationFilter">
+          <option value="all">Toutes les validations</option>
+          <option value="ready">Champ à valider</option>
+          <option value="missing">Validation incomplète</option>
+          <option value="complete">Tout validé</option>
+        </select>
       </div>
       <span class="pill gold" id="visibleCount">0 élément</span>
     </section>
 
-    <section class="content-layout">
-      <div class="card section-card">
-        <div class="section-title">
-          <div>
-            <h3>Productions à suivre</h3>
-            <p>Valide les textes, les visuels et les dates proposées.</p>
-          </div>
+    <section class="card board-card">
+      <div class="section-title">
+        <div>
+          <h3>Calendrier éditorial</h3>
+          <p>Classement automatique : année → mois → semaine. Les cellules sont modifiables directement.</p>
         </div>
-        <div id="postsList" class="posts"></div>
+        <div class="post-actions" style="margin-top:0;">
+          <button class="btn btn-outline" id="openAllBtn" type="button">Tout ouvrir</button>
+          <button class="btn btn-outline" id="closeAllBtn" type="button">Tout fermer</button>
+        </div>
       </div>
-
-      <aside class="card section-card">
-        <div class="section-title">
-          <div>
-            <h3>Calendrier éditorial</h3>
-            <p>Vue rapide des publications prévues.</p>
-          </div>
-        </div>
-        <div id="calendarList" class="calendar-list"></div>
-      </aside>
+      <div class="board-help">
+        <span class="pill info">Style Monday</span>
+        <span>Les textes et liens se sauvegardent quand tu quittes la cellule.</span>
+        <span>Les dates, statuts et validations se sauvegardent dès changement.</span>
+      </div>
+      <div id="calendarBoard" style="margin-top:16px;"></div>
     </section>
   </main>
 
@@ -872,12 +678,11 @@
   <script>
     /************************************************************
      * CONFIGURATION SUPABASE
-     * ----------------------------------------------------------
      * Même configuration que le fichier index.html du projet Formation-en-ligne.
-     * Ne dépend pas de assets/config.js.
      ************************************************************/
     const SUPABASE_URL = "https://xlyhujiebervldzoxouk.supabase.co";
     const SUPABASE_KEY = "sb_publishable_IqLPvaAeDZoDlYKE-m_Fxw_29Zbnhh_";
+    const ADMIN_EMAIL = "rakotomanga41@gmail.com";
 
     const STATUS_LABELS = {
       brouillon: "Brouillon",
@@ -896,6 +701,15 @@
       programme: "info",
       publie: "success"
     };
+
+    const PLATFORMS = ["Instagram", "Facebook", "LinkedIn", "TikTok", "Pinterest", "Autre"];
+    const DIRECT_FIELDS = [
+      "client_email", "title", "platform", "publication_date", "publication_time",
+      "caption_text", "visual_url", "file_url", "client_comment", "status",
+      "text_validated", "visual_validated", "date_validated"
+    ];
+    const META_FIELDS = ["cm_assigned", "graphiste_assigned", "ready_for_validation"];
+    const META_REGEX = /\n?<!--CM_META:([A-Za-z0-9+/=]+)-->/s;
 
     let supabaseClient = null;
     let currentUser = null;
@@ -922,7 +736,6 @@
         }
 
         const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
-
         if (sessionError) throw sessionError;
 
         currentUser = sessionData?.session?.user || null;
@@ -989,7 +802,7 @@
     }
 
     async function verifyClientAccess() {
-      const email = String(currentUser.email || "").trim().toLowerCase();
+      const email = normalizeEmail(currentUser.email);
 
       const { data, error } = await supabaseClient
         .from("client_spaces")
@@ -1001,6 +814,19 @@
       if (error) throw error;
 
       if (!data) {
+        if (email === ADMIN_EMAIL) {
+          currentAccess = {
+            client_name: "Administrateur",
+            client_email: ADMIN_EMAIL,
+            is_active: true,
+            role: "admin",
+            can_manage: true
+          };
+          updateProfile();
+          toggleAdminPanel();
+          return;
+        }
+
         showBlockedState(
           "Accès réservé",
           "Ton email n’est pas autorisé à consulter cette page. Demande à l’administrateur de t’ajouter dans client_spaces.",
@@ -1035,7 +861,8 @@
         currentAccess?.is_admin === true ||
         currentAccess?.role === "admin" ||
         currentAccess?.role === "manager" ||
-        currentAccess?.type === "admin"
+        currentAccess?.type === "admin" ||
+        normalizeEmail(currentUser?.email) === ADMIN_EMAIL
       );
     }
 
@@ -1059,21 +886,31 @@
         .order("created_at", { ascending: false });
 
       if (!manager) {
-        query = query.eq("client_email", currentUser.email);
+        query = query.ilike("client_email", normalizeEmail(currentUser.email));
       }
 
       const { data, error } = await query;
       if (error) throw error;
 
-      allPosts = data || [];
+      allPosts = (data || []).map(normalizePost);
       renderEverything();
+    }
+
+    function normalizePost(post) {
+      return {
+        ...post,
+        client_email: normalizeEmail(post.client_email),
+        status: post.status || "a_valider",
+        text_validated: Boolean(post.text_validated),
+        visual_validated: Boolean(post.visual_validated),
+        date_validated: Boolean(post.date_validated)
+      };
     }
 
     function renderEverything() {
       const filteredPosts = getFilteredPosts();
       updateStats();
-      renderPosts(filteredPosts);
-      renderCalendar(filteredPosts);
+      renderCalendarBoard(filteredPosts);
       updateVisibleCount(filteredPosts.length);
     }
 
@@ -1081,29 +918,45 @@
       const search = $("#searchInput").value.trim().toLowerCase();
       const status = $("#statusFilter").value;
       const platform = $("#platformFilter").value;
+      const validation = $("#validationFilter").value;
 
       return allPosts.filter((post) => {
+        const parsed = parseAdminNote(post.admin_note);
+        const meta = withDefaultMeta(parsed.meta, post);
         const haystack = [
           post.title,
           post.platform,
           post.caption_text,
           post.admin_note,
           post.client_comment,
-          post.client_email
+          post.client_email,
+          meta.cm_assigned,
+          meta.graphiste_assigned,
+          post.visual_url,
+          post.file_url
         ].join(" ").toLowerCase();
 
+        const allValidated = post.text_validated && post.visual_validated && post.date_validated;
         const matchesSearch = !search || haystack.includes(search);
         const matchesStatus = status === "all" || post.status === status;
         const matchesPlatform = platform === "all" || post.platform === platform;
+        const matchesValidation =
+          validation === "all" ||
+          (validation === "ready" && meta.ready_for_validation) ||
+          (validation === "missing" && !allValidated) ||
+          (validation === "complete" && allValidated);
 
-        return matchesSearch && matchesStatus && matchesPlatform;
+        return matchesSearch && matchesStatus && matchesPlatform && matchesValidation;
       });
     }
 
     function updateStats() {
       const total = allPosts.length;
-      const toValidate = allPosts.filter((p) => ["a_valider", "modification_demandee", "brouillon"].includes(p.status)).length;
-      const validated = allPosts.filter((p) => p.status === "valide").length;
+      const toValidate = allPosts.filter((post) => {
+        const meta = withDefaultMeta(parseAdminNote(post.admin_note).meta, post);
+        return meta.ready_for_validation || ["a_valider", "modification_demandee", "brouillon"].includes(post.status);
+      }).length;
+      const validated = allPosts.filter((p) => p.status === "valide" || (p.text_validated && p.visual_validated && p.date_validated)).length;
       const programmed = allPosts.filter((p) => ["programme", "publie"].includes(p.status)).length;
 
       $("#statTotal").textContent = total;
@@ -1116,8 +969,8 @@
       $("#visibleCount").textContent = `${count} ${count > 1 ? "éléments" : "élément"}`;
     }
 
-    function renderPosts(posts) {
-      const container = $("#postsList");
+    function renderCalendarBoard(posts) {
+      const container = $("#calendarBoard");
 
       if (!posts.length) {
         container.innerHTML = `
@@ -1129,200 +982,281 @@
         return;
       }
 
-      container.innerHTML = posts.map((post) => postTemplate(post)).join("");
+      const sorted = [...posts].sort(comparePostsByDate);
+      const grouped = groupByYearMonthWeek(sorted);
 
-      posts.forEach((post) => {
-        const card = document.querySelector(`[data-post-card="${post.id}"]`);
-        if (!card) return;
-
-        card.querySelectorAll("[data-validation]").forEach((checkbox) => {
-          checkbox.addEventListener("change", () => handleValidationChange(post.id, checkbox.dataset.validation, checkbox.checked));
-        });
-
-        const commentBtn = card.querySelector("[data-save-comment]");
-        commentBtn?.addEventListener("click", () => saveComment(post.id));
-
-        const validateBtn = card.querySelector("[data-validate-post]");
-        validateBtn?.addEventListener("click", () => validatePost(post.id));
-
-        const requestBtn = card.querySelector("[data-request-change]");
-        requestBtn?.addEventListener("click", () => requestChange(post.id));
-
-        const statusSelect = card.querySelector("[data-status-select]");
-        statusSelect?.addEventListener("change", () => updateStatus(post.id, statusSelect.value));
-
-        const deleteBtn = card.querySelector("[data-delete-post]");
-        deleteBtn?.addEventListener("click", () => deletePost(post.id));
-      });
-    }
-
-    function postTemplate(post) {
-      const status = post.status || "a_valider";
-      const statusLabel = STATUS_LABELS[status] || status;
-      const statusClass = STATUS_CLASS[status] || "neutral";
-      const dateLabel = formatDate(post.publication_date);
-      const timeLabel = post.publication_time ? post.publication_time.slice(0, 5) : "Heure à définir";
-      const platform = post.platform || "Plateforme à définir";
-      const caption = post.caption_text || "Aucun texte ajouté pour le moment.";
-      const comment = post.client_comment || "";
-      const adminNote = post.admin_note || "";
-      const managerControls = isManager()
-        ? `
-          <div class="post-actions">
-            <select class="select" data-status-select style="max-width:230px; border-radius:999px; padding:10px 13px;">
-              ${Object.keys(STATUS_LABELS).map((key) => `<option value="${key}" ${key === status ? "selected" : ""}>${STATUS_LABELS[key]}</option>`).join("")}
-            </select>
-            <button class="btn btn-danger" type="button" data-delete-post>Supprimer</button>
-          </div>
-        `
-        : "";
-
-      return `
-        <article class="post-card" data-post-card="${escapeHtml(post.id)}">
-          <div class="post-head">
-            <div>
-              <h4 class="post-title">${escapeHtml(post.title || "Publication sans titre")}</h4>
-              <div class="post-meta">
-                <span class="pill gold">${escapeHtml(platform)}</span>
-                <span class="pill neutral">${escapeHtml(dateLabel)} · ${escapeHtml(timeLabel)}</span>
-                <span class="pill ${statusClass}">${escapeHtml(statusLabel)}</span>
-                ${isManager() ? `<span class="pill info">${escapeHtml(post.client_email || "client non défini")}</span>` : ""}
-              </div>
-            </div>
-          </div>
-
-          <div class="post-body">
-            <div>
-              <div class="caption-box">${escapeHtml(caption)}</div>
-
-              ${adminNote ? `<p class="muted small"><strong>Note :</strong> ${escapeHtml(adminNote)}</p>` : ""}
-
-              <div class="validation-grid">
-                <label class="check-tile">
-                  <input type="checkbox" data-validation="text_validated" ${post.text_validated ? "checked" : ""}>
-                  Texte validé
-                </label>
-                <label class="check-tile">
-                  <input type="checkbox" data-validation="visual_validated" ${post.visual_validated ? "checked" : ""}>
-                  Visuel validé
-                </label>
-                <label class="check-tile">
-                  <input type="checkbox" data-validation="date_validated" ${post.date_validated ? "checked" : ""}>
-                  Date validée
-                </label>
-              </div>
-
-              <div class="comment-area">
-                <textarea class="textarea" data-comment-box="${escapeHtml(post.id)}" placeholder="Ajouter un commentaire ou une demande de modification...">${escapeHtml(comment)}</textarea>
-                <div class="post-actions">
-                  <button class="btn btn-outline" type="button" data-save-comment>Enregistrer commentaire</button>
-                  <button class="btn btn-danger" type="button" data-request-change>Demander une modification</button>
-                  <button class="btn btn-success" type="button" data-validate-post>Valider cette publication</button>
-                </div>
-              </div>
-
-              ${managerControls}
-            </div>
-
-            <div class="assets-box">
-              ${post.visual_url ? `<a class="asset-link" href="${escapeAttribute(post.visual_url)}" target="_blank" rel="noopener">Ouvrir le visuel ↗</a>` : `<span class="asset-link muted">Aucun visuel ajouté</span>`}
-              ${post.file_url ? `<a class="asset-link" href="${escapeAttribute(post.file_url)}" target="_blank" rel="noopener">Ouvrir le fichier ↗</a>` : `<span class="asset-link muted">Aucun fichier ajouté</span>`}
-            </div>
-          </div>
-        </article>
-      `;
-    }
-
-    function renderCalendar(posts) {
-      const container = $("#calendarList");
-      const datedPosts = posts
-        .filter((post) => post.publication_date)
-        .sort((a, b) => `${a.publication_date || "9999"} ${a.publication_time || "99:99"}`.localeCompare(`${b.publication_date || "9999"} ${b.publication_time || "99:99"}`));
-
-      if (!datedPosts.length) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <strong>Aucune date prévue</strong>
-            <p>Les publications datées apparaîtront ici.</p>
-          </div>
-        `;
-        return;
-      }
-
-      const grouped = datedPosts.reduce((acc, post) => {
-        const date = post.publication_date;
-        if (!acc[date]) acc[date] = [];
-        acc[date].push(post);
-        return acc;
-      }, {});
-
-      container.innerHTML = Object.entries(grouped).map(([date, items]) => `
-        <div class="calendar-day">
-          <div class="calendar-date">
-            <span>${escapeHtml(formatDate(date))}</span>
-            <span>${items.length}</span>
-          </div>
-          <div class="calendar-items">
-            ${items.map((item) => `
-              <div class="calendar-item">
-                <strong>${escapeHtml(item.publication_time ? item.publication_time.slice(0, 5) : "Heure à définir")} · ${escapeHtml(item.title || "Sans titre")}</strong>
-                <span>${escapeHtml(item.platform || "Plateforme à définir")} · ${escapeHtml(STATUS_LABELS[item.status] || item.status || "À valider")}</span>
-              </div>
-            `).join("")}
-          </div>
-        </div>
+      container.innerHTML = Object.entries(grouped).map(([yearLabel, yearData]) => `
+        <details class="year-group" open>
+          <summary>
+            <span>${escapeHtml(yearLabel)}</span>
+            <span>${yearData.count} ${yearData.count > 1 ? "publications" : "publication"}</span>
+          </summary>
+          ${Object.entries(yearData.months).map(([monthLabel, monthData]) => `
+            <details class="month-group" open>
+              <summary>
+                <span>${escapeHtml(monthLabel)}</span>
+                <span>${monthData.count}</span>
+              </summary>
+              ${Object.entries(monthData.weeks).map(([weekLabel, weekPosts]) => `
+                <details class="week-group" open>
+                  <summary>
+                    <span>${escapeHtml(weekLabel)}</span>
+                    <span>${weekPosts.length}</span>
+                  </summary>
+                  ${tableTemplate(weekPosts)}
+                </details>
+              `).join("")}
+            </details>
+          `).join("")}
+        </details>
       `).join("");
     }
 
-    async function handleValidationChange(postId, field, checked) {
-      const allowedFields = ["text_validated", "visual_validated", "date_validated"];
-      if (!allowedFields.includes(field)) return;
+    function tableTemplate(posts) {
+      return `
+        <div class="table-wrap">
+          <table class="monday-table">
+            <thead>
+              <tr>
+                <th>Titre</th>
+                <th>Date</th>
+                <th>Heure</th>
+                <th>Plateforme</th>
+                <th>CM assigné</th>
+                <th>Graphiste</th>
+                <th>Production textuelle</th>
+                <th>Production visuelle</th>
+                <th>Champ à valider</th>
+                <th>Statut</th>
+                <th>Validations</th>
+                <th>Commentaire client</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${posts.map(rowTemplate).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
 
-      try {
-        const updates = { [field]: checked };
+    function rowTemplate(post) {
+      const parsed = parseAdminNote(post.admin_note);
+      const meta = withDefaultMeta(parsed.meta, post);
+      const status = post.status || "a_valider";
+      const manager = isManager();
+      const managerDisabled = manager ? "" : "disabled";
+      const canDelete = manager ? "" : "hidden";
 
-        const post = allPosts.find((p) => p.id === postId);
-        if (post) {
-          const finalText = field === "text_validated" ? checked : post.text_validated;
-          const finalVisual = field === "visual_validated" ? checked : post.visual_validated;
-          const finalDate = field === "date_validated" ? checked : post.date_validated;
+      return `
+        <tr data-post-row="${escapeAttribute(post.id)}">
+          <td>
+            <textarea class="table-textarea title-field" data-direct-field="title" ${managerDisabled}>${escapeHtml(post.title || "")}</textarea>
+            <div style="margin-top:8px;">
+              <span class="pill ${STATUS_CLASS[status] || "neutral"}">${escapeHtml(STATUS_LABELS[status] || status)}</span>
+              ${manager ? `<span class="pill info" style="margin-top:6px;">${escapeHtml(post.client_email || "client")}</span>` : ""}
+            </div>
+          </td>
+          <td><input class="table-field" type="date" data-direct-field="publication_date" value="${escapeAttribute(post.publication_date || "")}" ${managerDisabled}></td>
+          <td><input class="table-field" type="time" data-direct-field="publication_time" value="${escapeAttribute(formatInputTime(post.publication_time))}" ${managerDisabled}></td>
+          <td>${platformSelect(post.platform, managerDisabled)}</td>
+          <td><input class="table-field assign-field" type="text" data-meta-field="cm_assigned" value="${escapeAttribute(meta.cm_assigned || "")}" placeholder="CM" ${managerDisabled}></td>
+          <td><input class="table-field assign-field" type="text" data-meta-field="graphiste_assigned" value="${escapeAttribute(meta.graphiste_assigned || "")}" placeholder="Graphiste" ${managerDisabled}></td>
+          <td><textarea class="table-textarea copy-field" data-direct-field="caption_text" placeholder="Production textuelle..." ${managerDisabled}>${escapeHtml(post.caption_text || "")}</textarea></td>
+          <td>
+            <input class="table-field asset-field" type="url" data-direct-field="visual_url" value="${escapeAttribute(post.visual_url || "")}" placeholder="Lien Canva / visuel" ${managerDisabled}>
+            <input class="table-field asset-field" style="margin-top:8px;" type="url" data-direct-field="file_url" value="${escapeAttribute(post.file_url || "")}" placeholder="Lien fichier / Drive" ${managerDisabled}>
+            ${post.visual_url ? `<a class="asset-link" style="margin-top:8px; display:block;" href="${escapeAttribute(post.visual_url)}" target="_blank" rel="noopener">Ouvrir visuel ↗</a>` : ""}
+          </td>
+          <td>
+            <label class="check-line">
+              <input type="checkbox" data-meta-field="ready_for_validation" ${meta.ready_for_validation ? "checked" : ""} ${managerDisabled}>
+              À valider
+            </label>
+          </td>
+          <td>${statusSelect(status, managerDisabled)}</td>
+          <td>
+            <div class="validation-stack">
+              <label class="check-line"><input type="checkbox" data-direct-field="text_validated" ${post.text_validated ? "checked" : ""}> Texte validé</label>
+              <label class="check-line"><input type="checkbox" data-direct-field="visual_validated" ${post.visual_validated ? "checked" : ""}> Visuel validé</label>
+              <label class="check-line"><input type="checkbox" data-direct-field="date_validated" ${post.date_validated ? "checked" : ""}> Date validée</label>
+            </div>
+          </td>
+          <td><textarea class="table-textarea comment-field" data-direct-field="client_comment" placeholder="Commentaire ou modification à demander...">${escapeHtml(post.client_comment || "")}</textarea></td>
+          <td>
+            <div class="row-actions">
+              <button class="btn btn-success mini-btn" type="button" data-quick-validate>Tout valider</button>
+              <button class="btn btn-danger mini-btn ${canDelete}" type="button" data-delete-post>Supprimer</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
 
-          if (finalText && finalVisual && finalDate) {
-            updates.status = "valide";
-          } else if (post.status === "valide") {
-            updates.status = "a_valider";
-          }
+    function platformSelect(current, disabledAttr) {
+      return `
+        <select class="table-select" data-direct-field="platform" ${disabledAttr}>
+          ${PLATFORMS.map((platform) => `<option value="${escapeAttribute(platform)}" ${platform === current ? "selected" : ""}>${escapeHtml(platform)}</option>`).join("")}
+        </select>
+      `;
+    }
+
+    function statusSelect(current, disabledAttr) {
+      return `
+        <select class="table-select" data-direct-field="status" ${disabledAttr}>
+          ${Object.entries(STATUS_LABELS).map(([key, label]) => `<option value="${key}" ${key === current ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}
+        </select>
+      `;
+    }
+
+    function groupByYearMonthWeek(posts) {
+      const grouped = {};
+
+      posts.forEach((post) => {
+        const keys = getDateGroupKeys(post.publication_date);
+
+        if (!grouped[keys.year]) grouped[keys.year] = { count: 0, months: {} };
+        if (!grouped[keys.year].months[keys.month]) grouped[keys.year].months[keys.month] = { count: 0, weeks: {} };
+        if (!grouped[keys.year].months[keys.month].weeks[keys.week]) grouped[keys.year].months[keys.month].weeks[keys.week] = [];
+
+        grouped[keys.year].count += 1;
+        grouped[keys.year].months[keys.month].count += 1;
+        grouped[keys.year].months[keys.month].weeks[keys.week].push(post);
+      });
+
+      return grouped;
+    }
+
+    function getDateGroupKeys(dateValue) {
+      if (!dateValue) {
+        return {
+          year: "Sans date",
+          month: "Dates à définir",
+          week: "Semaine à définir"
+        };
+      }
+
+      const date = new Date(`${dateValue}T00:00:00`);
+      if (Number.isNaN(date.getTime())) {
+        return {
+          year: "Sans date",
+          month: "Dates à définir",
+          week: "Semaine à définir"
+        };
+      }
+
+      const year = String(date.getFullYear());
+      const month = date.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
+      const week = getISOWeekLabel(date);
+
+      return {
+        year,
+        month: month.charAt(0).toUpperCase() + month.slice(1),
+        week
+      };
+    }
+
+    function getISOWeekLabel(date) {
+      const target = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+      const dayNumber = target.getUTCDay() || 7;
+      target.setUTCDate(target.getUTCDate() + 4 - dayNumber);
+      const yearStart = new Date(Date.UTC(target.getUTCFullYear(), 0, 1));
+      const weekNumber = Math.ceil((((target - yearStart) / 86400000) + 1) / 7);
+
+      const weekStart = new Date(date);
+      const localDay = weekStart.getDay() || 7;
+      weekStart.setDate(weekStart.getDate() - localDay + 1);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+
+      return `Semaine ${weekNumber} · ${shortDate(weekStart)} → ${shortDate(weekEnd)}`;
+    }
+
+    function comparePostsByDate(a, b) {
+      const av = `${a.publication_date || "9999-12-31"} ${a.publication_time || "99:99"} ${a.created_at || ""}`;
+      const bv = `${b.publication_date || "9999-12-31"} ${b.publication_time || "99:99"} ${b.created_at || ""}`;
+      return av.localeCompare(bv);
+    }
+
+    async function handleCalendarEdit(event) {
+      const input = event.target.closest("[data-direct-field], [data-meta-field]");
+      if (!input || input.disabled) return;
+
+      const isBlurEvent = event.type === "focusout";
+      const isChangeEvent = event.type === "change";
+      const tagName = input.tagName.toLowerCase();
+      const type = (input.getAttribute("type") || "").toLowerCase();
+      const shouldSaveOnChange = ["checkbox", "date", "time"].includes(type) || tagName === "select";
+      const shouldSaveOnBlur = ["text", "url", "email", ""].includes(type) || tagName === "textarea";
+
+      if (isChangeEvent && !shouldSaveOnChange) return;
+      if (isBlurEvent && !shouldSaveOnBlur) return;
+
+      const row = input.closest("[data-post-row]");
+      const postId = row?.dataset.postRow;
+      if (!postId) return;
+
+      if (input.dataset.directField) {
+        await saveDirectField(postId, input.dataset.directField, getInputValue(input));
+      } else if (input.dataset.metaField) {
+        await saveMetaField(postId, input.dataset.metaField, getInputValue(input));
+      }
+    }
+
+    async function saveDirectField(postId, field, value) {
+      if (!DIRECT_FIELDS.includes(field)) return;
+
+      const post = allPosts.find((item) => item.id === postId);
+      if (!post) return;
+
+      const currentValue = normalizeComparableValue(post[field]);
+      const nextValue = normalizeComparableValue(value);
+      if (currentValue === nextValue) return;
+
+      const updates = { [field]: normalizeDbValue(field, value) };
+
+      if (["text_validated", "visual_validated", "date_validated"].includes(field)) {
+        const finalText = field === "text_validated" ? Boolean(value) : Boolean(post.text_validated);
+        const finalVisual = field === "visual_validated" ? Boolean(value) : Boolean(post.visual_validated);
+        const finalDate = field === "date_validated" ? Boolean(value) : Boolean(post.date_validated);
+
+        if (finalText && finalVisual && finalDate) {
+          updates.status = "valide";
+        } else if (post.status === "valide") {
+          updates.status = "a_valider";
         }
-
-        await updatePost(postId, updates, "Validation mise à jour.");
-      } catch (error) {
-        toast(error.message || "Erreur lors de la validation.");
-      }
-    }
-
-    async function saveComment(postId) {
-      const box = document.querySelector(`[data-comment-box="${postId}"]`);
-      const comment = box ? box.value.trim() : "";
-      await updatePost(postId, { client_comment: comment }, "Commentaire enregistré.");
-    }
-
-    async function requestChange(postId) {
-      const box = document.querySelector(`[data-comment-box="${postId}"]`);
-      const comment = box ? box.value.trim() : "";
-
-      if (!comment) {
-        toast("Ajoute d’abord un commentaire pour expliquer la modification souhaitée.");
-        box?.focus();
-        return;
       }
 
-      await updatePost(postId, {
-        client_comment: comment,
-        status: "modification_demandee"
-      }, "Demande de modification envoyée.");
+      await updatePost(postId, updates, "Champ enregistré.");
     }
 
-    async function validatePost(postId) {
+    async function saveMetaField(postId, field, value) {
+      if (!META_FIELDS.includes(field)) return;
+
+      const post = allPosts.find((item) => item.id === postId);
+      if (!post) return;
+
+      const parsed = parseAdminNote(post.admin_note);
+      const meta = withDefaultMeta(parsed.meta, post);
+      const normalizedValue = field === "ready_for_validation" ? Boolean(value) : String(value || "").trim();
+
+      if (String(meta[field] ?? "") === String(normalizedValue ?? "")) return;
+
+      meta[field] = normalizedValue;
+
+      const updates = {
+        admin_note: buildAdminNote(parsed.note, meta)
+      };
+
+      if (field === "ready_for_validation" && normalizedValue === true && post.status === "brouillon") {
+        updates.status = "a_valider";
+      }
+
+      await updatePost(postId, updates, "Champ enregistré.");
+    }
+
+    async function quickValidate(postId) {
       await updatePost(postId, {
         text_validated: true,
         visual_validated: true,
@@ -1331,19 +1265,20 @@
       }, "Publication validée.");
     }
 
-    async function updateStatus(postId, status) {
-      await updatePost(postId, { status }, "Statut mis à jour.");
-    }
-
     async function updatePost(postId, updates, successMessage) {
-      const { error } = await supabaseClient
+      const { data, error } = await supabaseClient
         .from("editorial_posts")
         .update(updates)
-        .eq("id", postId);
+        .eq("id", postId)
+        .select("*")
+        .single();
 
-      if (error) throw error;
+      if (error) {
+        toast(error.message || "Mise à jour impossible.");
+        throw error;
+      }
 
-      allPosts = allPosts.map((post) => post.id === postId ? { ...post, ...updates } : post);
+      allPosts = allPosts.map((post) => post.id === postId ? normalizePost({ ...post, ...(data || updates) }) : post);
       renderEverything();
       toast(successMessage || "Mise à jour enregistrée.");
     }
@@ -1377,7 +1312,7 @@
         return;
       }
 
-      const clientEmail = $("#formClientEmail").value.trim().toLowerCase();
+      const clientEmail = normalizeEmail($("#formClientEmail").value);
       const title = $("#formTitle").value.trim();
 
       if (!clientEmail || !title) {
@@ -1386,6 +1321,13 @@
       }
 
       try {
+        const ready = $("#formReadyForValidation").checked;
+        const meta = {
+          cm_assigned: $("#formCmAssigned").value.trim(),
+          graphiste_assigned: $("#formGraphisteAssigned").value.trim(),
+          ready_for_validation: ready
+        };
+
         const payload = {
           client_email: clientEmail,
           title,
@@ -1395,8 +1337,8 @@
           caption_text: $("#formCaption").value.trim() || null,
           visual_url: $("#formVisualUrl").value.trim() || null,
           file_url: $("#formFileUrl").value.trim() || null,
-          admin_note: $("#formAdminNote").value.trim() || null,
-          status: "a_valider",
+          admin_note: buildAdminNote($("#formAdminNote").value.trim(), meta),
+          status: ready ? "a_valider" : "brouillon",
           text_validated: false,
           visual_validated: false,
           date_validated: false
@@ -1410,14 +1352,15 @@
 
         if (error) throw error;
 
-        allPosts = [data, ...allPosts];
+        allPosts = [normalizePost(data), ...allPosts];
         $("#postForm").reset();
         $("#formClientEmail").value = clientEmail;
+        $("#formReadyForValidation").checked = true;
         renderEverything();
-        toast("Publication ajoutée au calendrier.");
+        toast("Ligne ajoutée au calendrier.");
       } catch (error) {
         console.error(error);
-        toast(error.message || "Impossible d’ajouter la publication.");
+        toast(error.message || "Impossible d’ajouter la ligne.");
       }
     }
 
@@ -1433,11 +1376,39 @@
 
       $("#logoutBtn")?.addEventListener("click", logout);
       $("#postForm")?.addEventListener("submit", handlePostFormSubmit);
-      $("#resetFormBtn")?.addEventListener("click", () => $("#postForm").reset());
+      $("#resetFormBtn")?.addEventListener("click", () => {
+        $("#postForm").reset();
+        $("#formReadyForValidation").checked = true;
+      });
 
-      ["#searchInput", "#statusFilter", "#platformFilter"].forEach((selector) => {
+      ["#searchInput", "#statusFilter", "#platformFilter", "#validationFilter"].forEach((selector) => {
         $(selector)?.addEventListener("input", renderEverything);
         $(selector)?.addEventListener("change", renderEverything);
+      });
+
+      $("#calendarBoard")?.addEventListener("change", handleCalendarEdit);
+      $("#calendarBoard")?.addEventListener("focusout", handleCalendarEdit);
+      $("#calendarBoard")?.addEventListener("click", async (event) => {
+        const row = event.target.closest("[data-post-row]");
+        if (!row) return;
+        const postId = row.dataset.postRow;
+
+        if (event.target.closest("[data-quick-validate]")) {
+          await quickValidate(postId);
+        }
+
+        if (event.target.closest("[data-delete-post]")) {
+          await deletePost(postId);
+        }
+      });
+
+      $("#openAllBtn")?.addEventListener("click", () => setAllDetailsOpen(true));
+      $("#closeAllBtn")?.addEventListener("click", () => setAllDetailsOpen(false));
+    }
+
+    function setAllDetailsOpen(open) {
+      document.querySelectorAll("#calendarBoard details").forEach((details) => {
+        details.open = open;
       });
     }
 
@@ -1472,16 +1443,95 @@
       window.__toastTimer = setTimeout(() => box.classList.remove("show"), 3200);
     }
 
-    function formatDate(value) {
-      if (!value) return "Date à définir";
-      const date = new Date(`${value}T00:00:00`);
-      if (Number.isNaN(date.getTime())) return value;
-      return date.toLocaleDateString("fr-FR", {
-        weekday: "short",
-        day: "2-digit",
-        month: "short",
-        year: "numeric"
-      });
+    function parseAdminNote(value) {
+      const raw = String(value || "");
+      const match = raw.match(META_REGEX);
+      const note = raw.replace(META_REGEX, "").trim();
+      let meta = {};
+
+      if (match?.[1]) {
+        try {
+          meta = JSON.parse(decodeBase64Unicode(match[1]));
+        } catch (error) {
+          console.warn("Métadonnées CM illisibles", error);
+        }
+      }
+
+      return { note, meta };
+    }
+
+    function withDefaultMeta(meta, post) {
+      const status = post?.status || "a_valider";
+      return {
+        ...meta,
+        cm_assigned: String(meta?.cm_assigned || ""),
+        graphiste_assigned: String(meta?.graphiste_assigned || ""),
+        ready_for_validation: Boolean(meta?.ready_for_validation === true || meta?.ready_for_validation === "true" || status === "a_valider" || status === "modification_demandee")
+      };
+    }
+
+    function buildAdminNote(note, meta) {
+      const cleanNote = String(note || "").trim();
+      const cleanMeta = Object.fromEntries(
+        Object.entries(meta || {}).filter(([, value]) => {
+          if (value === false || value === null || value === undefined) return false;
+          if (typeof value === "string" && !value.trim()) return false;
+          return true;
+        })
+      );
+
+      const metaKeys = Object.keys(cleanMeta);
+      if (!metaKeys.length) return cleanNote || null;
+
+      const encoded = encodeBase64Unicode(JSON.stringify(cleanMeta));
+      return `${cleanNote ? `${cleanNote}\n\n` : ""}<!--CM_META:${encoded}-->`;
+    }
+
+    function encodeBase64Unicode(value) {
+      const bytes = new TextEncoder().encode(value);
+      let binary = "";
+      bytes.forEach((byte) => binary += String.fromCharCode(byte));
+      return btoa(binary);
+    }
+
+    function decodeBase64Unicode(value) {
+      const binary = atob(value);
+      const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+      return new TextDecoder().decode(bytes);
+    }
+
+    function getInputValue(input) {
+      const type = (input.getAttribute("type") || "").toLowerCase();
+      if (type === "checkbox") return input.checked;
+      return input.value;
+    }
+
+    function normalizeDbValue(field, value) {
+      if (["text_validated", "visual_validated", "date_validated"].includes(field)) return Boolean(value);
+      if (["publication_date", "publication_time", "caption_text", "visual_url", "file_url", "client_comment"].includes(field)) {
+        return String(value || "").trim() || null;
+      }
+      if (field === "client_email") return normalizeEmail(value);
+      return String(value || "").trim();
+    }
+
+    function normalizeComparableValue(value) {
+      if (value === null || value === undefined) return "";
+      if (typeof value === "boolean") return String(value);
+      return String(value).trim();
+    }
+
+    function normalizeEmail(value) {
+      return String(value || "").trim().toLowerCase();
+    }
+
+    function formatInputTime(value) {
+      if (!value) return "";
+      return String(value).slice(0, 5);
+    }
+
+    function shortDate(date) {
+      return date.toLocaleDateString("fr-FR", { day: "2-digit", month: "short" });
     }
 
     function getInitials(value) {
