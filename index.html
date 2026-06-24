@@ -131,6 +131,22 @@
       color: var(--danger);
     }
 
+    /* Mise à jour espace client CM : lien caché par défaut */
+    .client-space-hidden {
+      display: none !important;
+    }
+
+    .client-space-link {
+      background: var(--green);
+      color: #ffffff;
+      text-decoration: none;
+    }
+
+    .client-space-link:hover {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
     .view {
       display: none;
     }
@@ -1517,6 +1533,7 @@
       <nav class="nav">
         <button class="nav-link active" type="button" onclick="showStudentView(this)">Espace élève</button>
         <button class="nav-link" type="button" data-admin-trigger>Gestion des dépôts</button>
+        <a class="nav-link client-space-link client-space-hidden" id="clientSpaceLink" href="client-space.html">Espace client</a>
         <button class="nav-link logout" type="button" onclick="logout()">Déconnexion</button>
       </nav>
     </header>
@@ -2593,6 +2610,7 @@
       }
 
       await loadCurrentProfile();
+      await showClientSpaceLinkIfAllowed();
 
       if (loading) {
         loading.style.display = "none";
@@ -2626,6 +2644,39 @@
 
       currentProfile = profile;
       return profile;
+    }
+
+    async function showClientSpaceLinkIfAllowed() {
+      const link = document.getElementById("clientSpaceLink");
+
+      if (!link) return;
+
+      link.classList.add("client-space-hidden");
+
+      try {
+        const { data: userData } = await supabaseClient.auth.getUser();
+        const email = currentProfile?.email || userData?.user?.email;
+
+        if (!email) return;
+
+        const { data: clientAccess, error } = await supabaseClient
+          .from("client_spaces")
+          .select("id, is_active")
+          .eq("client_email", email)
+          .eq("is_active", true)
+          .maybeSingle();
+
+        if (error) {
+          console.warn("Espace client non disponible :", error.message);
+          return;
+        }
+
+        if (clientAccess) {
+          link.classList.remove("client-space-hidden");
+        }
+      } catch (error) {
+        console.warn("Vérification espace client impossible :", error);
+      }
     }
 
     async function isCurrentUserAdmin() {
