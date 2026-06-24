@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Espace client | Calendrier éditorial</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     :root {
       --bg: #f6f2ea;
@@ -500,6 +501,60 @@
     .check-line input { width: 18px; height: 18px; accent-color: #111827; flex: 0 0 auto; }
     .drawer-actions { display: flex; gap: 10px; flex-wrap: wrap; padding: 16px 18px; border-top: 1px solid var(--border); background: #fff; }
 
+
+    .import-card {
+      margin: 16px 0;
+      padding: 20px;
+      border: 1px dashed rgba(184, 135, 70, 0.45);
+      background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(248,239,225,0.55));
+    }
+    .import-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .import-head h3 { margin: 0; font-size: 22px; letter-spacing: -0.025em; }
+    .import-head p { margin: 6px 0 0; color: var(--muted); line-height: 1.55; max-width: 820px; }
+    .import-grid { display: grid; grid-template-columns: minmax(280px, 0.8fr) minmax(320px, 1.2fr); gap: 16px; align-items: start; }
+    .import-drop {
+      min-height: 172px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 18px;
+      border: 1px dashed var(--border-strong);
+      border-radius: 22px;
+      background: rgba(255,255,255,0.75);
+    }
+    .import-drop strong { display: block; margin-bottom: 6px; font-size: 18px; }
+    .import-drop span { color: var(--muted); line-height: 1.5; font-size: 14px; }
+    .file-input { width: 100%; margin-top: 14px; border: 1px solid var(--border); background: #fff; border-radius: 16px; padding: 12px; }
+    .import-help {
+      padding: 16px;
+      border-radius: 20px;
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .import-help strong { color: var(--text); }
+    .import-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+    .import-tags span { border-radius: 999px; background: var(--primary-soft); color: var(--primary); padding: 6px 9px; font-size: 12px; font-weight: 850; }
+    .import-preview { margin-top: 16px; display: none; }
+    .import-preview.show { display: block; }
+    .import-preview-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+    .import-preview-head strong { font-size: 18px; }
+    .import-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .preview-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 18px; background: #fff; }
+    .preview-table { width: 100%; border-collapse: collapse; min-width: 980px; font-size: 13px; }
+    .preview-table th, .preview-table td { padding: 11px 12px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+    .preview-table th { background: #fbfaf7; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+    .preview-table td { max-width: 240px; }
+    .import-errors { margin-top: 10px; padding: 12px 14px; border-radius: 16px; background: var(--warning-soft); color: var(--warning); font-weight: 750; line-height: 1.5; }
+
     .state-screen { min-height: 100vh; display: grid; place-items: center; padding: 24px; text-align: center; }
     .state-box { width: min(560px, 100%); background: #fff; border: 1px solid var(--border); border-radius: 26px; padding: 28px; box-shadow: var(--shadow); }
     .state-box strong { display: block; font-size: 24px; margin-bottom: 8px; }
@@ -529,6 +584,9 @@
       .page-title { padding: 20px; }
       .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .filters { grid-template-columns: 1fr; }
+
+      .import-grid { grid-template-columns: 1fr; }
+      .import-card { padding: 16px; }
       .calendar-sidebar { padding: 14px; }
       .board-content { padding: 10px; }
       .month-section-head { align-items: flex-start; flex-direction: column; }
@@ -637,6 +695,53 @@
       <button class="btn btn-primary" id="addBlankRowBtnDuplicate" type="button">+ Ajouter une ligne vide</button>
     </section>
 
+
+
+    <section class="card import-card" id="importCard" data-manager-only>
+      <div class="import-head">
+        <div>
+          <h3>Importer un fichier Excel / CSV</h3>
+          <p>
+            Dépose un fichier avec ta base de contenus : le site lit les lignes, affiche un aperçu, puis les ajoute au calendrier.
+            Les colonnes sont reconnues automatiquement même si les titres ne sont pas exactement identiques.
+          </p>
+        </div>
+        <button class="btn btn-soft" id="clearImportBtn" type="button">Réinitialiser l’import</button>
+      </div>
+
+      <div class="import-grid">
+        <div class="import-drop">
+          <div>
+            <strong>Fichier accepté : .xlsx, .xls ou .csv</strong>
+            <span>Choisis le fichier, vérifie l’aperçu, puis clique sur “Importer dans le calendrier”.</span>
+            <input id="excelImportInput" class="file-input" type="file" accept=".xlsx,.xls,.csv" />
+          </div>
+        </div>
+        <div class="import-help">
+          <strong>Colonnes conseillées :</strong>
+          <div class="import-tags">
+            <span>client_email</span><span>titre</span><span>date</span><span>heure</span><span>plateforme</span><span>cm</span><span>graphiste</span><span>production textuelle</span><span>production visuelle</span><span>lien drive</span><span>statut</span><span>à valider</span>
+          </div>
+          <p>
+            Si la colonne <strong>client_email</strong> est absente, le site utilise l’email “Client de la nouvelle ligne”.
+            Exemple : <em>titre, date, plateforme, cm, graphiste, texte, visuel</em> fonctionne aussi.
+          </p>
+        </div>
+      </div>
+
+      <div id="importPreview" class="import-preview">
+        <div class="import-preview-head">
+          <strong id="importPreviewTitle">Aperçu de l’import</strong>
+          <div class="import-actions">
+            <button class="btn btn-primary" id="confirmImportBtn" type="button">Importer dans le calendrier</button>
+            <button class="btn btn-outline" id="cancelImportBtn" type="button">Annuler</button>
+          </div>
+        </div>
+        <div id="importErrors" class="import-errors hidden"></div>
+        <div id="importPreviewTable" class="preview-table-wrap"></div>
+      </div>
+    </section>
+
     <section class="planning-layout">
       <aside class="card calendar-sidebar">
         <div>
@@ -713,6 +818,8 @@
     let toastTimer = null;
     let selectedMonthKey = "all";
     let selectedPostId = null;
+    let importRows = [];
+    let importPayloads = [];
 
     const $ = (selector) => document.querySelector(selector);
 
@@ -1147,6 +1254,7 @@
           <div class="row-actions">
             <button class="btn btn-primary mini-btn" type="button" data-open-editor>Modifier</button>
             <button class="btn btn-success mini-btn" type="button" data-quick-validate ${disabled}>Valider</button>
+            ${isManager() ? `<button class="btn btn-danger mini-btn" type="button" data-delete-post>Supprimer</button>` : ""}
           </div>
         </article>`;
     }
@@ -1381,14 +1489,291 @@
     }
 
     async function deletePost(postId) {
-      if (!isManager()) return;
-      if (!confirm("Supprimer cette publication du calendrier ?")) return;
-      const { error } = await supabaseClient.from("editorial_posts").delete().eq("id", postId);
-      if (error) return toast(error.message || "Suppression impossible.");
-      allPosts = allPosts.filter((post) => post.id !== postId);
+      const post = allPosts.find((item) => item.id === postId);
+      if (!post) return toast("Publication introuvable.");
+      if (!isManager()) {
+        toast("Suppression réservée à l’administrateur ou au gestionnaire.");
+        return;
+      }
+
+      const label = post.title ? `« ${post.title} »` : "cette publication";
+      const confirmed = confirm(`Supprimer définitivement ${label} du calendrier ?\n\nCette action retire la ligne pour toi et pour le client.`);
+      if (!confirmed) return;
+
+      const { error } = await supabaseClient
+        .from("editorial_posts")
+        .delete()
+        .eq("id", postId);
+
+      if (error) {
+        toast(error.message || "Suppression impossible. Vérifie la policy DELETE de editorial_posts.");
+        return;
+      }
+
+      allPosts = allPosts.filter((item) => item.id !== postId);
       if (selectedPostId === postId) selectedPostId = null;
       renderEverything();
       toast("Publication supprimée.");
+    }
+
+
+    async function handleExcelImport(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      if (!isManager()) return toast("Import réservé à l’administrateur ou au gestionnaire.");
+      try {
+        if (!window.XLSX) await loadXlsxScript();
+        if (!window.XLSX) throw new Error("La bibliothèque Excel n’a pas pu être chargée.");
+
+        const buffer = await file.arrayBuffer();
+        const workbook = XLSX.read(buffer, { type: "array", cellDates: true });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(sheet, { defval: "", raw: false });
+
+        if (!rows.length) {
+          clearImportPreview();
+          toast("Le fichier est vide ou illisible.");
+          return;
+        }
+
+        const fallbackEmail = normalizeEmail($("#newClientEmail")?.value || currentAccess?.client_email || currentUser?.email);
+        const parsed = rows.map((row, index) => mapImportRow(row, index, fallbackEmail));
+        importRows = parsed;
+        importPayloads = parsed.filter((item) => item.payload).map((item) => item.payload);
+        renderImportPreview(file.name, parsed);
+      } catch (error) {
+        console.error(error);
+        toast(error?.message || "Import impossible.");
+      }
+    }
+
+    function loadXlsxScript() {
+      return new Promise((resolve) => {
+        if (window.XLSX) return resolve();
+        const existing = document.querySelector('script[src*="xlsx.full.min.js"]');
+        if (existing) {
+          existing.addEventListener("load", resolve, { once: true });
+          existing.addEventListener("error", resolve, { once: true });
+          return setTimeout(resolve, 3500);
+        }
+        const script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+        script.onload = resolve;
+        script.onerror = resolve;
+        document.head.appendChild(script);
+        setTimeout(resolve, 3500);
+      });
+    }
+
+    function mapImportRow(row, index, fallbackEmail) {
+      const get = (...names) => getImportValue(row, names);
+      const clientEmail = normalizeEmail(get("client_email", "email client", "client", "email", "mail") || fallbackEmail);
+      const title = String(get("titre", "title", "publication", "idee", "idée", "sujet", "post") || "").trim();
+      const caption = String(get("production textuelle", "texte", "caption", "legende", "légende", "contenu", "copy", "rédaction", "redaction") || "").trim();
+      const platform = normalizePlatform(get("plateforme", "platform", "réseau", "reseau", "réseau social", "social"));
+      const publicationDate = normalizeImportDate(get("date", "date publication", "date de publication", "publication_date", "jour"));
+      const publicationTime = normalizeImportTime(get("heure", "horaire", "time", "publication_time"));
+      const cm = String(get("cm", "community manager", "cm assigné", "cm assigne", "cm_assigned") || "").trim();
+      const graphiste = String(get("graphiste", "designer", "graphiste assigné", "graphiste assigne", "graphiste_assigned") || "").trim();
+      const visualUrl = String(get("production visuelle", "visuel", "lien visuel", "canva", "lien canva", "visual_url", "url visuel") || "").trim();
+      const fileUrl = String(get("drive", "lien drive", "fichier", "lien fichier", "file", "file_url", "document") || "").trim();
+      const comment = String(get("commentaire", "comment", "retour client", "client_comment") || "").trim();
+      const status = normalizeImportStatus(get("statut", "status"));
+      const ready = normalizeImportBoolean(get("à valider", "a valider", "champ à valider", "champ a valider", "ready_for_validation"));
+      const textValidated = normalizeImportBoolean(get("texte validé", "texte valide", "text_validated"));
+      const visualValidated = normalizeImportBoolean(get("visuel validé", "visuel valide", "visual_validated"));
+      const dateValidated = normalizeImportBoolean(get("date validée", "date validee", "date_validated"));
+
+      const errors = [];
+      if (!clientEmail) errors.push("email client manquant");
+      if (!title && !caption) errors.push("titre ou texte manquant");
+      if (publicationDate === "INVALID") errors.push("date invalide");
+      if (publicationTime === "INVALID") errors.push("heure invalide");
+
+      if (errors.length) {
+        return { index, original: row, errors, payload: null };
+      }
+
+      const payload = {
+        client_email: clientEmail,
+        title: title || caption.slice(0, 70) || `Publication importée ${index + 1}`,
+        platform,
+        publication_date: publicationDate || null,
+        publication_time: publicationTime || null,
+        caption_text: caption || null,
+        visual_url: visualUrl || null,
+        file_url: fileUrl || null,
+        client_comment: comment || null,
+        admin_note: buildAdminNote("", { cm_assigned: cm, graphiste_assigned: graphiste, ready_for_validation: ready }),
+        status,
+        text_validated: textValidated,
+        visual_validated: visualValidated,
+        date_validated: dateValidated
+      };
+
+      return { index, original: row, errors: [], payload };
+    }
+
+    function getImportValue(row, names) {
+      const entries = Object.entries(row || {});
+      const normalizedNames = names.map(normalizeImportKey);
+      for (const [key, value] of entries) {
+        if (normalizedNames.includes(normalizeImportKey(key))) return value;
+      }
+      for (const [key, value] of entries) {
+        const nk = normalizeImportKey(key);
+        if (normalizedNames.some((name) => nk.includes(name) || name.includes(nk))) return value;
+      }
+      return "";
+    }
+
+    function normalizeImportKey(value) {
+      return String(value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+    }
+
+    function normalizePlatform(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return "Instagram";
+      const found = PLATFORMS.find((platform) => normalizeImportKey(platform) === normalizeImportKey(raw));
+      return found || raw;
+    }
+
+    function normalizeImportStatus(value) {
+      const key = normalizeImportKey(value);
+      if (!key) return "a_valider";
+      if (["brouillon", "draft"].includes(key)) return "brouillon";
+      if (["a valider", "validation", "to validate", "a_valider"].includes(key)) return "a_valider";
+      if (["modification demandee", "modification demandée", "retour", "a modifier", "modification_demandee"].includes(key)) return "modification_demandee";
+      if (["valide", "validé", "validee", "validée", "approved", "valide"].includes(key)) return "valide";
+      if (["programme", "programmé", "programmee", "scheduled", "programme"].includes(key)) return "programme";
+      if (["publie", "publié", "publiee", "publiée", "published"].includes(key)) return "publie";
+      return STATUS_LABELS[key] ? key : "a_valider";
+    }
+
+    function normalizeImportBoolean(value) {
+      if (typeof value === "boolean") return value;
+      const key = normalizeImportKey(value);
+      return ["1", "oui", "yes", "true", "vrai", "x", "ok", "valide", "validee", "validee", "validé", "validée", "a valider"].includes(key);
+    }
+
+    function normalizeImportDate(value) {
+      if (!value) return "";
+      if (value instanceof Date && !Number.isNaN(value.getTime())) return value.toISOString().slice(0, 10);
+      const raw = String(value).trim();
+      if (!raw) return "";
+      if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+      const slash = raw.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+      if (slash) {
+        const day = Number(slash[1]);
+        const month = Number(slash[2]);
+        let year = Number(slash[3]);
+        if (year < 100) year += 2000;
+        const date = new Date(year, month - 1, day);
+        if (date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day) {
+          return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+        }
+        return "INVALID";
+      }
+      const parsed = new Date(raw);
+      if (!Number.isNaN(parsed.getTime())) return parsed.toISOString().slice(0, 10);
+      return "INVALID";
+    }
+
+    function normalizeImportTime(value) {
+      if (!value) return "";
+      const raw = String(value).trim();
+      if (!raw) return "";
+      const match = raw.match(/^(\d{1,2})[:hH](\d{2})(?::\d{2})?$/);
+      if (match) {
+        const hours = Number(match[1]);
+        const minutes = Number(match[2]);
+        if (hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59) {
+          return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+        }
+        return "INVALID";
+      }
+      if (/^\d{1,2}$/.test(raw)) {
+        const hours = Number(raw);
+        if (hours >= 0 && hours <= 23) return `${String(hours).padStart(2, "0")}:00`;
+      }
+      return "INVALID";
+    }
+
+    function renderImportPreview(fileName, parsed) {
+      const preview = $("#importPreview");
+      const table = $("#importPreviewTable");
+      const errorsBox = $("#importErrors");
+      const okRows = parsed.filter((item) => item.payload);
+      const badRows = parsed.filter((item) => item.errors.length);
+      setText("#importPreviewTitle", `${okRows.length} ligne${okRows.length > 1 ? "s" : ""} prête${okRows.length > 1 ? "s" : ""} à importer · ${fileName}`);
+
+      if (errorsBox) {
+        errorsBox.classList.toggle("hidden", !badRows.length);
+        errorsBox.innerHTML = badRows.length ? `${badRows.length} ligne${badRows.length > 1 ? "s" : ""} ignorée${badRows.length > 1 ? "s" : ""} : ${badRows.slice(0, 5).map((item) => `ligne ${item.index + 2} (${item.errors.join(", ")})`).join(" · ")}${badRows.length > 5 ? "…" : ""}` : "";
+      }
+
+      const rows = okRows.slice(0, 12).map(({ payload }) => {
+        const parsedMeta = parseAdminNote(payload.admin_note);
+        return `<tr>
+          <td>${escapeHtml(payload.publication_date || "—")}</td>
+          <td>${escapeHtml(payload.publication_time || "—")}</td>
+          <td>${escapeHtml(payload.client_email || "—")}</td>
+          <td>${escapeHtml(payload.platform || "—")}</td>
+          <td><strong>${escapeHtml(payload.title || "—")}</strong><br><span>${escapeHtml((payload.caption_text || "").slice(0, 110))}</span></td>
+          <td>${escapeHtml(parsedMeta.meta.cm_assigned || "—")}</td>
+          <td>${escapeHtml(parsedMeta.meta.graphiste_assigned || "—")}</td>
+          <td>${escapeHtml(STATUS_LABELS[payload.status] || payload.status || "—")}</td>
+        </tr>`;
+      }).join("");
+
+      if (table) {
+        table.innerHTML = okRows.length ? `<table class="preview-table"><thead><tr><th>Date</th><th>Heure</th><th>Client</th><th>Plateforme</th><th>Publication</th><th>CM</th><th>Graphiste</th><th>Statut</th></tr></thead><tbody>${rows}</tbody></table>` : `<div class="empty-state"><strong>Aucune ligne importable.</strong><span>Vérifie les colonnes du fichier.</span></div>`;
+      }
+      preview?.classList.add("show");
+      $("#confirmImportBtn")?.toggleAttribute("disabled", !okRows.length);
+      preview?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    async function confirmExcelImport() {
+      if (!isManager()) return toast("Import réservé à l’administrateur ou au gestionnaire.");
+      if (!importPayloads.length) return toast("Aucune ligne à importer.");
+      const button = $("#confirmImportBtn");
+      const previousText = button?.textContent;
+      if (button) { button.disabled = true; button.textContent = "Import en cours..."; }
+      try {
+        const { data, error } = await supabaseClient
+          .from("editorial_posts")
+          .insert(importPayloads)
+          .select("*");
+        if (error) throw error;
+        allPosts = [...(data || []).map(normalizePost), ...allPosts];
+        selectedMonthKey = "all";
+        clearImportPreview(false);
+        renderEverything();
+        toast(`${data?.length || importPayloads.length} publication${(data?.length || importPayloads.length) > 1 ? "s" : ""} importée${(data?.length || importPayloads.length) > 1 ? "s" : ""}.`);
+      } catch (error) {
+        console.error(error);
+        toast(error?.message || "Import refusé. Vérifie la policy INSERT de editorial_posts.");
+      } finally {
+        if (button) { button.disabled = false; button.textContent = previousText || "Importer dans le calendrier"; }
+      }
+    }
+
+    function clearImportPreview(clearInput = true) {
+      importRows = [];
+      importPayloads = [];
+      $("#importPreview")?.classList.remove("show");
+      const table = $("#importPreviewTable");
+      if (table) table.innerHTML = "";
+      const errorsBox = $("#importErrors");
+      if (errorsBox) { errorsBox.classList.add("hidden"); errorsBox.innerHTML = ""; }
+      if (clearInput && $("#excelImportInput")) $("#excelImportInput").value = "";
     }
 
     function bindEvents() {
@@ -1401,6 +1786,11 @@
       $("#logoutBtn")?.addEventListener("click", logout);
       $("#addBlankRowBtn")?.addEventListener("click", createBlankPost);
       $("#addBlankRowBtnDuplicate")?.addEventListener("click", createBlankPost);
+
+      $("#excelImportInput")?.addEventListener("change", handleExcelImport);
+      $("#confirmImportBtn")?.addEventListener("click", confirmExcelImport);
+      $("#cancelImportBtn")?.addEventListener("click", () => clearImportPreview(true));
+      $("#clearImportBtn")?.addEventListener("click", () => clearImportPreview(true));
 
       ["#searchInput", "#clientFilter", "#statusFilter", "#platformFilter", "#validationFilter"].forEach((selector) => {
         $(selector)?.addEventListener("input", () => { selectedMonthKey = selectedMonthKey || "all"; renderEverything(); });
@@ -1419,6 +1809,10 @@
         const row = event.target.closest("[data-post-row]");
         if (!row) return;
         const postId = row.dataset.postRow;
+        if (event.target.closest("[data-delete-post]")) {
+          await deletePost(postId);
+          return;
+        }
         if (event.target.closest("[data-quick-validate]")) {
           await quickValidate(postId);
           return;
