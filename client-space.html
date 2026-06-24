@@ -1,1790 +1,236 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Espace client | Calendrier éditorial</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root {
-      --bg: #f6f2ea;
-      --panel: #ffffff;
-      --panel-soft: #fbfaf7;
-      --text: #171717;
-      --muted: #667085;
-      --border: #e5dfd4;
-      --border-strong: #d4c7b6;
-      --primary: #111827;
-      --primary-soft: #f0ede7;
-      --accent: #b88746;
-      --accent-soft: #f7efe3;
-      --danger: #b42318;
-      --danger-soft: #fee4e2;
-      --success: #067647;
-      --success-soft: #dcfae6;
-      --warning: #b54708;
-      --warning-soft: #fef0c7;
-      --info: #175cd3;
-      --info-soft: #d1e9ff;
-      --shadow: 0 18px 45px rgba(17, 24, 39, 0.08);
-      --shadow-light: 0 10px 26px rgba(17, 24, 39, 0.055);
-      --radius: 22px;
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(184, 135, 70, 0.13), transparent 34%),
-        linear-gradient(135deg, #f7f3eb 0%, #fbfaf8 45%, #f2eee8 100%);
-      min-height: 100vh;
-    }
-
-    button, input, select, textarea { font: inherit; }
-    a { color: inherit; }
-    .hidden { display: none !important; }
-
-    .page-shell {
-      width: min(1440px, calc(100% - 28px));
-      margin: 0 auto;
-      padding: 20px 0 46px;
-    }
-
-    .topbar {
-      position: sticky;
-      top: 10px;
-      z-index: 60;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 20px;
-      padding: 12px;
-      border: 1px solid rgba(229, 223, 212, 0.9);
-      border-radius: 24px;
-      background: rgba(255,255,255,0.9);
-      backdrop-filter: blur(14px);
-      box-shadow: var(--shadow-light);
-    }
-
-    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
-    .brand-logo {
-      width: 46px;
-      height: 46px;
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      color: #fff;
-      font-weight: 950;
-      background: linear-gradient(135deg, #111827, #3b2d20 55%, #b88746);
-      box-shadow: var(--shadow-light);
-      flex: 0 0 auto;
-    }
-    .brand h1 { margin: 0; font-size: clamp(19px, 3vw, 28px); letter-spacing: -0.04em; }
-    .brand p { margin: 1px 0 0; color: var(--muted); font-size: 13px; }
-    .top-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-
-    .btn {
-      border: 0;
-      cursor: pointer;
-      border-radius: 999px;
-      padding: 11px 15px;
-      font-weight: 850;
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: 0.18s ease;
-      text-decoration: none;
-      white-space: nowrap;
-      min-height: 42px;
-    }
-    .btn:hover { transform: translateY(-1px); }
-    .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 12px 25px rgba(17, 24, 39, 0.18); }
-    .btn-soft { background: var(--primary-soft); color: var(--primary); border: 1px solid var(--border); }
-    .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--border); }
-    .btn-danger { background: var(--danger-soft); color: var(--danger); }
-    .btn-success { background: var(--success-soft); color: var(--success); }
-    .mini-btn { padding: 8px 10px; font-size: 12px; min-height: 36px; }
-
-    .grid { display: grid; gap: 16px; }
-    .hero { grid-template-columns: 1.25fr 0.75fr; align-items: stretch; margin-bottom: 16px; }
-    .card {
-      background: rgba(255,255,255,0.94);
-      border: 1px solid rgba(229, 223, 212, 0.96);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
-    }
-    .hero-main { padding: 26px; position: relative; overflow: hidden; }
-    .hero-main::after {
-      content: "";
-      position: absolute;
-      width: 210px;
-      height: 210px;
-      right: -72px;
-      top: -90px;
-      border-radius: 50%;
-      background: rgba(184, 135, 70, 0.14);
-    }
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      color: #7a542f;
-      padding: 8px 12px;
-      font-size: 13px;
-      font-weight: 950;
-      margin-bottom: 14px;
-    }
-    .hero-main h2 {
-      margin: 0;
-      font-size: clamp(26px, 5vw, 44px);
-      line-height: 1.02;
-      letter-spacing: -0.055em;
-      max-width: 900px;
-    }
-    .hero-main p { margin: 14px 0 0; color: var(--muted); max-width: 900px; line-height: 1.62; }
-
-    .profile-card { padding: 22px; display: flex; flex-direction: column; justify-content: space-between; gap: 18px; }
-    .profile-row { display: flex; align-items: center; gap: 12px; min-width: 0; }
-    .avatar {
-      width: 52px;
-      height: 52px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, #111827, #b88746);
-      color: #fff;
-      display: grid;
-      place-items: center;
-      font-size: 19px;
-      font-weight: 950;
-      flex: 0 0 auto;
-    }
-    .profile-card h3 { margin: 0; font-size: 19px; }
-    .profile-card p { margin: 3px 0 0; color: var(--muted); font-size: 14px; word-break: break-word; }
-    .small { font-size: 13px; line-height: 1.55; }
-    .muted { color: var(--muted); }
-
-    .stats { grid-template-columns: repeat(4, minmax(150px, 1fr)); margin-bottom: 16px; }
-    .stat-card { padding: 17px; }
-    .stat-card span { color: var(--muted); font-weight: 750; font-size: 13px; }
-    .stat-card strong { display: block; margin-top: 8px; font-size: 29px; letter-spacing: -0.04em; }
-
-    .field, .select, .textarea,
-    .table-field, .table-select, .table-textarea {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      padding: 11px 12px;
-      background: #fff;
-      color: var(--text);
-      outline: none;
-      transition: 0.15s ease;
-      min-height: 42px;
-    }
-    .textarea, .table-textarea { resize: vertical; line-height: 1.45; }
-    .field:focus, .select:focus, .textarea:focus,
-    .table-field:focus, .table-select:focus, .table-textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(184, 135, 70, 0.13);
-      background: #fff;
-    }
-    .table-field, .table-select, .table-textarea { border-color: transparent; background: #f9fafb; }
-    .table-field:disabled, .table-select:disabled, .table-textarea:disabled { opacity: 0.78; cursor: not-allowed; }
-
-    .manager-bar {
-      padding: 16px;
-      margin-bottom: 16px;
-      display: grid;
-      grid-template-columns: minmax(240px, 1fr) auto auto;
-      gap: 12px;
-      align-items: end;
-    }
-    .manager-bar label,
-    .composer-field label,
-    .composer-box > label {
-      display: grid;
-      gap: 7px;
-      font-weight: 850;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .quick-table-card { margin-bottom: 16px; overflow: hidden; }
-    .quick-table-title {
-      padding: 18px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      background: linear-gradient(135deg, #fffdf8 0%, #ffffff 70%);
-    }
-    .quick-table-title h3 { margin: 0; font-size: 18px; }
-    .quick-table-title p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
-
-    .quick-composer {
-      padding: 18px;
-      display: grid;
-      grid-template-columns: minmax(280px, 1.15fr) minmax(320px, 1fr);
-      gap: 16px;
-      align-items: stretch;
-    }
-    .composer-box {
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 15px;
-      background: #fff;
-      display: grid;
-      gap: 13px;
-    }
-    .composer-box h4 {
-      margin: 0;
-      font-size: 15px;
-      letter-spacing: -0.02em;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .composer-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-    .composer-grid.compact { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .composer-span-2 { grid-column: span 2; }
-    .composer-span-4 { grid-column: span 4; }
-    .composer-actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
-    .composer-title { min-height: 86px; font-weight: 850; }
-    .composer-caption { min-height: 170px; }
-
-    .toolbar {
-      padding: 14px;
-      margin-bottom: 16px;
-      position: sticky;
-      top: 86px;
-      z-index: 50;
-      background: rgba(255,255,255,0.94);
-    }
-    .filters {
-      display: grid;
-      grid-template-columns: minmax(230px, 1.2fr) repeat(4, minmax(145px, 190px));
-      gap: 10px;
-      align-items: center;
-    }
-
-    .section-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 14px;
-      flex-wrap: wrap;
-      padding: 20px 20px 0;
-    }
-    .section-title h3 { margin: 0; font-size: 22px; letter-spacing: -0.03em; }
-    .section-title p { margin: 6px 0 0; color: var(--muted); line-height: 1.55; }
-    .board-card { overflow: hidden; }
-    .board-help { padding: 13px 20px 16px; display: flex; align-items: center; gap: 9px; flex-wrap: wrap; color: var(--muted); font-size: 13px; }
-    .board-group { padding: 0 16px 18px; }
-    details.group { border: 1px solid var(--border); border-radius: 18px; background: #fff; margin-bottom: 12px; overflow: hidden; }
-    details.group > summary {
-      cursor: pointer;
-      padding: 13px 15px;
-      font-weight: 950;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      background: #fbfaf7;
-    }
-    details.group details.group { margin: 12px; }
-    .summary-count { color: var(--muted); font-weight: 750; font-size: 13px; }
-
-    .table-wrap {
-      overflow-x: auto;
-      border-top: 1px solid var(--border);
-      background: #fff;
-      -webkit-overflow-scrolling: touch;
-    }
-    table.monday-table {
-      width: 100%;
-      min-width: 1540px;
-      border-collapse: separate;
-      border-spacing: 0;
-      table-layout: fixed;
-    }
-    .monday-table th, .monday-table td {
-      border-right: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 8px;
-      vertical-align: top;
-      background: #fff;
-    }
-    .monday-table th {
-      position: sticky;
-      top: 150px;
-      z-index: 4;
-      background: #f9fafb;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.055em;
-      font-size: 10px;
-      white-space: nowrap;
-    }
-    .monday-table th:first-child,
-    .monday-table td:first-child {
-      position: sticky;
-      left: 0;
-      z-index: 3;
-      box-shadow: 8px 0 18px rgba(17, 24, 39, 0.04);
-    }
-    .monday-table th:first-child { z-index: 5; background: #f9fafb; }
-    .monday-table td:first-child { background: #fff; }
-    .monday-table tr:hover td { background: #fffdf8; }
-    .monday-table tr:hover td:first-child { background: #fffdf8; }
-
-    .col-publication { width: 250px; }
-    .col-client { width: 190px; }
-    .col-date { width: 128px; }
-    .col-time { width: 96px; }
-    .col-platform { width: 130px; }
-    .col-assign { width: 128px; }
-    .col-copy { width: 290px; }
-    .col-assets { width: 230px; }
-    .col-ready { width: 130px; }
-    .col-status { width: 145px; }
-    .col-validations { width: 165px; }
-    .col-comment { width: 230px; }
-    .col-actions { width: 110px; }
-
-    .title-field { min-height: 82px; font-weight: 850; }
-    .copy-field { min-height: 150px; }
-    .asset-field { min-width: 0; }
-    .assign-field { min-width: 0; }
-    .comment-field { min-height: 120px; }
-
-    .pill {
-      display: inline-flex;
-      width: fit-content;
-      align-items: center;
-      gap: 6px;
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 12px;
-      font-weight: 900;
-      white-space: nowrap;
-    }
-    .pill.gold { background: var(--accent-soft); color: #7a542f; }
-    .pill.info { background: var(--info-soft); color: var(--info); }
-    .pill.success { background: var(--success-soft); color: var(--success); }
-    .pill.warning { background: var(--warning-soft); color: var(--warning); }
-    .pill.danger { background: var(--danger-soft); color: var(--danger); }
-    .pill.neutral { background: #f2f4f7; color: #344054; }
-
-    .check-line { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 750; color: #344054; margin: 7px 0; }
-    .check-line input { width: 17px; height: 17px; accent-color: #111827; flex: 0 0 auto; }
-    .validation-stack { display: grid; gap: 4px; }
-    .row-actions { display: flex; flex-direction: column; gap: 8px; }
-    .asset-link { color: var(--info); font-weight: 850; font-size: 13px; text-decoration: none; word-break: break-word; }
-    .asset-link:hover { text-decoration: underline; }
-
-    .empty-state { padding: 30px; text-align: center; color: var(--muted); }
-    .empty-state strong { display: block; color: var(--text); margin-bottom: 6px; }
-    .state-screen { min-height: 100vh; display: grid; place-items: center; padding: 24px; text-align: center; }
-    .state-box { width: min(560px, 100%); background: #fff; border: 1px solid var(--border); border-radius: 26px; padding: 28px; box-shadow: var(--shadow); }
-    .state-box strong { display: block; font-size: 24px; margin-bottom: 8px; }
-    .state-box p { color: var(--muted); line-height: 1.6; }
-    .state-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
-
-    .toast {
-      position: fixed;
-      right: 18px;
-      bottom: 18px;
-      z-index: 100;
-      width: min(420px, calc(100% - 36px));
-      background: #111827;
-      color: #fff;
-      border-radius: 18px;
-      padding: 14px 16px;
-      box-shadow: var(--shadow);
-      transform: translateY(18px);
-      opacity: 0;
-      pointer-events: none;
-      transition: 0.18s ease;
-      font-weight: 750;
-    }
-    .toast.show { opacity: 1; transform: translateY(0); }
-
-
-
-    /* Navigation par pages : chaque grand bloc a son propre espace */
-    .page-tabs {
-      position: sticky;
-      top: 84px;
-      z-index: 55;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-      margin: 0 0 16px;
-      padding: 10px;
-      border: 1px solid rgba(229, 223, 212, 0.96);
-      border-radius: 22px;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(14px);
-      box-shadow: var(--shadow-light);
-    }
-
-    .page-tab {
-      border: 1px solid transparent;
-      border-radius: 17px;
-      padding: 14px 16px;
-      background: transparent;
-      color: var(--muted);
-      cursor: pointer;
-      text-align: left;
-      transition: 0.18s ease;
-      display: grid;
-      gap: 3px;
-      min-height: 72px;
-    }
-
-    .page-tab strong {
-      display: block;
-      color: var(--text);
-      font-size: 15px;
-      letter-spacing: -0.02em;
-    }
-
-    .page-tab span {
-      display: block;
-      font-size: 12px;
-      line-height: 1.35;
-      color: var(--muted);
-    }
-
-    .page-tab:hover,
-    .page-tab.active {
-      background: var(--primary);
-      border-color: var(--primary);
-      transform: translateY(-1px);
-    }
-
-    .page-tab:hover strong,
-    .page-tab:hover span,
-    .page-tab.active strong,
-    .page-tab.active span {
-      color: #ffffff;
-    }
-
-    .app-pages { display: grid; gap: 16px; }
-    .app-page { display: none; }
-    .app-page.active-page { display: block; animation: pageFade 0.18s ease; }
-
-    @keyframes pageFade {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .page-heading {
-      padding: 24px;
-      margin-bottom: 16px;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 18px;
-      align-items: start;
-      background:
-        radial-gradient(circle at top right, rgba(184, 135, 70, 0.12), transparent 34%),
-        rgba(255,255,255,0.94);
-    }
-
-    .page-heading h2 {
-      margin: 0;
-      font-size: clamp(24px, 4vw, 40px);
-      line-height: 1.05;
-      letter-spacing: -0.055em;
-    }
-
-    .page-heading p {
-      margin: 10px 0 0;
-      color: var(--muted);
-      line-height: 1.65;
-      max-width: 760px;
-    }
-
-    .page-heading-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .action-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      margin-top: 16px;
-    }
-
-    .action-card {
-      padding: 18px;
-      display: grid;
-      gap: 10px;
-      min-height: 190px;
-      align-content: start;
-    }
-
-    .action-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      background: var(--accent-soft);
-      color: #7a542f;
-      font-weight: 950;
-      font-size: 18px;
-    }
-
-    .action-card h3 { margin: 0; font-size: 18px; letter-spacing: -0.03em; }
-    .action-card p { margin: 0; color: var(--muted); line-height: 1.55; }
-    .action-card .btn { width: fit-content; margin-top: 6px; }
-
-    .workspace-frame {
-      min-height: calc(100vh - 190px);
-    }
-
-    .quick-table-card,
-    .board-card,
-    .toolbar,
-    .manager-bar {
-      margin-bottom: 16px;
-    }
-
-    .quick-table-card {
-      min-height: calc(100vh - 260px);
-    }
-
-    .quick-composer {
-      min-height: 620px;
-      align-items: stretch;
-    }
-
-    .composer-box {
-      align-content: start;
-    }
-
-    .board-card {
-      min-height: calc(100vh - 300px);
-    }
-
-    @media (max-width: 1120px) {
-      .hero { grid-template-columns: 1fr; }
-      .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .quick-composer { grid-template-columns: 1fr; }
-      .composer-grid.compact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .composer-span-4 { grid-column: span 2; }
-      .toolbar { position: static; }
-      .monday-table th { top: 0; }
-      .page-tabs { position: static; }
-      .action-grid { grid-template-columns: 1fr; }
-      .page-heading { grid-template-columns: 1fr; }
-      .page-heading-actions { justify-content: stretch; }
-      .page-heading-actions .btn { flex: 1 1 auto; }
-    }
-
-    @media (max-width: 820px) {
-      .page-shell { width: min(100% - 18px, 1440px); padding-top: 12px; }
-      .topbar { position: static; flex-direction: column; align-items: flex-start; border-radius: 20px; }
-      .top-actions { width: 100%; justify-content: stretch; }
-      .top-actions .btn { flex: 1 1 auto; }
-      .page-tabs { grid-template-columns: 1fr; gap: 8px; padding: 8px; }
-      .page-tab { min-height: 58px; padding: 12px; }
-      .page-heading { padding: 20px; }
-      .quick-table-card, .board-card { min-height: auto; }
-      .quick-composer { min-height: auto; }
-      .hero-main, .profile-card { padding: 20px; }
-      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .manager-bar { grid-template-columns: 1fr; }
-      .filters { grid-template-columns: 1fr; }
-      .quick-composer { padding: 14px; }
-      .composer-grid, .composer-grid.compact { grid-template-columns: 1fr; }
-      .composer-span-2, .composer-span-4 { grid-column: span 1; }
-      .composer-actions .btn { width: 100%; }
-      .board-group { padding: 0 10px 14px; }
-      details.group details.group { margin: 8px; }
-      details.group > summary { padding: 13px; }
-
-      .table-wrap { overflow: visible; border-top: 0; background: transparent; }
-      table.monday-table,
-      .monday-table thead,
-      .monday-table tbody,
-      .monday-table tr,
-      .monday-table td { display: block; width: 100%; min-width: 0; }
-      .monday-table thead { display: none; }
-      .monday-table tr {
-        margin: 10px 0 14px;
-        border: 1px solid var(--border);
-        border-left: 5px solid var(--accent);
-        border-radius: 18px;
-        overflow: hidden;
-        background: #fff;
-        box-shadow: var(--shadow-light);
-      }
-      .monday-table th,
-      .monday-table td,
-      .monday-table th:first-child,
-      .monday-table td:first-child {
-        position: static;
-        box-shadow: none;
-      }
-      .monday-table td {
-        border-right: 0;
-        border-bottom: 1px solid var(--border);
-        padding: 12px;
-        display: grid;
-        gap: 8px;
-        background: #fff;
-      }
-      .monday-table td:last-child { border-bottom: 0; }
-      .monday-table td::before {
-        content: attr(data-label);
-        color: var(--muted);
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        font-weight: 950;
-      }
-      .monday-table tr:hover td,
-      .monday-table tr:hover td:first-child { background: #fff; }
-      .title-field { min-height: 92px; }
-      .copy-field { min-height: 170px; }
-      .comment-field { min-height: 120px; }
-      .row-actions { flex-direction: row; flex-wrap: wrap; }
-      .row-actions .btn { flex: 1 1 130px; }
-    }
-
-    @media (max-width: 560px) {
-      .brand-logo { width: 42px; height: 42px; border-radius: 14px; }
-      .brand h1 { font-size: 20px; }
-      .brand p { font-size: 12px; }
-      .top-actions { flex-direction: column; align-items: stretch; }
-      .top-actions .btn { width: 100%; }
-      .hero-main h2 { font-size: 28px; }
-      .stats { grid-template-columns: 1fr; }
-      .stat-card strong { font-size: 26px; }
-      .quick-table-title, .section-title { padding: 16px; }
-      .board-help { padding: 12px 16px; }
-      .field, .select, .textarea,
-      .table-field, .table-select, .table-textarea { font-size: 15px; }
-    }
-  </style>
-</head>
-<body>
-  <section id="stateScreen" class="state-screen">
-    <div class="state-box">
-      <strong id="stateTitle">Chargement...</strong>
-      <p id="stateMessage">Vérification de ton accès à l’espace client.</p>
-      <div id="stateActions" class="state-actions"></div>
-    </div>
-  </section>
-
-  <main id="app" class="page-shell hidden">
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-logo">CM</div>
-        <div>
-          <h1>Espace client</h1>
-          <p>Calendrier éditorial par pages</p>
-        </div>
-      </div>
-      <div class="top-actions">
-        <a class="btn btn-soft" href="index.html">← Retour formation</a>
-        <button class="btn btn-outline" id="refreshBtn" type="button">Actualiser</button>
-        <button class="btn btn-primary" id="logoutBtn" type="button">Déconnexion</button>
-      </div>
-    </header>
-
-    <nav class="page-tabs" aria-label="Navigation espace client">
-      <button class="page-tab active" type="button" data-open-page="dashboard">
-        <strong>Vue d’ensemble</strong>
-        <span>Résumé, profil et accès rapide</span>
-      </button>
-      <button class="page-tab" type="button" data-open-page="create">
-        <strong>Nouvelle publication</strong>
-        <span>Grand espace pour écrire un post</span>
-      </button>
-      <button class="page-tab" type="button" data-open-page="calendar">
-        <strong>Calendrier éditorial</strong>
-        <span>Table Monday classée par date</span>
-      </button>
-    </nav>
-
-    <div class="app-pages">
-      <section class="app-page active-page" id="page-dashboard" data-app-page="dashboard">
-        <section class="grid hero">
-          <div class="card hero-main">
-            <span class="eyebrow">✦ Community Management</span>
-            <h2>Un espace client plus clair, séparé en pages.</h2>
-            <p>
-              Les grands blocs ne sont plus empilés sur une seule page. Tu as une page pour le résumé,
-              une page complète pour créer une publication, et une page complète pour modifier le calendrier éditorial.
-            </p>
-          </div>
-          <aside class="card profile-card">
-            <div class="profile-row">
-              <div class="avatar" id="avatarInitials">C</div>
-              <div>
-                <h3 id="clientName">Client</h3>
-                <p id="clientEmail">email@client.com</p>
-              </div>
-            </div>
-            <div>
-              <span id="accessBadge" class="pill success">Accès actif</span>
-              <p class="muted small" style="margin-top:12px;">Tu peux travailler ici sans ouvrir Supabase. Supabase garde seulement les données enregistrées en arrière-plan.</p>
-            </div>
-          </aside>
-        </section>
-
-        <section class="grid stats">
-          <article class="card stat-card"><span>Total publications</span><strong id="statTotal">0</strong></article>
-          <article class="card stat-card"><span>À valider</span><strong id="statToValidate">0</strong></article>
-          <article class="card stat-card"><span>Validées</span><strong id="statValidated">0</strong></article>
-          <article class="card stat-card"><span>Programmées / publiées</span><strong id="statProgrammed">0</strong></article>
-        </section>
-
-        <section class="grid action-grid">
-          <article class="card action-card">
-            <div class="action-icon">+</div>
-            <h3>Créer un post</h3>
-            <p>Ouvre une vraie page de rédaction avec de grands champs pour écrire la production textuelle et préparer les liens visuels.</p>
-            <button class="btn btn-primary" type="button" data-open-page="create">Nouvelle publication</button>
-          </article>
-          <article class="card action-card">
-            <div class="action-icon">📅</div>
-            <h3>Modifier le calendrier</h3>
-            <p>Va sur la page calendrier pour écrire directement dans les cellules, comme dans une table Monday.</p>
-            <button class="btn btn-soft" type="button" data-open-page="calendar">Ouvrir le calendrier</button>
-          </article>
-          <article class="card action-card">
-            <div class="action-icon">✓</div>
-            <h3>Suivre les validations</h3>
-            <p>Filtre les publications à valider, les validations incomplètes ou les posts déjà validés.</p>
-            <button class="btn btn-outline" type="button" data-open-page="calendar" data-calendar-filter="missing">Voir les validations</button>
-          </article>
-        </section>
-      </section>
-
-      <section class="app-page workspace-frame" id="page-create" data-app-page="create">
-        <section class="card page-heading">
-          <div>
-            <span class="eyebrow">📝 Création de contenu</span>
-            <h2>Nouvelle publication</h2>
-            <p>
-              Cette page est dédiée à la création d’un post. Les champs sont volontairement plus grands,
-              pour écrire confortablement le titre, la production textuelle, les liens visuels, l’équipe assignée et les validations.
-            </p>
-          </div>
-          <div class="page-heading-actions">
-            <button class="btn btn-outline" type="button" data-open-page="calendar">Voir le calendrier</button>
-          </div>
-        </section>
-
-        <section id="managerBar" class="card manager-bar hidden">
-          <label>
-            Client utilisé pour les nouvelles lignes
-            <input class="field" id="newClientEmail" type="email" placeholder="client@email.com" />
-          </label>
-          <button class="btn btn-primary" id="addBlankRowBtn" type="button">+ Nouvelle ligne vide</button>
-          <button class="btn btn-outline" id="scrollQuickRowBtn" type="button">Rester sur cette page</button>
-        </section>
-
-        <section class="card quick-table-card" id="quickRowSection">
-          <div class="quick-table-title">
-            <div>
-              <h3>Bloc de création du post</h3>
-              <p>Écris ton contenu ici, puis ajoute-le au calendrier. Après ajout, tu peux encore modifier la ligne dans la page Calendrier.</p>
-            </div>
-            <span class="pill gold">Page création</span>
-          </div>
-
-          <div class="quick-composer">
-            <div class="composer-box">
-              <h4>📝 Contenu du post</h4>
-              <label>
-                Titre / idée de publication
-                <textarea class="table-textarea composer-title" id="quickTitle" placeholder="Ex : Post lancement offre juillet"></textarea>
-              </label>
-              <label>
-                Production textuelle
-                <textarea class="table-textarea composer-caption" id="quickCaption" placeholder="Accroche, légende, CTA, hashtags..."></textarea>
-              </label>
-            </div>
-
-            <div class="composer-box">
-              <h4>📅 Organisation</h4>
-              <div class="composer-grid compact">
-                <label class="composer-span-4">
-                  Client
-                  <input class="table-field" id="quickClientEmail" type="email" placeholder="client@email.com" />
-                </label>
-                <label>
-                  Date
-                  <input class="table-field" id="quickDate" type="date" />
-                </label>
-                <label>
-                  Heure
-                  <input class="table-field" id="quickTime" type="time" />
-                </label>
-                <label>
-                  Plateforme
-                  <select class="table-select" id="quickPlatform"></select>
-                </label>
-                <label>
-                  Statut
-                  <select class="table-select" id="quickStatus"></select>
-                </label>
-                <label>
-                  CM assigné
-                  <input class="table-field" id="quickCm" type="text" placeholder="Nom du CM" />
-                </label>
-                <label>
-                  Graphiste
-                  <input class="table-field" id="quickGraphiste" type="text" placeholder="Nom du graphiste" />
-                </label>
-                <label class="composer-span-4">
-                  Lien visuel / Canva
-                  <input class="table-field" id="quickVisualUrl" type="url" placeholder="https://..." />
-                </label>
-                <label class="composer-span-4">
-                  Lien Drive / fichier
-                  <input class="table-field" id="quickFileUrl" type="url" placeholder="https://..." />
-                </label>
-                <label class="composer-span-4">
-                  Commentaire / note
-                  <textarea class="table-textarea comment-field" id="quickComment" placeholder="Commentaire client ou note interne"></textarea>
-                </label>
-              </div>
-
-              <div class="composer-grid">
-                <div>
-                  <label class="check-line"><input id="quickReady" type="checkbox" checked /> Champ à valider</label>
-                  <label class="check-line"><input id="quickTextValidated" type="checkbox" /> Texte validé</label>
-                </div>
-                <div>
-                  <label class="check-line"><input id="quickVisualValidated" type="checkbox" /> Visuel validé</label>
-                  <label class="check-line"><input id="quickDateValidated" type="checkbox" /> Date validée</label>
-                </div>
-              </div>
-
-              <div class="composer-actions">
-                <button class="btn btn-outline" type="button" data-open-page="calendar">Annuler / voir calendrier</button>
-                <button class="btn btn-primary" id="createQuickRowBtn" type="button">+ Ajouter cette publication</button>
-              </div>
-            </div>
-          </div>
-        </section>
-      </section>
-
-      <section class="app-page workspace-frame" id="page-calendar" data-app-page="calendar">
-        <section class="card page-heading">
-          <div>
-            <span class="eyebrow">📅 Calendrier éditorial</span>
-            <h2>Table de production</h2>
-            <p>
-              Cette page garde tout l’espace pour le calendrier. Les cellules sont modifiables directement.
-              Classement automatique : année → mois → semaine.
-            </p>
-          </div>
-          <div class="page-heading-actions">
-            <button class="btn btn-primary" type="button" data-open-page="create">+ Nouvelle publication</button>
-            <button class="btn btn-outline" id="openAllBtn" type="button">Tout ouvrir</button>
-            <button class="btn btn-outline" id="closeAllBtn" type="button">Tout fermer</button>
-          </div>
-        </section>
-
-        <section class="card toolbar">
-          <div class="filters">
-            <input class="field" id="searchInput" type="search" placeholder="Rechercher : titre, CM, graphiste, texte..." />
-            <select class="select" id="clientFilter"><option value="all">Tous les clients</option></select>
-            <select class="select" id="statusFilter"></select>
-            <select class="select" id="platformFilter"></select>
-            <select class="select" id="validationFilter">
-              <option value="all">Toutes les validations</option>
-              <option value="ready">Champ à valider</option>
-              <option value="missing">Validation incomplète</option>
-              <option value="complete">Tout validé</option>
-            </select>
-          </div>
-        </section>
-
-        <section class="card board-card">
-          <div class="section-title">
-            <div>
-              <h3>Calendrier éditorial</h3>
-              <p>Les cellules sont directement modifiables. Classement automatique : année → mois → semaine.</p>
-            </div>
-            <div class="top-actions">
-              <span class="pill gold" id="visibleCount">0 élément</span>
-            </div>
-          </div>
-          <div class="board-help">
-            <span class="pill info">Style Monday</span>
-            <span>Texte et liens : sauvegarde quand tu quittes la cellule.</span>
-            <span>Date, statut, plateforme, cases : sauvegarde immédiate.</span>
-          </div>
-          <div id="calendarBoard" class="board-group"></div>
-        </section>
-      </section>
-    </div>
-  </main>
-
-  <div class="toast" id="toast"></div>
-
-  <script>
-    const SUPABASE_URL = "https://xlyhujiebervldzoxouk.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_IqLPvaAeDZoDlYKE-m_Fxw_29Zbnhh_";
-    const ADMIN_EMAIL = "rakotomanga41@gmail.com";
-
-    const STATUS_LABELS = {
-      brouillon: "Brouillon",
-      a_valider: "À valider",
-      modification_demandee: "Modification demandée",
-      valide: "Validé",
-      programme: "Programmé",
-      publie: "Publié"
-    };
-    const STATUS_CLASS = {
-      brouillon: "neutral",
-      a_valider: "warning",
-      modification_demandee: "danger",
-      valide: "success",
-      programme: "info",
-      publie: "success"
-    };
-    const PLATFORMS = ["Instagram", "Facebook", "LinkedIn", "TikTok", "Pinterest", "Autre"];
-    const DIRECT_FIELDS = [
-      "client_email", "title", "platform", "publication_date", "publication_time",
-      "caption_text", "visual_url", "file_url", "client_comment", "status",
-      "text_validated", "visual_validated", "date_validated"
-    ];
-    const META_FIELDS = ["cm_assigned", "graphiste_assigned", "ready_for_validation"];
-    const META_REGEX = /\n?<!--CM_META:([A-Za-z0-9+/=]+)-->/s;
-
-    let supabaseClient = null;
-    let currentUser = null;
-    let currentAccess = null;
-    let clientSpaces = [];
-    let allPosts = [];
-    let toastTimer = null;
-
-    const $ = (selector) => document.querySelector(selector);
-    document.addEventListener("DOMContentLoaded", initClientSpace);
-
-    async function initClientSpace() {
-      fillStaticSelects();
-      bindEvents();
-
-      try {
-        supabaseClient = await getSupabaseClient();
-        if (!supabaseClient) {
-          showBlockedState("Supabase non chargé", "La bibliothèque Supabase n’a pas pu être chargée. Recharge la page avec Ctrl + F5.", true);
-          return;
-        }
-
-        const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
-        if (sessionError) throw sessionError;
-        currentUser = sessionData?.session?.user || null;
-
-        if (!currentUser) {
-          showBlockedState("Connexion requise", "Connecte-toi d’abord pour accéder à cet espace privé.", true);
-          return;
-        }
-
-        await verifyClientAccess();
-        await loadClientSpaces();
-        applyAccessToUi();
-        await loadPosts();
-
-        $("#stateScreen").classList.add("hidden");
-        $("#app").classList.remove("hidden");
-      } catch (error) {
-        console.error(error);
-        if (error?.message !== "Accès non autorisé") {
-          showBlockedState("Erreur de chargement", error?.message || "Impossible de charger l’espace client pour le moment.", true);
-        }
-      }
-    }
-
-    async function getSupabaseClient() {
-      if (window.supabaseClient) return window.supabaseClient;
-      if (!window.supabase?.createClient) await loadSupabaseScript();
-      if (!window.supabase?.createClient) return null;
-      window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      return window.supabaseClient;
-    }
-
-    function loadSupabaseScript() {
-      return new Promise((resolve) => {
-        if (window.supabase?.createClient) return resolve();
-        const existing = document.querySelector('script[src*="supabase-js"]');
-        if (existing) {
-          existing.addEventListener("load", resolve, { once: true });
-          existing.addEventListener("error", resolve, { once: true });
-          setTimeout(resolve, 2500);
-          return;
-        }
-        const script = document.createElement("script");
-        script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-        script.onload = resolve;
-        script.onerror = resolve;
-        document.head.appendChild(script);
-        setTimeout(resolve, 2500);
-      });
-    }
-
-    async function verifyClientAccess() {
-      const email = normalizeEmail(currentUser.email);
-      const { data, error } = await supabaseClient
-        .from("client_spaces")
-        .select("*")
-        .ilike("client_email", email)
-        .eq("is_active", true)
-        .maybeSingle();
-
-      if (error) throw error;
-
-      if (!data) {
-        if (email === ADMIN_EMAIL) {
-          currentAccess = { client_name: "Administrateur", client_email: ADMIN_EMAIL, is_active: true, role: "admin", can_manage: true };
-          return;
-        }
-        showBlockedState("Accès réservé", "Ton email n’est pas autorisé à consulter cette page. Demande à l’administrateur de t’ajouter dans client_spaces.", true);
-        throw new Error("Accès non autorisé");
-      }
-
-      currentAccess = data;
-    }
-
-    async function loadClientSpaces() {
-      if (!isManager()) {
-        clientSpaces = [currentAccess];
-        return;
-      }
-
-      const { data, error } = await supabaseClient
-        .from("client_spaces")
-        .select("*")
-        .eq("is_active", true)
-        .order("client_name", { ascending: true });
-
-      if (error) {
-        console.warn(error);
-        clientSpaces = [currentAccess];
-        return;
-      }
-      clientSpaces = data || [];
-    }
-
-    function applyAccessToUi() {
-      const name = currentAccess.client_name || currentUser.email || "Client";
-      const email = normalizeEmail(currentUser.email || currentAccess.client_email);
-      $("#clientName").textContent = name;
-      $("#clientEmail").textContent = email;
-      $("#avatarInitials").textContent = getInitials(name || email);
-
-      if (isManager()) {
-        $("#accessBadge").className = "pill gold";
-        $("#accessBadge").textContent = "Accès gestionnaire";
-        $("#managerBar").classList.remove("hidden");
-      } else {
-        $("#accessBadge").className = "pill success";
-        $("#accessBadge").textContent = "Accès client";
-        $("#managerBar").classList.add("hidden");
-      }
-
-      const defaultEmail = isManager()
-        ? (normalizeEmail(currentAccess.client_email) || email)
-        : email;
-      $("#newClientEmail").value = defaultEmail;
-      $("#quickClientEmail").value = defaultEmail;
-      $("#quickClientEmail").disabled = !isManager();
-    }
-
-    function isManager() {
-      return Boolean(
-        currentAccess?.can_manage === true ||
-        currentAccess?.is_admin === true ||
-        ["admin", "manager"].includes(String(currentAccess?.role || "").toLowerCase()) ||
-        String(currentAccess?.type || "").toLowerCase() === "admin" ||
-        normalizeEmail(currentUser?.email) === ADMIN_EMAIL
-      );
-    }
-
-    function canEditPost(post) {
-      if (isManager()) return true;
-      return normalizeEmail(post.client_email) === normalizeEmail(currentUser?.email);
-    }
-
-    async function loadPosts() {
-      let query = supabaseClient
-        .from("editorial_posts")
-        .select("*")
-        .order("publication_date", { ascending: true, nullsFirst: false })
-        .order("publication_time", { ascending: true, nullsFirst: false })
-        .order("created_at", { ascending: false });
-
-      if (!isManager()) query = query.ilike("client_email", normalizeEmail(currentUser.email));
-
-      const { data, error } = await query;
-      if (error) throw error;
-      allPosts = (data || []).map(normalizePost);
-      renderEverything();
-    }
-
-    function normalizePost(post) {
-      return {
-        ...post,
-        client_email: normalizeEmail(post.client_email),
-        status: post.status || "a_valider",
-        text_validated: Boolean(post.text_validated),
-        visual_validated: Boolean(post.visual_validated),
-        date_validated: Boolean(post.date_validated)
-      };
-    }
-
-    function renderEverything() {
-      renderClientFilter();
-      renderStats();
-      renderBoard();
-      requestAnimationFrame(() => initAutosize());
-    }
-
-    function renderClientFilter() {
-      const filter = $("#clientFilter");
-      if (!filter) return;
-      const previous = filter.value || "all";
-
-      if (!isManager()) {
-        filter.innerHTML = `<option value="${escapeAttribute(normalizeEmail(currentUser.email))}">Mon espace</option>`;
-        filter.value = normalizeEmail(currentUser.email);
-        filter.disabled = true;
-        return;
-      }
-
-      const emails = Array.from(new Set([
-        ...clientSpaces.map((item) => normalizeEmail(item.client_email)).filter(Boolean),
-        ...allPosts.map((post) => normalizeEmail(post.client_email)).filter(Boolean)
-      ])).sort();
-
-      filter.disabled = false;
-      filter.innerHTML = `<option value="all">Tous les clients</option>` + emails.map((email) => `<option value="${escapeAttribute(email)}">${escapeHtml(labelForClient(email))}</option>`).join("");
-      filter.value = emails.includes(previous) || previous === "all" ? previous : "all";
-    }
-
-    function labelForClient(email) {
-      const found = clientSpaces.find((item) => normalizeEmail(item.client_email) === normalizeEmail(email));
-      return found?.client_name ? `${found.client_name} · ${email}` : email;
-    }
-
-    function getFilteredPosts() {
-      const search = normalizeSearch($("#searchInput")?.value || "");
-      const client = $("#clientFilter")?.value || "all";
-      const status = $("#statusFilter")?.value || "all";
-      const platform = $("#platformFilter")?.value || "all";
-      const validation = $("#validationFilter")?.value || "all";
-
-      return allPosts.filter((post) => {
-        const parsed = parseAdminNote(post.admin_note);
-        const meta = withDefaultMeta(parsed.meta, post);
-        const haystack = normalizeSearch([
-          post.client_email, post.title, post.platform, post.caption_text,
-          post.visual_url, post.file_url, post.client_comment, parsed.note,
-          meta.cm_assigned, meta.graphiste_assigned
-        ].filter(Boolean).join(" "));
-        const complete = post.text_validated && post.visual_validated && post.date_validated;
-
-        if (search && !haystack.includes(search)) return false;
-        if (client !== "all" && normalizeEmail(post.client_email) !== normalizeEmail(client)) return false;
-        if (status !== "all" && post.status !== status) return false;
-        if (platform !== "all" && post.platform !== platform) return false;
-        if (validation === "ready" && !meta.ready_for_validation) return false;
-        if (validation === "missing" && complete) return false;
-        if (validation === "complete" && !complete) return false;
-        return true;
-      });
-    }
-
-    function renderStats() {
-      const posts = getFilteredPosts();
-      const toValidate = posts.filter((post) => {
-        const meta = withDefaultMeta(parseAdminNote(post.admin_note).meta, post);
-        return meta.ready_for_validation || ["a_valider", "modification_demandee"].includes(post.status);
-      }).length;
-      const validated = posts.filter((post) => post.status === "valide" || (post.text_validated && post.visual_validated && post.date_validated)).length;
-      const programmed = posts.filter((post) => ["programme", "publie"].includes(post.status)).length;
-      $("#statTotal").textContent = posts.length;
-      $("#statToValidate").textContent = toValidate;
-      $("#statValidated").textContent = validated;
-      $("#statProgrammed").textContent = programmed;
-      $("#visibleCount").textContent = `${posts.length} élément${posts.length > 1 ? "s" : ""}`;
-    }
-
-    function renderBoard() {
-      const container = $("#calendarBoard");
-      const posts = getFilteredPosts().sort(comparePostsByDate);
-
-      if (!posts.length) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <strong>Aucune ligne dans le calendrier.</strong>
-            <p>Utilise la “Ligne rapide” ou le bouton “+ Nouvelle ligne vide” pour commencer à écrire tes posts directement sur le site.</p>
-          </div>`;
-        return;
-      }
-
-      const grouped = groupByYearMonthWeek(posts);
-      container.innerHTML = Object.entries(grouped).map(([year, yearData]) => `
-        <details class="group" open>
-          <summary><span>${escapeHtml(year)}</span><span class="summary-count">${yearData.count} publication${yearData.count > 1 ? "s" : ""}</span></summary>
-          ${Object.entries(yearData.months).map(([month, monthData]) => `
-            <details class="group" open>
-              <summary><span>${escapeHtml(month)}</span><span class="summary-count">${monthData.count}</span></summary>
-              ${Object.entries(monthData.weeks).map(([week, weekPosts]) => `
-                <details class="group" open>
-                  <summary><span>${escapeHtml(week)}</span><span class="summary-count">${weekPosts.length}</span></summary>
-                  ${tableTemplate(weekPosts)}
-                </details>
-              `).join("")}
-            </details>
-          `).join("")}
-        </details>
-      `).join("");
-    }
-
-    function tableTemplate(posts) {
-      return `
-        <div class="table-wrap">
-          <table class="monday-table">
-            <colgroup>
-              <col class="col-publication">
-              <col class="col-client">
-              <col class="col-date">
-              <col class="col-time">
-              <col class="col-platform">
-              <col class="col-assign">
-              <col class="col-assign">
-              <col class="col-copy">
-              <col class="col-assets">
-              <col class="col-ready">
-              <col class="col-status">
-              <col class="col-validations">
-              <col class="col-comment">
-              <col class="col-actions">
-            </colgroup>
-            <thead>
-              <tr>
-                <th>Publication</th>
-                <th>Client</th>
-                <th>Date</th>
-                <th>Heure</th>
-                <th>Plateforme</th>
-                <th>CM</th>
-                <th>Graphiste</th>
-                <th>Texte</th>
-                <th>Visuel / fichiers</th>
-                <th>À valider</th>
-                <th>Statut</th>
-                <th>Validations</th>
-                <th>Commentaire</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>${posts.map(rowTemplate).join("")}</tbody>
-          </table>
-        </div>`;
-    }
-
-    function rowTemplate(post) {
-      const parsed = parseAdminNote(post.admin_note);
-      const meta = withDefaultMeta(parsed.meta, post);
-      const status = post.status || "a_valider";
-      const editable = canEditPost(post);
-      const disabled = editable ? "" : "disabled";
-      const managerOnlyDisabled = isManager() ? "" : "disabled";
-      const deleteButton = isManager() ? `<button class="btn btn-danger mini-btn" type="button" data-delete-post>Supprimer</button>` : "";
-      const clientField = isManager()
-        ? `<input class="table-field" type="email" data-direct-field="client_email" value="${escapeAttribute(post.client_email || "")}" ${managerOnlyDisabled}>`
-        : `<span class="pill info">${escapeHtml(post.client_email || "client")}</span>`;
-
-      return `
-        <tr data-post-row="${escapeAttribute(post.id)}">
-          <td data-label="Publication">
-            <textarea class="table-textarea title-field" data-direct-field="title" placeholder="Titre / idée de publication" ${disabled}>${escapeHtml(post.title || "")}</textarea>
-            <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
-              <span class="pill ${STATUS_CLASS[status] || "neutral"}">${escapeHtml(STATUS_LABELS[status] || status)}</span>
-              ${meta.ready_for_validation ? `<span class="pill warning">À valider</span>` : ""}
-            </div>
-          </td>
-          <td data-label="Client">${clientField}</td>
-          <td data-label="Date"><input class="table-field" type="date" data-direct-field="publication_date" value="${escapeAttribute(post.publication_date || "")}" ${disabled}></td>
-          <td data-label="Heure"><input class="table-field" type="time" data-direct-field="publication_time" value="${escapeAttribute(formatInputTime(post.publication_time))}" ${disabled}></td>
-          <td data-label="Plateforme">${platformSelect(post.platform, disabled)}</td>
-          <td data-label="CM assigné"><input class="table-field assign-field" type="text" data-meta-field="cm_assigned" value="${escapeAttribute(meta.cm_assigned || "")}" placeholder="CM" ${disabled}></td>
-          <td data-label="Graphiste"><input class="table-field assign-field" type="text" data-meta-field="graphiste_assigned" value="${escapeAttribute(meta.graphiste_assigned || "")}" placeholder="Graphiste" ${disabled}></td>
-          <td data-label="Production textuelle"><textarea class="table-textarea copy-field" data-direct-field="caption_text" placeholder="Accroche, légende, CTA, hashtags..." ${disabled}>${escapeHtml(post.caption_text || "")}</textarea></td>
-          <td data-label="Production visuelle">
-            <input class="table-field asset-field" type="url" data-direct-field="visual_url" value="${escapeAttribute(post.visual_url || "")}" placeholder="Lien Canva / visuel" ${disabled}>
-            <input class="table-field asset-field" style="margin-top:8px;" type="url" data-direct-field="file_url" value="${escapeAttribute(post.file_url || "")}" placeholder="Lien Drive / fichier" ${disabled}>
-            ${post.visual_url ? `<a class="asset-link" style="margin-top:8px; display:block;" href="${escapeAttribute(post.visual_url)}" target="_blank" rel="noopener">Ouvrir visuel ↗</a>` : ""}
-            ${post.file_url ? `<a class="asset-link" style="margin-top:5px; display:block;" href="${escapeAttribute(post.file_url)}" target="_blank" rel="noopener">Ouvrir fichier ↗</a>` : ""}
-          </td>
-          <td data-label="Champ à valider"><label class="check-line"><input type="checkbox" data-meta-field="ready_for_validation" ${meta.ready_for_validation ? "checked" : ""} ${disabled}> À valider</label></td>
-          <td data-label="Statut">${statusSelect(status, disabled)}</td>
-          <td data-label="Validations">
-            <div class="validation-stack">
-              <label class="check-line"><input type="checkbox" data-direct-field="text_validated" ${post.text_validated ? "checked" : ""} ${disabled}> Texte validé</label>
-              <label class="check-line"><input type="checkbox" data-direct-field="visual_validated" ${post.visual_validated ? "checked" : ""} ${disabled}> Visuel validé</label>
-              <label class="check-line"><input type="checkbox" data-direct-field="date_validated" ${post.date_validated ? "checked" : ""} ${disabled}> Date validée</label>
-            </div>
-          </td>
-          <td data-label="Commentaire"><textarea class="table-textarea comment-field" data-direct-field="client_comment" placeholder="Commentaire ou modification demandée" ${disabled}>${escapeHtml(post.client_comment || "")}</textarea></td>
-          <td data-label="Actions">
-            <div class="row-actions">
-              <button class="btn btn-success mini-btn" type="button" data-quick-validate ${disabled}>Tout valider</button>
-              ${deleteButton}
-            </div>
-          </td>
-        </tr>`;
-    }
-
-    function platformSelect(current, disabledAttr = "") {
-      return `<select class="table-select" data-direct-field="platform" ${disabledAttr}>${PLATFORMS.map((platform) => `<option value="${escapeAttribute(platform)}" ${platform === current ? "selected" : ""}>${escapeHtml(platform)}</option>`).join("")}</select>`;
-    }
-
-    function statusSelect(current, disabledAttr = "") {
-      return `<select class="table-select" data-direct-field="status" ${disabledAttr}>${Object.entries(STATUS_LABELS).map(([key, label]) => `<option value="${key}" ${key === current ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>`;
-    }
-
-    function fillStaticSelects() {
-      const platformOptions = `<option value="all">Toutes les plateformes</option>` + PLATFORMS.map((item) => `<option value="${item}">${item}</option>`).join("");
-      $("#platformFilter").innerHTML = platformOptions;
-      $("#quickPlatform").innerHTML = PLATFORMS.map((item) => `<option value="${item}">${item}</option>`).join("");
-
-      const statusOptions = `<option value="all">Tous les statuts</option>` + Object.entries(STATUS_LABELS).map(([key, label]) => `<option value="${key}">${label}</option>`).join("");
-      $("#statusFilter").innerHTML = statusOptions;
-      $("#quickStatus").innerHTML = Object.entries(STATUS_LABELS).map(([key, label]) => `<option value="${key}" ${key === "a_valider" ? "selected" : ""}>${label}</option>`).join("");
-    }
-
-    function groupByYearMonthWeek(posts) {
-      const grouped = {};
-      posts.forEach((post) => {
-        const keys = getDateGroupKeys(post.publication_date);
-        if (!grouped[keys.year]) grouped[keys.year] = { count: 0, months: {} };
-        if (!grouped[keys.year].months[keys.month]) grouped[keys.year].months[keys.month] = { count: 0, weeks: {} };
-        if (!grouped[keys.year].months[keys.month].weeks[keys.week]) grouped[keys.year].months[keys.month].weeks[keys.week] = [];
-        grouped[keys.year].count += 1;
-        grouped[keys.year].months[keys.month].count += 1;
-        grouped[keys.year].months[keys.month].weeks[keys.week].push(post);
-      });
-      return grouped;
-    }
-
-    function getDateGroupKeys(dateValue) {
-      if (!dateValue) return { year: "Sans date", month: "Dates à définir", week: "Semaine à définir" };
-      const date = new Date(`${dateValue}T00:00:00`);
-      if (Number.isNaN(date.getTime())) return { year: "Sans date", month: "Dates à définir", week: "Semaine à définir" };
-      const year = String(date.getFullYear());
-      const month = date.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
-      return { year, month: month.charAt(0).toUpperCase() + month.slice(1), week: getISOWeekLabel(date) };
-    }
-
-    function getISOWeekLabel(date) {
-      const target = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-      const dayNumber = target.getUTCDay() || 7;
-      target.setUTCDate(target.getUTCDate() + 4 - dayNumber);
-      const yearStart = new Date(Date.UTC(target.getUTCFullYear(), 0, 1));
-      const weekNumber = Math.ceil((((target - yearStart) / 86400000) + 1) / 7);
-      const weekStart = new Date(date);
-      const localDay = weekStart.getDay() || 7;
-      weekStart.setDate(weekStart.getDate() - localDay + 1);
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekStart.getDate() + 6);
-      return `Semaine ${weekNumber} · ${shortDate(weekStart)} → ${shortDate(weekEnd)}`;
-    }
-
-    function comparePostsByDate(a, b) {
-      const av = `${a.publication_date || "9999-12-31"} ${a.publication_time || "99:99"} ${a.created_at || ""}`;
-      const bv = `${b.publication_date || "9999-12-31"} ${b.publication_time || "99:99"} ${b.created_at || ""}`;
-      return av.localeCompare(bv);
-    }
-
-    async function handleCalendarEdit(event) {
-      const input = event.target.closest("[data-direct-field], [data-meta-field]");
-      if (!input || input.disabled) return;
-
-      const row = input.closest("[data-post-row]");
-      const postId = row?.dataset.postRow;
-      if (!postId) return;
-
-      const isBlurEvent = event.type === "focusout";
-      const isChangeEvent = event.type === "change";
-      const tagName = input.tagName.toLowerCase();
-      const type = (input.getAttribute("type") || "").toLowerCase();
-      const shouldSaveOnChange = ["checkbox", "date", "time"].includes(type) || tagName === "select";
-      const shouldSaveOnBlur = ["text", "url", "email", ""].includes(type) || tagName === "textarea";
-
-      if (isChangeEvent && !shouldSaveOnChange) return;
-      if (isBlurEvent && !shouldSaveOnBlur) return;
-
-      try {
-        if (input.dataset.directField) await saveDirectField(postId, input.dataset.directField, getInputValue(input));
-        if (input.dataset.metaField) await saveMetaField(postId, input.dataset.metaField, getInputValue(input));
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    async function saveDirectField(postId, field, value) {
-      if (!DIRECT_FIELDS.includes(field)) return;
-      const post = allPosts.find((item) => item.id === postId);
-      if (!post || !canEditPost(post)) return;
-
-      if (field === "client_email" && !isManager()) return;
-      const normalizedValue = normalizeDbValue(field, value);
-      if (normalizeComparableValue(post[field]) === normalizeComparableValue(normalizedValue)) return;
-
-      const updates = { [field]: normalizedValue };
-
-      if (["text_validated", "visual_validated", "date_validated"].includes(field)) {
-        const finalText = field === "text_validated" ? Boolean(value) : Boolean(post.text_validated);
-        const finalVisual = field === "visual_validated" ? Boolean(value) : Boolean(post.visual_validated);
-        const finalDate = field === "date_validated" ? Boolean(value) : Boolean(post.date_validated);
-        if (finalText && finalVisual && finalDate) updates.status = "valide";
-        else if (post.status === "valide") updates.status = "a_valider";
-      }
-
-      await updatePost(postId, updates, "Champ enregistré.");
-    }
-
-    async function saveMetaField(postId, field, value) {
-      if (!META_FIELDS.includes(field)) return;
-      const post = allPosts.find((item) => item.id === postId);
-      if (!post || !canEditPost(post)) return;
-
-      const parsed = parseAdminNote(post.admin_note);
-      const meta = withDefaultMeta(parsed.meta, post);
-      const normalizedValue = field === "ready_for_validation" ? Boolean(value) : String(value || "").trim();
-      if (String(meta[field] ?? "") === String(normalizedValue ?? "")) return;
-
-      meta[field] = normalizedValue;
-      const updates = { admin_note: buildAdminNote(parsed.note, meta) };
-      if (field === "ready_for_validation" && normalizedValue === true && post.status === "brouillon") updates.status = "a_valider";
-      await updatePost(postId, updates, "Champ enregistré.");
-    }
-
-    async function updatePost(postId, updates, successMessage) {
-      const { data, error } = await supabaseClient
-        .from("editorial_posts")
-        .update(updates)
-        .eq("id", postId)
-        .select("*")
-        .single();
-
-      if (error) {
-        toast(error.message || "Mise à jour impossible. Vérifie les policies RLS de editorial_posts.");
-        throw error;
-      }
-
-      allPosts = allPosts.map((post) => post.id === postId ? normalizePost({ ...post, ...(data || updates) }) : post);
-      renderEverything();
-      toast(successMessage || "Enregistré.");
-    }
-
-    async function createPost(payload, successMessage = "Ligne ajoutée au calendrier.") {
-      const { data, error } = await supabaseClient
-        .from("editorial_posts")
-        .insert(payload)
-        .select("*")
-        .single();
-
-      if (error) {
-        toast(error.message || "Création impossible. Vérifie les policies RLS de editorial_posts.");
-        throw error;
-      }
-
-      allPosts = [normalizePost(data), ...allPosts];
-      renderEverything();
-      toast(successMessage);
-      return data;
-    }
-
-    async function createBlankPost() {
-      try {
-        const clientEmail = getNewLineClientEmail();
-        if (!clientEmail) return toast("Email client obligatoire pour créer une ligne.");
-        const payload = {
-          client_email: clientEmail,
-          title: "Nouvelle publication",
-          platform: "Instagram",
-          publication_date: null,
-          publication_time: null,
-          caption_text: null,
-          visual_url: null,
-          file_url: null,
-          client_comment: null,
-          admin_note: buildAdminNote("", { cm_assigned: "", graphiste_assigned: "", ready_for_validation: false }),
-          status: "brouillon",
-          text_validated: false,
-          visual_validated: false,
-          date_validated: false
-        };
-        await createPost(payload, "Ligne vide créée. Tu peux maintenant écrire directement dans le tableau.");
-        switchAppPage("calendar");
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    async function createQuickRow() {
-      try {
-        const clientEmail = normalizeEmail($("#quickClientEmail").value || getNewLineClientEmail());
-        if (!clientEmail) return toast("Email client obligatoire.");
-
-        const textValidated = $("#quickTextValidated").checked;
-        const visualValidated = $("#quickVisualValidated").checked;
-        const dateValidated = $("#quickDateValidated").checked;
-        let status = $("#quickStatus").value || "a_valider";
-        if (textValidated && visualValidated && dateValidated) status = "valide";
-
-        const payload = {
-          client_email: clientEmail,
-          title: $("#quickTitle").value.trim() || "Nouvelle publication",
-          platform: $("#quickPlatform").value || "Instagram",
-          publication_date: $("#quickDate").value || null,
-          publication_time: $("#quickTime").value || null,
-          caption_text: $("#quickCaption").value.trim() || null,
-          visual_url: $("#quickVisualUrl").value.trim() || null,
-          file_url: $("#quickFileUrl").value.trim() || null,
-          client_comment: $("#quickComment").value.trim() || null,
-          admin_note: buildAdminNote("", {
-            cm_assigned: $("#quickCm").value.trim(),
-            graphiste_assigned: $("#quickGraphiste").value.trim(),
-            ready_for_validation: $("#quickReady").checked
-          }),
-          status,
-          text_validated: textValidated,
-          visual_validated: visualValidated,
-          date_validated: dateValidated
-        };
-
-        await createPost(payload);
-        resetQuickRow(clientEmail);
-        switchAppPage("calendar");
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    async function quickValidate(postId) {
-      const post = allPosts.find((item) => item.id === postId);
-      if (!post || !canEditPost(post)) return;
-      await updatePost(postId, { text_validated: true, visual_validated: true, date_validated: true, status: "valide" }, "Publication validée.");
-    }
-
-    async function deletePost(postId) {
-      if (!isManager()) return;
-      if (!confirm("Supprimer cette ligne du calendrier ?")) return;
-      const { error } = await supabaseClient.from("editorial_posts").delete().eq("id", postId);
-      if (error) return toast(error.message || "Suppression impossible.");
-      allPosts = allPosts.filter((post) => post.id !== postId);
-      renderEverything();
-      toast("Ligne supprimée.");
-    }
-
-    function getNewLineClientEmail() {
-      if (isManager()) return normalizeEmail($("#newClientEmail").value || $("#quickClientEmail").value || currentAccess.client_email || currentUser.email);
-      return normalizeEmail(currentUser.email);
-    }
-
-    function resetQuickRow(clientEmail) {
-      ["#quickTitle", "#quickDate", "#quickTime", "#quickCm", "#quickGraphiste", "#quickCaption", "#quickVisualUrl", "#quickFileUrl", "#quickComment"].forEach((selector) => { const el = $(selector); if (el) el.value = ""; });
-      $("#quickClientEmail").value = clientEmail || getNewLineClientEmail();
-      $("#quickPlatform").value = "Instagram";
-      $("#quickStatus").value = "a_valider";
-      $("#quickReady").checked = true;
-      $("#quickTextValidated").checked = false;
-      $("#quickVisualValidated").checked = false;
-      $("#quickDateValidated").checked = false;
-    }
-
-
-    function switchAppPage(pageName) {
-      const target = pageName || "dashboard";
-      document.querySelectorAll("[data-app-page]").forEach((page) => {
-        page.classList.toggle("active-page", page.dataset.appPage === target);
-      });
-      document.querySelectorAll("[data-open-page]").forEach((button) => {
-        button.classList.toggle("active", button.dataset.openPage === target);
-      });
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      requestAnimationFrame(() => initAutosize());
-    }
-
-    function bindEvents() {
-      document.addEventListener("input", (event) => {
-        const textarea = event.target.closest("textarea");
-        if (textarea) autoResizeTextarea(textarea);
-      });
-
-      $("#refreshBtn")?.addEventListener("click", async () => { await loadPosts(); toast("Données actualisées."); });
-      $("#logoutBtn")?.addEventListener("click", logout);
-      $("#addBlankRowBtn")?.addEventListener("click", createBlankPost);
-      $("#createQuickRowBtn")?.addEventListener("click", createQuickRow);
-      $("#scrollQuickRowBtn")?.addEventListener("click", () => switchAppPage("create"));
-
-      document.addEventListener("click", (event) => {
-        const button = event.target.closest("[data-open-page]");
-        if (!button) return;
-        switchAppPage(button.dataset.openPage);
-        if (button.dataset.calendarFilter) {
-          const filter = $("#validationFilter");
-          if (filter) {
-            filter.value = button.dataset.calendarFilter;
-            renderEverything();
-          }
-        }
-      });
-
-      $("#newClientEmail")?.addEventListener("input", () => {
-        if (isManager()) $("#quickClientEmail").value = normalizeEmail($("#newClientEmail").value);
-      });
-
-      ["#searchInput", "#clientFilter", "#statusFilter", "#platformFilter", "#validationFilter"].forEach((selector) => {
-        $(selector)?.addEventListener("input", renderEverything);
-        $(selector)?.addEventListener("change", renderEverything);
-      });
-
-      $("#calendarBoard")?.addEventListener("change", handleCalendarEdit);
-      $("#calendarBoard")?.addEventListener("focusout", handleCalendarEdit);
-      $("#calendarBoard")?.addEventListener("click", async (event) => {
-        const row = event.target.closest("[data-post-row]");
-        if (!row) return;
-        const postId = row.dataset.postRow;
-        if (event.target.closest("[data-quick-validate]")) await quickValidate(postId);
-        if (event.target.closest("[data-delete-post]")) await deletePost(postId);
-      });
-
-      $("#openAllBtn")?.addEventListener("click", () => setAllDetailsOpen(true));
-      $("#closeAllBtn")?.addEventListener("click", () => setAllDetailsOpen(false));
-    }
-
-    function setAllDetailsOpen(open) {
-      document.querySelectorAll("#calendarBoard details").forEach((details) => { details.open = open; });
-    }
-
-    function initAutosize(root = document) {
-      root.querySelectorAll("textarea").forEach(autoResizeTextarea);
-    }
-
-    function autoResizeTextarea(textarea) {
-      if (!textarea) return;
-      const minHeight = parseInt(window.getComputedStyle(textarea).minHeight, 10) || 42;
-      const maxHeight = window.innerWidth <= 820 ? 360 : 520;
-      textarea.style.height = "auto";
-      textarea.style.height = `${Math.min(Math.max(textarea.scrollHeight + 2, minHeight), maxHeight)}px`;
-    }
-
-    async function logout() {
-      try { await supabaseClient?.auth?.signOut(); } catch (error) { console.warn(error); }
-      window.location.href = "login.html";
-    }
-
-    function showBlockedState(title, message, showButtons = false) {
-      $("#app")?.classList.add("hidden");
-      $("#stateScreen")?.classList.remove("hidden");
-      $("#stateTitle").textContent = title;
-      $("#stateMessage").textContent = message;
-      $("#stateActions").innerHTML = showButtons ? `
-        <a class="btn btn-primary" href="login.html">Se connecter</a>
-        <a class="btn btn-outline" href="index.html">Retour au site</a>
-      ` : "";
-    }
-
-    function toast(message) {
-      const el = $("#toast");
-      el.textContent = message;
-      el.classList.add("show");
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => el.classList.remove("show"), 3200);
-    }
-
-    function parseAdminNote(value) {
-      const raw = String(value || "");
-      const match = raw.match(META_REGEX);
-      if (!match) return { note: raw.trim(), meta: {} };
-      const note = raw.replace(META_REGEX, "").trim();
-      try { return { note, meta: JSON.parse(fromBase64(match[1])) || {} }; }
-      catch { return { note, meta: {} }; }
-    }
-
-    function buildAdminNote(note, meta) {
-      return `${String(note || "").trim()}\n<!--CM_META:${toBase64(JSON.stringify(meta || {}))}-->`;
-    }
-
-    function withDefaultMeta(meta, post) {
-      const status = post?.status || "a_valider";
-      return {
-        cm_assigned: meta?.cm_assigned || "",
-        graphiste_assigned: meta?.graphiste_assigned || "",
-        ready_for_validation: typeof meta?.ready_for_validation === "boolean" ? meta.ready_for_validation : ["a_valider", "modification_demandee"].includes(status)
-      };
-    }
-
-    function getInputValue(input) {
-      const type = (input.getAttribute("type") || "").toLowerCase();
-      if (type === "checkbox") return input.checked;
-      return input.value;
-    }
-
-    function normalizeDbValue(field, value) {
-      if (["text_validated", "visual_validated", "date_validated"].includes(field)) return Boolean(value);
-      if (["publication_date", "publication_time", "caption_text", "visual_url", "file_url", "client_comment"].includes(field)) return String(value || "").trim() || null;
-      if (field === "client_email") return normalizeEmail(value);
-      return String(value || "").trim();
-    }
-
-    function normalizeComparableValue(value) {
-      if (typeof value === "boolean") return value ? "true" : "false";
-      return String(value ?? "").trim();
-    }
-
-    function normalizeEmail(value) { return String(value || "").trim().toLowerCase(); }
-    function normalizeSearch(value) { return String(value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
-    function shortDate(date) { return date.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" }); }
-    function formatInputTime(value) { return value ? String(value).slice(0, 5) : ""; }
-    function getInitials(value) { return String(value || "C").trim().split(/\s+/).slice(0,2).map((part) => part[0]?.toUpperCase()).join("") || "C"; }
-
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-    function escapeAttribute(value) { return escapeHtml(value); }
-
-    function toBase64(value) {
-      return btoa(unescape(encodeURIComponent(value)));
-    }
-    function fromBase64(value) {
-      return decodeURIComponent(escape(atob(value)));
-    }
-  </script>
-</body>
-</html>
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Espace client | Accueil</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
+:root {
+  --bg:#f6f2ea; --panel:#fff; --soft:#fbfaf7; --text:#171717; --muted:#667085;
+  --border:#e5dfd4; --border-strong:#d5c7b6; --primary:#111827; --primary-soft:#f0ede7;
+  --accent:#b88746; --accent-soft:#f8efe1; --danger:#b42318; --danger-soft:#fee4e2;
+  --success:#067647; --success-soft:#dcfae6; --warning:#b54708; --warning-soft:#fef0c7;
+  --info:#175cd3; --info-soft:#d1e9ff; --shadow:0 18px 45px rgba(17,24,39,.08);
+  --shadow-light:0 10px 26px rgba(17,24,39,.055); --radius:24px;
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--text);background:radial-gradient(circle at top left,rgba(184,135,70,.14),transparent 34%),linear-gradient(135deg,#f7f3eb 0%,#fbfaf8 45%,#f2eee8 100%);min-height:100vh} button,input,select,textarea{font:inherit} a{color:inherit}.hidden{display:none!important}.page-shell{width:min(1480px,calc(100% - 28px));margin:0 auto;padding:18px 0 46px}.topbar{position:sticky;top:10px;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;padding:12px;border:1px solid rgba(229,223,212,.9);border-radius:24px;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);box-shadow:var(--shadow-light)}.brand{display:flex;align-items:center;gap:12px;min-width:0;text-decoration:none}.brand-logo{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;color:#fff;font-weight:950;background:linear-gradient(135deg,#111827,#3b2d20 55%,#b88746);box-shadow:var(--shadow-light);flex:0 0 auto}.brand h1{margin:0;font-size:clamp(19px,3vw,28px);letter-spacing:-.04em}.brand p{margin:1px 0 0;color:var(--muted);font-size:13px}.top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}.btn{border:0;cursor:pointer;border-radius:999px;padding:11px 15px;font-weight:850;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.18s ease;text-decoration:none;white-space:nowrap;min-height:42px}.btn:hover{transform:translateY(-1px)}.btn-primary{background:var(--primary);color:#fff;box-shadow:0 12px 25px rgba(17,24,39,.18)}.btn-soft{background:var(--primary-soft);color:var(--primary);border:1px solid var(--border)}.btn-outline{background:transparent;color:var(--primary);border:1px solid var(--border)}.btn-danger{background:var(--danger-soft);color:var(--danger)}.btn-success{background:var(--success-soft);color:var(--success)}.mini-btn{padding:8px 10px;font-size:12px;min-height:36px}.card{background:rgba(255,255,255,.95);border:1px solid rgba(229,223,212,.96);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(12px)}.grid{display:grid;gap:16px}.hero{grid-template-columns:1.25fr .75fr;align-items:stretch;margin-bottom:16px}.hero-main{padding:28px;position:relative;overflow:hidden}.hero-main::after{content:"";position:absolute;width:230px;height:230px;right:-80px;top:-100px;border-radius:50%;background:rgba(184,135,70,.14)}.eyebrow{display:inline-flex;align-items:center;gap:8px;border-radius:999px;background:var(--accent-soft);color:#7a542f;padding:8px 12px;font-size:13px;font-weight:950;margin-bottom:14px}.hero-main h2,.page-title h2{margin:0;font-size:clamp(28px,5vw,48px);line-height:1.02;letter-spacing:-.055em;max-width:900px}.hero-main p,.page-title p{margin:14px 0 0;color:var(--muted);max-width:900px;line-height:1.62}.profile-card{padding:22px;display:flex;flex-direction:column;justify-content:space-between;gap:18px}.profile-row{display:flex;align-items:center;gap:12px;min-width:0}.avatar{width:52px;height:52px;border-radius:18px;background:linear-gradient(135deg,#111827,#b88746);color:#fff;display:grid;place-items:center;font-size:19px;font-weight:950;flex:0 0 auto}.profile-card h3{margin:0;font-size:19px}.profile-card p{margin:3px 0 0;color:var(--muted);font-size:14px;word-break:break-word}.small{font-size:13px;line-height:1.55}.muted{color:var(--muted)}.pill{display:inline-flex;width:fit-content;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900;white-space:nowrap}.pill.gold{background:var(--accent-soft);color:#7a542f}.pill.info{background:var(--info-soft);color:var(--info)}.pill.success{background:var(--success-soft);color:var(--success)}.pill.warning{background:var(--warning-soft);color:var(--warning)}.pill.danger{background:var(--danger-soft);color:var(--danger)}.pill.neutral{background:#f2f4f7;color:#344054}.stats{grid-template-columns:repeat(4,minmax(150px,1fr));margin-bottom:16px}.stat-card{padding:17px}.stat-card span{color:var(--muted);font-weight:750;font-size:13px}.stat-card strong{display:block;margin-top:8px;font-size:29px;letter-spacing:-.04em}.action-grid{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:16px}.action-card{padding:20px;display:grid;gap:12px;min-height:210px;align-content:start}.action-icon{width:48px;height:48px;border-radius:17px;display:grid;place-items:center;background:var(--accent-soft);color:#7a542f;font-weight:950;font-size:18px}.action-card h3{margin:0;font-size:20px;letter-spacing:-.03em}.action-card p{margin:0;color:var(--muted);line-height:1.56}.action-card .btn{width:fit-content;margin-top:6px}.page-title{padding:26px;margin-bottom:16px;background:radial-gradient(circle at top right,rgba(184,135,70,.13),transparent 35%),rgba(255,255,255,.95)}.page-title-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap}.page-title-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.form-page{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(330px,.65fr);gap:16px;align-items:start}.form-card{padding:22px}.form-section-title{margin:0 0 16px;font-size:22px;letter-spacing:-.035em}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.span-2{grid-column:span 2}label.field-label{display:grid;gap:8px;font-weight:850;font-size:13px;color:var(--muted)}.field,.select,.textarea,.table-field,.table-select,.table-textarea{width:100%;border:1px solid var(--border);border-radius:14px;padding:12px 13px;background:#fff;color:var(--text);outline:none;transition:.15s ease;min-height:44px}.textarea,.table-textarea{resize:vertical;line-height:1.48}.field:focus,.select:focus,.textarea:focus,.table-field:focus,.table-select:focus,.table-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(184,135,70,.13);background:#fff}.big-title{min-height:112px;font-weight:850;font-size:18px}.big-caption{min-height:360px;font-size:16px}.side-stack{display:grid;gap:16px;position:sticky;top:94px}.check-grid{display:grid;gap:10px}.check-line{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:800;color:#344054}.check-line input{width:18px;height:18px;accent-color:#111827;flex:0 0 auto}.form-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:18px}.notice{padding:16px;border-radius:18px;background:var(--accent-soft);color:#7a542f;line-height:1.55;font-weight:750}.toolbar{padding:14px;margin-bottom:16px;position:sticky;top:86px;z-index:50;background:rgba(255,255,255,.94)}.filters{display:grid;grid-template-columns:minmax(240px,1.2fr) repeat(4,minmax(145px,190px));gap:10px;align-items:center}.manager-bar{padding:16px;margin-bottom:16px;display:grid;grid-template-columns:minmax(240px,1fr) auto auto;gap:12px;align-items:end}.manager-bar label{display:grid;gap:7px;font-weight:850;font-size:13px;color:var(--muted)}.board-card{overflow:hidden;min-height:calc(100vh - 275px)}.board-help{padding:14px 20px 16px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;color:var(--muted);font-size:13px;border-bottom:1px solid var(--border)}.board-group{padding:16px}.group{border:1px solid var(--border);border-radius:18px;background:#fff;margin-bottom:12px;overflow:hidden}.group>summary{cursor:pointer;padding:14px 16px;font-weight:950;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fbfaf7}.group .group{margin:12px}.summary-count{color:var(--muted);font-weight:750;font-size:13px}.table-wrap{overflow-x:auto;border-top:1px solid var(--border);background:#fff;-webkit-overflow-scrolling:touch}table.monday-table{width:100%;min-width:1640px;border-collapse:separate;border-spacing:0;table-layout:fixed}.monday-table th,.monday-table td{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:8px;vertical-align:top;background:#fff}.monday-table th{position:sticky;top:150px;z-index:4;background:#f9fafb;color:var(--muted);text-transform:uppercase;letter-spacing:.055em;font-size:10px;white-space:nowrap}.monday-table th:first-child,.monday-table td:first-child{position:sticky;left:0;z-index:3;box-shadow:8px 0 18px rgba(17,24,39,.04)}.monday-table th:first-child{z-index:5;background:#f9fafb}.monday-table td:first-child{background:#fff}.monday-table tr:hover td,.monday-table tr:hover td:first-child{background:#fffdf8}.table-field,.table-select,.table-textarea{border-color:transparent;background:#f9fafb}.table-field:disabled,.table-select:disabled,.table-textarea:disabled{opacity:.78;cursor:not-allowed}.col-publication{width:270px}.col-client{width:195px}.col-date{width:132px}.col-time{width:96px}.col-platform{width:135px}.col-assign{width:145px}.col-copy{width:330px}.col-assets{width:250px}.col-ready{width:130px}.col-status{width:150px}.col-validations{width:170px}.col-comment{width:240px}.col-actions{width:118px}.title-field{min-height:92px;font-weight:850}.copy-field{min-height:170px}.comment-field{min-height:125px}.asset-link{color:var(--info);font-weight:850;font-size:13px;text-decoration:none;word-break:break-word}.asset-link:hover{text-decoration:underline}.validation-stack{display:grid;gap:4px}.row-actions{display:flex;flex-direction:column;gap:8px}.empty-state{padding:34px;text-align:center;color:var(--muted)}.empty-state strong{display:block;color:var(--text);margin-bottom:6px}.state-screen{min-height:100vh;display:grid;place-items:center;padding:24px;text-align:center}.state-box{width:min(560px,100%);background:#fff;border:1px solid var(--border);border-radius:26px;padding:28px;box-shadow:var(--shadow)}.state-box strong{display:block;font-size:24px;margin-bottom:8px}.state-box p{color:var(--muted);line-height:1.6}.state-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:16px}.toast{position:fixed;right:18px;bottom:18px;z-index:100;width:min(420px,calc(100% - 36px));background:#111827;color:#fff;border-radius:18px;padding:14px 16px;box-shadow:var(--shadow);transform:translateY(18px);opacity:0;pointer-events:none;transition:.18s ease;font-weight:750}.toast.show{opacity:1;transform:translateY(0)}.recent-list{display:grid;gap:10px;margin-top:16px}.recent-item{padding:14px;border:1px solid var(--border);border-radius:18px;background:#fff;display:grid;gap:7px}.recent-item strong{font-size:15px}.recent-meta{display:flex;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:13px}.page-menu{display:flex;gap:8px;flex-wrap:wrap}.mobile-only-note{display:none}
+@media(max-width:1120px){.hero,.form-page{grid-template-columns:1fr}.side-stack{position:static}.filters{grid-template-columns:repeat(2,minmax(0,1fr))}.manager-bar{grid-template-columns:1fr}.toolbar{position:static}.monday-table th{top:0}.action-grid{grid-template-columns:1fr}}
+@media(max-width:820px){.page-shell{width:min(100% - 18px,1480px);padding-top:12px}.topbar{position:static;flex-direction:column;align-items:flex-start;border-radius:20px}.top-actions,.page-title-actions{width:100%;justify-content:stretch}.top-actions .btn,.page-title-actions .btn{flex:1 1 auto}.hero-main,.profile-card,.page-title,.form-card{padding:20px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.form-grid{grid-template-columns:1fr}.span-2{grid-column:span 1}.form-actions .btn{width:100%}.filters{grid-template-columns:1fr}.board-group{padding:10px}.group .group{margin:8px}.group>summary{padding:13px}.mobile-only-note{display:block}.table-wrap{overflow:visible;border-top:0;background:transparent}table.monday-table,.monday-table thead,.monday-table tbody,.monday-table tr,.monday-table td{display:block;width:100%;min-width:0}.monday-table thead{display:none}.monday-table tr{margin:10px 0 14px;border:1px solid var(--border);border-left:5px solid var(--accent);border-radius:18px;overflow:hidden;background:#fff;box-shadow:var(--shadow-light)}.monday-table th,.monday-table td,.monday-table th:first-child,.monday-table td:first-child{position:static;box-shadow:none}.monday-table td{border-right:0;border-bottom:1px solid var(--border);padding:12px;display:grid;gap:8px;background:#fff}.monday-table td:last-child{border-bottom:0}.monday-table td::before{content:attr(data-label);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:950}.monday-table tr:hover td,.monday-table tr:hover td:first-child{background:#fff}.title-field{min-height:100px}.copy-field{min-height:190px}.comment-field{min-height:120px}.row-actions{flex-direction:row;flex-wrap:wrap}.row-actions .btn{flex:1 1 130px}}
+@media(max-width:560px){.brand-logo{width:42px;height:42px;border-radius:14px}.brand h1{font-size:20px}.brand p{font-size:12px}.top-actions,.page-title-actions{flex-direction:column;align-items:stretch}.top-actions .btn,.page-title-actions .btn{width:100%}.hero-main h2,.page-title h2{font-size:28px}.stats{grid-template-columns:1fr}.stat-card strong{font-size:26px}.field,.select,.textarea,.table-field,.table-select,.table-textarea{font-size:15px}.big-caption{min-height:300px}}
+</style></head><body data-page="dashboard"><section id="stateScreen" class="state-screen"><div class="state-box"><strong id="stateTitle">Chargement...</strong><p id="stateMessage">Vérification de ton accès à l’espace client.</p><div id="stateActions" class="state-actions"></div></div></section><main id="app" class="page-shell hidden"><header class="topbar"><a class="brand" href="client-space.html"><div class="brand-logo">CM</div><div><h1>Espace client</h1><p>Accueil et accès rapides</p></div></a><div class="top-actions"><a class="btn btn-soft" href="client-space.html">Accueil</a><a class="btn btn-outline" href="client-space-new.html" target="_blank" rel="noopener">+ Nouvelle publication</a><a class="btn btn-outline" href="client-space-calendar.html" target="_blank" rel="noopener">Calendrier</a><a class="btn btn-soft" href="index.html">← Formation</a><button class="btn btn-primary" id="logoutBtn" type="button">Déconnexion</button></div></header>
+<section class="grid hero"><div class="card hero-main"><span class="eyebrow">✦ Community Management</span><h2>Un espace client avec de vraies pages dédiées.</h2><p>Les blocs qui prennent de la place ouvrent maintenant leur propre page, dans un nouvel onglet : création de publication, calendrier éditorial et validations.</p><div class="page-menu" style="margin-top:20px"><a class="btn btn-primary" href="client-space-new.html" target="_blank" rel="noopener">Ouvrir la page Nouvelle publication ↗</a><a class="btn btn-soft" href="client-space-calendar.html" target="_blank" rel="noopener">Ouvrir le calendrier ↗</a></div></div><aside class="card profile-card"><div class="profile-row"><div class="avatar" id="avatarInitials">C</div><div><h3 id="clientName">Client</h3><p id="clientEmail">email@client.com</p></div></div><div><span id="accessBadge" class="pill success">Accès actif</span><p class="muted small" style="margin-top:12px;">Les pages de travail sont séparées pour avoir plus d’espace.</p></div></aside></section>
+<section class="grid stats"><article class="card stat-card"><span>Total publications</span><strong id="statTotal">0</strong></article><article class="card stat-card"><span>À valider</span><strong id="statToValidate">0</strong></article><article class="card stat-card"><span>Validées</span><strong id="statValidated">0</strong></article><article class="card stat-card"><span>Programmées / publiées</span><strong id="statProgrammed">0</strong></article></section>
+<section class="grid action-grid"><article class="card action-card"><div class="action-icon">+</div><h3>Nouvelle publication</h3><p>Une page complète, avec de grands champs pour écrire le post, assigner le CM et le graphiste, mettre les liens Canva/Drive.</p><a class="btn btn-primary" href="client-space-new.html" target="_blank" rel="noopener">Ouvrir en nouvel onglet ↗</a></article><article class="card action-card"><div class="action-icon">📅</div><h3>Calendrier éditorial</h3><p>Un vrai espace de travail façon Monday, classé par année, mois et semaine. Les cellules sont modifiables directement.</p><a class="btn btn-soft" href="client-space-calendar.html" target="_blank" rel="noopener">Ouvrir en nouvel onglet ↗</a></article><article class="card action-card"><div class="action-icon">✓</div><h3>Validations</h3><p>Ouvre le calendrier déjà filtré sur les éléments qui nécessitent une validation ou une modification.</p><a class="btn btn-outline" href="client-space-calendar.html?validation=missing" target="_blank" rel="noopener">Voir les validations ↗</a></article></section>
+<section class="card" style="padding:20px;margin-top:16px"><div class="page-title-head"><div><span class="eyebrow">Aperçu</span><h2 style="margin:0;font-size:28px;letter-spacing:-.04em">Prochaines publications</h2></div><a class="btn btn-outline" href="client-space-calendar.html" target="_blank" rel="noopener">Tout voir ↗</a></div><div id="recentPosts" class="recent-list"></div></section></main><div id="toast" class="toast"></div><datalist id="clientEmailList"></datalist><script>
+const SUPABASE_URL = "https://xlyhujiebervldzoxouk.supabase.co";
+const SUPABASE_KEY = "sb_publishable_IqLPvaAeDZoDlYKE-m_Fxw_29Zbnhh_";
+const ADMIN_EMAIL = "rakotomanga41@gmail.com";
+const STATUS_LABELS = { brouillon:"Brouillon", a_valider:"À valider", modification_demandee:"Modification demandée", valide:"Validé", programme:"Programmé", publie:"Publié" };
+const STATUS_CLASS = { brouillon:"neutral", a_valider:"warning", modification_demandee:"danger", valide:"success", programme:"info", publie:"success" };
+const PLATFORMS = ["Instagram","Facebook","LinkedIn","TikTok","Pinterest","Autre"];
+const DIRECT_FIELDS = ["client_email","title","platform","publication_date","publication_time","caption_text","visual_url","file_url","client_comment","status","text_validated","visual_validated","date_validated"];
+const META_FIELDS = ["cm_assigned","graphiste_assigned","ready_for_validation"];
+const META_REGEX = /\n?<!--CM_META:([A-Za-z0-9+/=]+)-->/s;
+let supabaseClient=null, currentUser=null, currentAccess=null, clientSpaces=[], allPosts=[], toastTimer=null;
+const $ = (selector) => document.querySelector(selector);
+document.addEventListener("DOMContentLoaded", initClientSpace);
+async function initClientSpace(){
+  fillStaticSelects(); bindEvents();
+  try{
+    supabaseClient = await getSupabaseClient();
+    if(!supabaseClient){ showBlockedState("Supabase non chargé","La bibliothèque Supabase n’a pas pu être chargée. Recharge la page avec Ctrl + F5.",true); return; }
+    const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
+    if(sessionError) throw sessionError;
+    currentUser=sessionData?.session?.user||null;
+    if(!currentUser){ showBlockedState("Connexion requise","Connecte-toi d’abord pour accéder à cet espace privé.",true); return; }
+    await verifyClientAccess();
+    await loadClientSpaces();
+    applyAccessToUi();
+    const page=document.body.dataset.page||"dashboard";
+    if(page==="dashboard"||page==="calendar") await loadPosts();
+    if(page==="create") setupCreatePage();
+    $("#stateScreen")?.classList.add("hidden");
+    $("#app")?.classList.remove("hidden");
+    requestAnimationFrame(()=>initAutosize());
+  }catch(error){
+    console.error(error);
+    if(error?.message!=="Accès non autorisé") showBlockedState("Erreur de chargement", error?.message||"Impossible de charger l’espace client pour le moment.", true);
+  }
+}
+async function getSupabaseClient(){
+  if(window.supabaseClient) return window.supabaseClient;
+  if(!window.supabase?.createClient) await loadSupabaseScript();
+  if(!window.supabase?.createClient) return null;
+  window.supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  return window.supabaseClient;
+}
+function loadSupabaseScript(){return new Promise((resolve)=>{if(window.supabase?.createClient) return resolve(); const existing=document.querySelector('script[src*="supabase-js"]'); if(existing){existing.addEventListener("load",resolve,{once:true});existing.addEventListener("error",resolve,{once:true});setTimeout(resolve,2500);return;} const script=document.createElement("script");script.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";script.onload=resolve;script.onerror=resolve;document.head.appendChild(script);setTimeout(resolve,2500);});}
+async function verifyClientAccess(){
+  const email=normalizeEmail(currentUser.email);
+  const {data,error}=await supabaseClient.from("client_spaces").select("*").ilike("client_email",email).eq("is_active",true).maybeSingle();
+  if(error) throw error;
+  if(!data){
+    if(email===ADMIN_EMAIL){ currentAccess={client_name:"Administrateur",client_email:ADMIN_EMAIL,is_active:true,role:"admin",can_manage:true}; return; }
+    showBlockedState("Accès réservé","Ton email n’est pas autorisé à consulter cette page. Demande à l’administrateur de t’ajouter dans client_spaces.",true);
+    throw new Error("Accès non autorisé");
+  }
+  currentAccess=data;
+}
+async function loadClientSpaces(){
+  if(!isManager()){ clientSpaces=[currentAccess]; return; }
+  const {data,error}=await supabaseClient.from("client_spaces").select("*").eq("is_active",true).order("client_name",{ascending:true});
+  if(error){ console.warn(error); clientSpaces=[currentAccess]; return; }
+  clientSpaces=data||[];
+}
+function applyAccessToUi(){
+  const name=currentAccess.client_name||currentUser.email||"Client";
+  const email=normalizeEmail(currentUser.email||currentAccess.client_email);
+  setText("#clientName",name); setText("#clientEmail",email); setText("#avatarInitials",getInitials(name||email));
+  const badge=$("#accessBadge"); if(badge){ badge.className=isManager()?"pill gold":"pill success"; badge.textContent=isManager()?"Accès gestionnaire":"Accès client"; }
+  const managerEls=document.querySelectorAll("[data-manager-only]"); managerEls.forEach(el=>el.classList.toggle("hidden",!isManager()));
+  const clientInputs=document.querySelectorAll("[data-client-email-input]");
+  clientInputs.forEach(input=>{ input.value=isManager()?(normalizeEmail(currentAccess.client_email)||email):email; input.disabled=!isManager(); });
+  renderClientOptions();
+}
+function isManager(){return Boolean(currentAccess?.can_manage===true||currentAccess?.is_admin===true||["admin","manager"].includes(String(currentAccess?.role||"").toLowerCase())||String(currentAccess?.type||"").toLowerCase()==="admin"||normalizeEmail(currentUser?.email)===ADMIN_EMAIL);}
+function canEditPost(post){return isManager()||normalizeEmail(post.client_email)===normalizeEmail(currentUser?.email);}
+async function loadPosts(){
+  let query=supabaseClient.from("editorial_posts").select("*").order("publication_date",{ascending:true,nullsFirst:false}).order("publication_time",{ascending:true,nullsFirst:false}).order("created_at",{ascending:false});
+  if(!isManager()) query=query.ilike("client_email",normalizeEmail(currentUser.email));
+  const {data,error}=await query; if(error) throw error;
+  allPosts=(data||[]).map(normalizePost); renderEverything();
+}
+function normalizePost(post){return {...post,client_email:normalizeEmail(post.client_email),status:post.status||"a_valider",text_validated:Boolean(post.text_validated),visual_validated:Boolean(post.visual_validated),date_validated:Boolean(post.date_validated)};}
+function renderEverything(){renderClientFilter(); renderStats(); if($("#calendarBoard")) renderBoard(); if($("#recentPosts")) renderRecentPosts(); requestAnimationFrame(()=>initAutosize());}
+function renderStats(){
+  if(!$("#statTotal")) return;
+  const posts=getFilteredPosts(false);
+  const toValidate=posts.filter(post=>{const meta=withDefaultMeta(parseAdminNote(post.admin_note).meta,post);return meta.ready_for_validation||["a_valider","modification_demandee"].includes(post.status);}).length;
+  const validated=posts.filter(post=>post.status==="valide"||(post.text_validated&&post.visual_validated&&post.date_validated)).length;
+  const programmed=posts.filter(post=>["programme","publie"].includes(post.status)).length;
+  setText("#statTotal",posts.length); setText("#statToValidate",toValidate); setText("#statValidated",validated); setText("#statProgrammed",programmed); setText("#visibleCount",`${posts.length} élément${posts.length>1?"s":""}`);
+}
+function renderClientOptions(){
+  const datalist=$("#clientEmailList"); if(datalist){ datalist.innerHTML=clientSpaces.map(item=>`<option value="${escapeAttribute(normalizeEmail(item.client_email))}">${escapeHtml(item.client_name||item.client_email)}</option>`).join(""); }
+}
+function renderClientFilter(){
+  const filter=$("#clientFilter"); if(!filter) return;
+  const previous=filter.value||"all";
+  if(!isManager()){filter.innerHTML=`<option value="${escapeAttribute(normalizeEmail(currentUser.email))}">Mon espace</option>`; filter.value=normalizeEmail(currentUser.email); filter.disabled=true; return;}
+  const emails=Array.from(new Set([...clientSpaces.map(item=>normalizeEmail(item.client_email)).filter(Boolean),...allPosts.map(post=>normalizeEmail(post.client_email)).filter(Boolean)])).sort();
+  filter.disabled=false; filter.innerHTML=`<option value="all">Tous les clients</option>`+emails.map(email=>`<option value="${escapeAttribute(email)}">${escapeHtml(labelForClient(email))}</option>`).join("");
+  filter.value=emails.includes(previous)||previous==="all"?previous:"all";
+}
+function labelForClient(email){const found=clientSpaces.find(item=>normalizeEmail(item.client_email)===normalizeEmail(email));return found?.client_name?`${found.client_name} · ${email}`:email;}
+function getFilteredPosts(useFilters=true){
+  const search=useFilters?normalizeSearch($("#searchInput")?.value||""):"";
+  const client=useFilters?($("#clientFilter")?.value||"all"):"all";
+  const status=useFilters?($("#statusFilter")?.value||"all"):"all";
+  const platform=useFilters?($("#platformFilter")?.value||"all"):"all";
+  const validation=useFilters?($("#validationFilter")?.value||new URLSearchParams(location.search).get("validation")||"all"):"all";
+  return allPosts.filter(post=>{
+    const parsed=parseAdminNote(post.admin_note); const meta=withDefaultMeta(parsed.meta,post); const complete=post.text_validated&&post.visual_validated&&post.date_validated;
+    const haystack=normalizeSearch([post.client_email,post.title,post.platform,post.caption_text,post.visual_url,post.file_url,post.client_comment,parsed.note,meta.cm_assigned,meta.graphiste_assigned].filter(Boolean).join(" "));
+    if(search&&!haystack.includes(search)) return false;
+    if(client!=="all"&&normalizeEmail(post.client_email)!==normalizeEmail(client)) return false;
+    if(status!=="all"&&post.status!==status) return false;
+    if(platform!=="all"&&post.platform!==platform) return false;
+    if(validation==="ready"&&!meta.ready_for_validation) return false;
+    if(validation==="missing"&&complete) return false;
+    if(validation==="complete"&&!complete) return false;
+    return true;
+  });
+}
+function renderRecentPosts(){
+  const container=$("#recentPosts"); if(!container) return;
+  const posts=allPosts.slice().sort(comparePostsByDate).slice(0,6);
+  if(!posts.length){container.innerHTML=`<div class="empty-state"><strong>Aucune publication.</strong><p>Crée une première publication depuis la page dédiée.</p></div>`;return;}
+  container.innerHTML=posts.map(post=>{const meta=withDefaultMeta(parseAdminNote(post.admin_note).meta,post);return `<article class="recent-item"><strong>${escapeHtml(post.title||"Publication sans titre")}</strong><div class="recent-meta"><span>${escapeHtml(post.publication_date||"Date à définir")}</span><span>·</span><span>${escapeHtml(post.platform||"Plateforme")}</span><span>·</span><span>${escapeHtml(meta.cm_assigned?`CM : ${meta.cm_assigned}`:"CM non assigné")}</span></div><span class="pill ${STATUS_CLASS[post.status]||"neutral"}">${escapeHtml(STATUS_LABELS[post.status]||post.status)}</span></article>`;}).join("");
+}
+function renderBoard(){
+  const container=$("#calendarBoard"); const posts=getFilteredPosts(true).sort(comparePostsByDate);
+  if(!posts.length){container.innerHTML=`<div class="empty-state"><strong>Aucune ligne dans ce calendrier.</strong><p>Ouvre la page “Nouvelle publication” ou crée une ligne vide pour commencer.</p></div>`;return;}
+  const grouped=groupByYearMonthWeek(posts);
+  container.innerHTML=Object.entries(grouped).map(([year,yearData])=>`<details class="group" open><summary><span>${escapeHtml(year)}</span><span class="summary-count">${yearData.count} publication${yearData.count>1?"s":""}</span></summary>${Object.entries(yearData.months).map(([month,monthData])=>`<details class="group" open><summary><span>${escapeHtml(month)}</span><span class="summary-count">${monthData.count}</span></summary>${Object.entries(monthData.weeks).map(([week,weekPosts])=>`<details class="group" open><summary><span>${escapeHtml(week)}</span><span class="summary-count">${weekPosts.length}</span></summary>${tableTemplate(weekPosts)}</details>`).join("")}</details>`).join("")}</details>`).join("");
+}
+function tableTemplate(posts){return `<div class="table-wrap"><table class="monday-table"><colgroup><col class="col-publication"><col class="col-client"><col class="col-date"><col class="col-time"><col class="col-platform"><col class="col-assign"><col class="col-assign"><col class="col-copy"><col class="col-assets"><col class="col-ready"><col class="col-status"><col class="col-validations"><col class="col-comment"><col class="col-actions"></colgroup><thead><tr><th>Publication</th><th>Client</th><th>Date</th><th>Heure</th><th>Plateforme</th><th>CM</th><th>Graphiste</th><th>Texte</th><th>Visuel / fichiers</th><th>À valider</th><th>Statut</th><th>Validations</th><th>Commentaire</th><th>Actions</th></tr></thead><tbody>${posts.map(rowTemplate).join("")}</tbody></table></div>`;}
+function rowTemplate(post){
+  const parsed=parseAdminNote(post.admin_note); const meta=withDefaultMeta(parsed.meta,post); const status=post.status||"a_valider"; const editable=canEditPost(post); const disabled=editable?"":"disabled";
+  const deleteButton=isManager()?`<button class="btn btn-danger mini-btn" type="button" data-delete-post>Supprimer</button>`:"";
+  const clientField=isManager()?`<input class="table-field" type="email" data-direct-field="client_email" value="${escapeAttribute(post.client_email||"")}" list="clientEmailList" ${disabled}>`:`<span class="pill info">${escapeHtml(post.client_email||"client")}</span>`;
+  return `<tr data-post-row="${escapeAttribute(post.id)}"><td data-label="Publication"><textarea class="table-textarea title-field" data-direct-field="title" placeholder="Titre / idée de publication" ${disabled}>${escapeHtml(post.title||"")}</textarea><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><span class="pill ${STATUS_CLASS[status]||"neutral"}">${escapeHtml(STATUS_LABELS[status]||status)}</span>${meta.ready_for_validation?`<span class="pill warning">À valider</span>`:""}</div></td><td data-label="Client">${clientField}</td><td data-label="Date"><input class="table-field" type="date" data-direct-field="publication_date" value="${escapeAttribute(post.publication_date||"")}" ${disabled}></td><td data-label="Heure"><input class="table-field" type="time" data-direct-field="publication_time" value="${escapeAttribute(formatInputTime(post.publication_time))}" ${disabled}></td><td data-label="Plateforme">${platformSelect(post.platform,disabled)}</td><td data-label="CM assigné"><input class="table-field" type="text" data-meta-field="cm_assigned" value="${escapeAttribute(meta.cm_assigned||"")}" placeholder="CM" ${disabled}></td><td data-label="Graphiste"><input class="table-field" type="text" data-meta-field="graphiste_assigned" value="${escapeAttribute(meta.graphiste_assigned||"")}" placeholder="Graphiste" ${disabled}></td><td data-label="Production textuelle"><textarea class="table-textarea copy-field" data-direct-field="caption_text" placeholder="Accroche, légende, CTA, hashtags..." ${disabled}>${escapeHtml(post.caption_text||"")}</textarea></td><td data-label="Production visuelle"><input class="table-field" type="url" data-direct-field="visual_url" value="${escapeAttribute(post.visual_url||"")}" placeholder="Lien Canva / visuel" ${disabled}><input class="table-field" style="margin-top:8px" type="url" data-direct-field="file_url" value="${escapeAttribute(post.file_url||"")}" placeholder="Lien Drive / fichier" ${disabled}>${post.visual_url?`<a class="asset-link" style="margin-top:8px;display:block" href="${escapeAttribute(post.visual_url)}" target="_blank" rel="noopener">Ouvrir visuel ↗</a>`:""}${post.file_url?`<a class="asset-link" style="margin-top:5px;display:block" href="${escapeAttribute(post.file_url)}" target="_blank" rel="noopener">Ouvrir fichier ↗</a>`:""}</td><td data-label="Champ à valider"><label class="check-line"><input type="checkbox" data-meta-field="ready_for_validation" ${meta.ready_for_validation?"checked":""} ${disabled}> À valider</label></td><td data-label="Statut">${statusSelect(status,disabled)}</td><td data-label="Validations"><div class="validation-stack"><label class="check-line"><input type="checkbox" data-direct-field="text_validated" ${post.text_validated?"checked":""} ${disabled}> Texte validé</label><label class="check-line"><input type="checkbox" data-direct-field="visual_validated" ${post.visual_validated?"checked":""} ${disabled}> Visuel validé</label><label class="check-line"><input type="checkbox" data-direct-field="date_validated" ${post.date_validated?"checked":""} ${disabled}> Date validée</label></div></td><td data-label="Commentaire"><textarea class="table-textarea comment-field" data-direct-field="client_comment" placeholder="Commentaire ou modification demandée" ${disabled}>${escapeHtml(post.client_comment||"")}</textarea></td><td data-label="Actions"><div class="row-actions"><button class="btn btn-success mini-btn" type="button" data-quick-validate ${disabled}>Tout valider</button>${deleteButton}</div></td></tr>`;
+}
+function platformSelect(current,disabledAttr=""){return `<select class="table-select" data-direct-field="platform" ${disabledAttr}>${PLATFORMS.map(platform=>`<option value="${escapeAttribute(platform)}" ${platform===current?"selected":""}>${escapeHtml(platform)}</option>`).join("")}</select>`;}
+function statusSelect(current,disabledAttr=""){return `<select class="table-select" data-direct-field="status" ${disabledAttr}>${Object.entries(STATUS_LABELS).map(([key,label])=>`<option value="${key}" ${key===current?"selected":""}>${escapeHtml(label)}</option>`).join("")}</select>`;}
+function fillStaticSelects(){
+  document.querySelectorAll("[data-platform-options]").forEach(select=>{select.innerHTML=(select.dataset.platformOptions==="all"?`<option value="all">Toutes les plateformes</option>`:"")+PLATFORMS.map(item=>`<option value="${item}">${item}</option>`).join("");});
+  document.querySelectorAll("[data-status-options]").forEach(select=>{select.innerHTML=(select.dataset.statusOptions==="all"?`<option value="all">Tous les statuts</option>`:"")+Object.entries(STATUS_LABELS).map(([key,label])=>`<option value="${key}" ${key==="a_valider"&&select.dataset.statusOptions!=="all"?"selected":""}>${label}</option>`).join("");});
+  const validationFromUrl=new URLSearchParams(location.search).get("validation"); if(validationFromUrl&&$("#validationFilter")) $("#validationFilter").value=validationFromUrl;
+}
+function setupCreatePage(){
+  if(!$("#createForm")) return;
+  const emailInput=$("#postClientEmail"); if(emailInput){emailInput.value=isManager()?normalizeEmail(currentAccess.client_email||currentUser.email):normalizeEmail(currentUser.email); emailInput.disabled=!isManager();}
+  const today=new Date(); const dateInput=$("#postDate"); if(dateInput&&!dateInput.value) dateInput.value=today.toISOString().slice(0,10);
+}
+async function handleCreateSubmit(event){
+  event.preventDefault();
+  const clientEmail=normalizeEmail($("#postClientEmail")?.value||currentUser.email); if(!clientEmail) return toast("Email client obligatoire.");
+  const textValidated=$("#postTextValidated")?.checked||false; const visualValidated=$("#postVisualValidated")?.checked||false; const dateValidated=$("#postDateValidated")?.checked||false;
+  let status=$("#postStatus")?.value||"a_valider"; if(textValidated&&visualValidated&&dateValidated) status="valide";
+  const payload={client_email:clientEmail,title:$("#postTitle")?.value.trim()||"Nouvelle publication",platform:$("#postPlatform")?.value||"Instagram",publication_date:$("#postDate")?.value||null,publication_time:$("#postTime")?.value||null,caption_text:$("#postCaption")?.value.trim()||null,visual_url:$("#postVisualUrl")?.value.trim()||null,file_url:$("#postFileUrl")?.value.trim()||null,client_comment:$("#postComment")?.value.trim()||null,admin_note:buildAdminNote("",{cm_assigned:$("#postCm")?.value.trim()||"",graphiste_assigned:$("#postGraphiste")?.value.trim()||"",ready_for_validation:$("#postReady")?.checked||false}),status,text_validated:textValidated,visual_validated:visualValidated,date_validated:dateValidated};
+  const created=await createPost(payload,"Publication créée.");
+  $("#createSuccess")?.classList.remove("hidden"); setText("#createdTitle",created?.title||payload.title); const form=$("#createForm"); form?.reset(); setupCreatePage(); window.scrollTo({top:0,behavior:"smooth"});
+}
+async function createPost(payload,successMessage="Ligne ajoutée."){
+  const {data,error}=await supabaseClient.from("editorial_posts").insert(payload).select("*").single();
+  if(error){toast(error.message||"Création impossible. Vérifie les policies RLS de editorial_posts."); throw error;}
+  allPosts=[normalizePost(data),...allPosts]; renderEverything(); toast(successMessage); return data;
+}
+async function createBlankPost(){
+  try{const clientEmail=normalizeEmail($("#newClientEmail")?.value||currentAccess.client_email||currentUser.email); if(!clientEmail) return toast("Email client obligatoire."); const payload={client_email:clientEmail,title:"Nouvelle publication",platform:"Instagram",publication_date:null,publication_time:null,caption_text:null,visual_url:null,file_url:null,client_comment:null,admin_note:buildAdminNote("",{cm_assigned:"",graphiste_assigned:"",ready_for_validation:false}),status:"brouillon",text_validated:false,visual_validated:false,date_validated:false}; await createPost(payload,"Ligne vide créée. Tu peux écrire directement dans le tableau."); await loadPosts();}catch(error){console.error(error);}
+}
+async function handleCalendarEdit(event){
+  const input=event.target.closest("[data-direct-field],[data-meta-field]"); if(!input||input.disabled) return;
+  const row=input.closest("[data-post-row]"); const postId=row?.dataset.postRow; if(!postId) return;
+  const isBlurEvent=event.type==="focusout", isChangeEvent=event.type==="change"; const tagName=input.tagName.toLowerCase(); const type=(input.getAttribute("type")||"").toLowerCase();
+  const shouldSaveOnChange=["checkbox","date","time"].includes(type)||tagName==="select"; const shouldSaveOnBlur=["text","url","email",""] .includes(type)||tagName==="textarea";
+  if(isChangeEvent&&!shouldSaveOnChange) return; if(isBlurEvent&&!shouldSaveOnBlur) return;
+  try{ if(input.dataset.directField) await saveDirectField(postId,input.dataset.directField,getInputValue(input)); if(input.dataset.metaField) await saveMetaField(postId,input.dataset.metaField,getInputValue(input)); }catch(error){console.error(error);}
+}
+async function saveDirectField(postId,field,value){
+  if(!DIRECT_FIELDS.includes(field)) return; const post=allPosts.find(item=>item.id===postId); if(!post||!canEditPost(post)) return; if(field==="client_email"&&!isManager()) return;
+  const normalizedValue=normalizeDbValue(field,value); if(normalizeComparableValue(post[field])===normalizeComparableValue(normalizedValue)) return;
+  const updates={[field]:normalizedValue};
+  if(["text_validated","visual_validated","date_validated"].includes(field)){const finalText=field==="text_validated"?Boolean(value):Boolean(post.text_validated);const finalVisual=field==="visual_validated"?Boolean(value):Boolean(post.visual_validated);const finalDate=field==="date_validated"?Boolean(value):Boolean(post.date_validated);if(finalText&&finalVisual&&finalDate) updates.status="valide"; else if(post.status==="valide") updates.status="a_valider";}
+  await updatePost(postId,updates,"Champ enregistré.");
+}
+async function saveMetaField(postId,field,value){
+  if(!META_FIELDS.includes(field)) return; const post=allPosts.find(item=>item.id===postId); if(!post||!canEditPost(post)) return;
+  const parsed=parseAdminNote(post.admin_note); const meta=withDefaultMeta(parsed.meta,post); const normalizedValue=field==="ready_for_validation"?Boolean(value):String(value||"").trim(); if(String(meta[field]??"")===String(normalizedValue??"")) return;
+  meta[field]=normalizedValue; const updates={admin_note:buildAdminNote(parsed.note,meta)}; if(field==="ready_for_validation"&&normalizedValue===true&&post.status==="brouillon") updates.status="a_valider"; await updatePost(postId,updates,"Champ enregistré.");
+}
+async function updatePost(postId,updates,successMessage){
+  const {data,error}=await supabaseClient.from("editorial_posts").update(updates).eq("id",postId).select("*").single();
+  if(error){toast(error.message||"Mise à jour impossible. Vérifie les policies RLS de editorial_posts."); throw error;}
+  allPosts=allPosts.map(post=>post.id===postId?normalizePost({...post,...(data||updates)}):post); renderEverything(); toast(successMessage||"Enregistré.");
+}
+async function quickValidate(postId){const post=allPosts.find(item=>item.id===postId); if(!post||!canEditPost(post)) return; await updatePost(postId,{text_validated:true,visual_validated:true,date_validated:true,status:"valide"},"Publication validée.");}
+async function deletePost(postId){if(!isManager()) return; if(!confirm("Supprimer cette ligne du calendrier ?")) return; const {error}=await supabaseClient.from("editorial_posts").delete().eq("id",postId); if(error) return toast(error.message||"Suppression impossible."); allPosts=allPosts.filter(post=>post.id!==postId); renderEverything(); toast("Ligne supprimée.");}
+function bindEvents(){
+  document.addEventListener("input",event=>{const textarea=event.target.closest("textarea"); if(textarea) autoResizeTextarea(textarea);});
+  $("#refreshBtn")?.addEventListener("click",async()=>{await loadPosts(); toast("Données actualisées.");}); $("#logoutBtn")?.addEventListener("click",logout); $("#addBlankRowBtn")?.addEventListener("click",createBlankPost); $("#createForm")?.addEventListener("submit",handleCreateSubmit);
+  ["#searchInput","#clientFilter","#statusFilter","#platformFilter","#validationFilter"].forEach(selector=>{$(selector)?.addEventListener("input",renderEverything);$(selector)?.addEventListener("change",renderEverything);});
+  $("#calendarBoard")?.addEventListener("change",handleCalendarEdit); $("#calendarBoard")?.addEventListener("focusout",handleCalendarEdit); $("#calendarBoard")?.addEventListener("click",async event=>{const row=event.target.closest("[data-post-row]"); if(!row) return; const postId=row.dataset.postRow; if(event.target.closest("[data-quick-validate]")) await quickValidate(postId); if(event.target.closest("[data-delete-post]")) await deletePost(postId);});
+  $("#openAllBtn")?.addEventListener("click",()=>setAllDetailsOpen(true)); $("#closeAllBtn")?.addEventListener("click",()=>setAllDetailsOpen(false));
+}
+function setAllDetailsOpen(open){document.querySelectorAll("#calendarBoard details").forEach(details=>{details.open=open;});}
+function groupByYearMonthWeek(posts){const grouped={};posts.forEach(post=>{const keys=getDateGroupKeys(post.publication_date); if(!grouped[keys.year]) grouped[keys.year]={count:0,months:{}}; if(!grouped[keys.year].months[keys.month]) grouped[keys.year].months[keys.month]={count:0,weeks:{}}; if(!grouped[keys.year].months[keys.month].weeks[keys.week]) grouped[keys.year].months[keys.month].weeks[keys.week]=[]; grouped[keys.year].count+=1; grouped[keys.year].months[keys.month].count+=1; grouped[keys.year].months[keys.month].weeks[keys.week].push(post);});return grouped;}
+function getDateGroupKeys(dateValue){if(!dateValue) return {year:"Sans date",month:"Dates à définir",week:"Semaine à définir"}; const date=new Date(`${dateValue}T00:00:00`); if(Number.isNaN(date.getTime())) return {year:"Sans date",month:"Dates à définir",week:"Semaine à définir"}; const year=String(date.getFullYear()); const month=date.toLocaleDateString("fr-FR",{month:"long",year:"numeric"}); return {year,month:month.charAt(0).toUpperCase()+month.slice(1),week:getISOWeekLabel(date)};}
+function getISOWeekLabel(date){const target=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate())); const dayNumber=target.getUTCDay()||7; target.setUTCDate(target.getUTCDate()+4-dayNumber); const yearStart=new Date(Date.UTC(target.getUTCFullYear(),0,1)); const weekNumber=Math.ceil((((target-yearStart)/86400000)+1)/7); const weekStart=new Date(date); const localDay=weekStart.getDay()||7; weekStart.setDate(weekStart.getDate()-localDay+1); const weekEnd=new Date(weekStart); weekEnd.setDate(weekStart.getDate()+6); return `Semaine ${weekNumber} · ${shortDate(weekStart)} → ${shortDate(weekEnd)}`;}
+function comparePostsByDate(a,b){const av=`${a.publication_date||"9999-12-31"} ${a.publication_time||"99:99"} ${a.created_at||""}`; const bv=`${b.publication_date||"9999-12-31"} ${b.publication_time||"99:99"} ${b.created_at||""}`; return av.localeCompare(bv);}
+function initAutosize(root=document){root.querySelectorAll("textarea").forEach(autoResizeTextarea);} function autoResizeTextarea(textarea){if(!textarea) return; const minHeight=parseInt(window.getComputedStyle(textarea).minHeight,10)||42; const maxHeight=window.innerWidth<=820?420:680; textarea.style.height="auto"; textarea.style.height=`${Math.min(Math.max(textarea.scrollHeight+2,minHeight),maxHeight)}px`;}
+async function logout(){try{await supabaseClient?.auth?.signOut();}catch(error){console.warn(error);} window.location.href="login.html";}
+function showBlockedState(title,message,showButtons=false){$("#app")?.classList.add("hidden"); $("#stateScreen")?.classList.remove("hidden"); setText("#stateTitle",title); setText("#stateMessage",message); const actions=$("#stateActions"); if(actions) actions.innerHTML=showButtons?`<a class="btn btn-primary" href="login.html">Se connecter</a><a class="btn btn-outline" href="index.html">Retour au site</a>`:"";}
+function toast(message){const el=$("#toast"); if(!el) return; el.textContent=message; el.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove("show"),3200);}
+function parseAdminNote(value){const raw=String(value||""); const match=raw.match(META_REGEX); if(!match) return {note:raw.trim(),meta:{}}; const note=raw.replace(META_REGEX,"").trim(); try{return {note,meta:JSON.parse(fromBase64(match[1]))||{}};}catch{return {note,meta:{}};}}
+function buildAdminNote(note,meta){return `${String(note||"").trim()}\n<!--CM_META:${toBase64(JSON.stringify(meta||{}))}-->`;}
+function withDefaultMeta(meta,post){const status=post?.status||"a_valider"; return {cm_assigned:meta?.cm_assigned||"",graphiste_assigned:meta?.graphiste_assigned||"",ready_for_validation:typeof meta?.ready_for_validation==="boolean"?meta.ready_for_validation:["a_valider","modification_demandee"].includes(status)};}
+function getInputValue(input){const type=(input.getAttribute("type")||"").toLowerCase(); if(type==="checkbox") return input.checked; return input.value;}
+function normalizeDbValue(field,value){if(["text_validated","visual_validated","date_validated"].includes(field)) return Boolean(value); if(["publication_date","publication_time","caption_text","visual_url","file_url","client_comment"].includes(field)) return String(value||"").trim()||null; if(field==="client_email") return normalizeEmail(value); return String(value||"").trim();}
+function normalizeComparableValue(value){if(typeof value==="boolean") return value?"true":"false"; return String(value??"").trim();}
+function normalizeEmail(value){return String(value||"").trim().toLowerCase();} function normalizeSearch(value){return String(value||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");} function shortDate(date){return date.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit"});} function formatInputTime(value){return value?String(value).slice(0,5):"";} function getInitials(value){return String(value||"C").trim().split(/\s+/).slice(0,2).map(part=>part[0]?.toUpperCase()).join("")||"C";} function setText(selector,value){const el=$(selector); if(el) el.textContent=value;} function escapeHtml(value){return String(value??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");} function escapeAttribute(value){return escapeHtml(value);} function toBase64(value){return btoa(unescape(encodeURIComponent(value)));} function fromBase64(value){return decodeURIComponent(escape(atob(value)));}
+</script></body></html
