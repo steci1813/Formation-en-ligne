@@ -8,9 +8,6 @@
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- Optionnel : si ton projet Formation-en-ligne a déjà un fichier de configuration, garde cette ligne. -->
-  <script src="assets/config.js"></script>
-
   <style>
     :root {
       --bg: #f6f4ef;
@@ -874,16 +871,13 @@
 
   <script>
     /************************************************************
-     * CONFIGURATION
+     * CONFIGURATION SUPABASE
      * ----------------------------------------------------------
-     * 1) Si ton projet a déjà window.SUPABASE_URL et
-     *    window.SUPABASE_ANON_KEY dans assets/config.js,
-     *    tu n'as rien à changer ici.
-     *
-     * 2) Sinon, les clés du projet Formation-en-ligne sont déjà mises en secours ci-dessous.
+     * Même configuration que le fichier index.html du projet Formation-en-ligne.
+     * Ne dépend pas de assets/config.js.
      ************************************************************/
-    const FALLBACK_SUPABASE_URL = "https://xlyhujiebervldzoxouk.supabase.co";
-    const FALLBACK_SUPABASE_ANON_KEY = "sb_publishable_IqLPvaAeDZoDlYKE-m_Fxw_29Zbnhh_";
+    const SUPABASE_URL = "https://xlyhujiebervldzoxouk.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_IqLPvaAeDZoDlYKE-m_Fxw_29Zbnhh_";
 
     const STATUS_LABELS = {
       brouillon: "Brouillon",
@@ -916,12 +910,12 @@
       bindEvents();
 
       try {
-        supabaseClient = getSupabaseClient();
+        supabaseClient = await getSupabaseClient();
 
         if (!supabaseClient) {
           showBlockedState(
-            "Configuration Supabase manquante",
-            "Ajoute les clés Supabase dans assets/config.js ou remplace les valeurs FALLBACK_SUPABASE_URL et FALLBACK_SUPABASE_ANON_KEY dans ce fichier.",
+            "Supabase non chargé",
+            "La bibliothèque Supabase n’a pas pu être chargée. Vérifie la connexion internet ou recharge la page avec Ctrl + F5.",
             true
           );
           return;
@@ -957,41 +951,50 @@
       }
     }
 
-    function getSupabaseClient() {
+    async function getSupabaseClient() {
       if (window.supabaseClient) return window.supabaseClient;
-      if (window.client) return window.client;
-      if (window.sb) return window.sb;
 
-      const supabaseUrl =
-        window.SUPABASE_URL ||
-        window.supabaseUrl ||
-        window.__SUPABASE_URL__ ||
-        FALLBACK_SUPABASE_URL;
+      if (!window.supabase?.createClient) {
+        await loadSupabaseScript();
+      }
 
-      const supabaseAnonKey =
-        window.SUPABASE_ANON_KEY ||
-        window.supabaseAnonKey ||
-        window.__SUPABASE_ANON_KEY__ ||
-        FALLBACK_SUPABASE_ANON_KEY;
+      if (!window.supabase?.createClient) return null;
 
-      const hasRealConfig =
-        supabaseUrl &&
-        supabaseAnonKey &&
-        !String(supabaseUrl).includes("REMPLACE_PAR") &&
-        !String(supabaseAnonKey).includes("REMPLACE_PAR");
+      window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      return window.supabaseClient;
+    }
 
-      if (!hasRealConfig || !window.supabase) return null;
+    function loadSupabaseScript() {
+      return new Promise((resolve) => {
+        if (window.supabase?.createClient) {
+          resolve();
+          return;
+        }
 
-      return window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+        const existingScript = document.querySelector('script[src*="supabase-js"]');
+        if (existingScript) {
+          existingScript.addEventListener("load", () => resolve(), { once: true });
+          existingScript.addEventListener("error", () => resolve(), { once: true });
+          setTimeout(resolve, 2500);
+          return;
+        }
+
+        const script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+        script.onload = () => resolve();
+        script.onerror = () => resolve();
+        document.head.appendChild(script);
+        setTimeout(resolve, 2500);
+      });
     }
 
     async function verifyClientAccess() {
-      const email = currentUser.email;
+      const email = String(currentUser.email || "").trim().toLowerCase();
 
       const { data, error } = await supabaseClient
         .from("client_spaces")
         .select("*")
-        .eq("client_email", email)
+        .ilike("client_email", email)
         .eq("is_active", true)
         .maybeSingle();
 
