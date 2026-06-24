@@ -2651,27 +2651,36 @@
 
       if (!link) return;
 
+      // Par défaut, le lien reste caché.
       link.classList.add("client-space-hidden");
 
       try {
         const { data: userData } = await supabaseClient.auth.getUser();
-        const email = currentProfile?.email || userData?.user?.email;
+        const rawEmail = userData?.user?.email || currentProfile?.email || "";
+        const email = String(rawEmail).trim().toLowerCase();
+        const currentRole = String(currentProfile?.role || "").trim().toLowerCase();
 
         if (!email) return;
 
+        // Sécurité pratique : l'admin du site doit aussi voir le raccourci.
+        if (currentRole === "admin") {
+          link.classList.remove("client-space-hidden");
+          return;
+        }
+
         const { data: clientAccess, error } = await supabaseClient
           .from("client_spaces")
-          .select("id, is_active")
-          .eq("client_email", email)
+          .select("id, is_active, client_email")
+          .ilike("client_email", email)
           .eq("is_active", true)
-          .maybeSingle();
+          .limit(1);
 
         if (error) {
           console.warn("Espace client non disponible :", error.message);
           return;
         }
 
-        if (clientAccess) {
+        if (clientAccess && clientAccess.length > 0) {
           link.classList.remove("client-space-hidden");
         }
       } catch (error) {
@@ -3444,6 +3453,16 @@
     initTrackingListeners();
     loadAllTrackingTables();
     protectSite();
+
+    // Vérifications supplémentaires pour éviter que le bouton reste caché
+    // si Supabase met un léger délai à restaurer la session.
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(showClientSpaceLinkIfAllowed, 600);
+    });
+
+    supabaseClient.auth.onAuthStateChange(() => {
+      setTimeout(showClientSpaceLinkIfAllowed, 300);
+    });
 
 /* ======================================================
    EXAMEN FINAL — Étude de marché
