@@ -1,248 +1,490 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Connexion — Formation Étude de marché</title>
 
   <style>
+    :root {
+      --green: #0f5748;
+      --green-soft: #e8f5ef;
+      --cream: #f7f1e8;
+      --text: #1f2933;
+      --muted: #667085;
+      --border: #e4e7ec;
+      --white: #ffffff;
+      --danger: #b42318;
+      --warning: #b54708;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
       font-family: Arial, sans-serif;
-      background: #f7f1e8;
+      background:
+        radial-gradient(circle at top left, rgba(15, 87, 72, 0.18), transparent 32%),
+        linear-gradient(135deg, var(--cream) 0%, #ffffff 100%);
+      color: var(--text);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #1f2933;
+      padding: 24px;
     }
 
-    .login-card {
-      width: 100%;
-      max-width: 430px;
-      background: white;
-      border-radius: 24px;
-      padding: 36px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+    .auth-shell {
+      width: min(1050px, 100%);
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 24px;
+      align-items: stretch;
     }
 
-    .logo {
-      width: 56px;
-      height: 56px;
-      border-radius: 16px;
-      background: #0f5748;
+    .auth-hero,
+    .auth-card {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(15, 87, 72, 0.13);
+      border-radius: 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .auth-hero {
+      padding: 34px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .auth-hero::after {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 999px;
+      right: -80px;
+      bottom: -80px;
+      background: var(--green-soft);
+      z-index: 0;
+    }
+
+    .auth-hero > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand-mark {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      background: var(--green);
       color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 18px;
       margin-bottom: 20px;
     }
 
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
     h1 {
-      margin: 0 0 8px;
-      font-size: 32px;
+      margin: 0 0 14px;
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1.02;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 28px;
     }
 
     p {
-      margin: 0 0 24px;
-      color: #667085;
+      line-height: 1.7;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .auth-card {
+      padding: 28px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 22px;
+      padding: 6px;
+      background: #f9fafb;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 14px;
+      cursor: pointer;
+      font-weight: 900;
+      background: transparent;
+      color: var(--muted);
+    }
+
+    .tab-btn.active {
+      background: var(--green);
+      color: #ffffff;
+    }
+
+    .auth-panel {
+      display: none;
+    }
+
+    .auth-panel.active {
+      display: block;
     }
 
     label {
       display: block;
-      margin-bottom: 8px;
-      font-weight: 700;
+      margin: 14px 0 7px;
+      font-weight: 800;
     }
 
-    input {
+    input,
+    select {
       width: 100%;
-      box-sizing: border-box;
-      padding: 14px;
-      margin-bottom: 16px;
-      border-radius: 14px;
       border: 1px solid #d0d5dd;
-      font-size: 15px;
-      outline: none;
+      border-radius: 16px;
+      padding: 13px 14px;
+      font: inherit;
+      background: #ffffff;
     }
 
-    input:focus {
-      border-color: #0f5748;
-      box-shadow: 0 0 0 3px rgba(15, 87, 72, 0.12);
-    }
-
-    button {
-      width: 100%;
-      padding: 15px;
+    .btn {
       border: 0;
       border-radius: 999px;
-      background: #0f5748;
-      color: white;
-      font-weight: 800;
+      padding: 13px 18px;
       cursor: pointer;
-      font-size: 15px;
+      font-weight: 900;
+      background: var(--green);
+      color: white;
+      width: 100%;
+      margin-top: 18px;
     }
 
-    button:hover {
-      opacity: 0.92;
+    .btn.secondary {
+      background: var(--green-soft);
+      color: var(--green);
     }
 
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+    .notice {
+      display: none;
+      border-left: 5px solid var(--green);
+      background: #f4fbf8;
+      border-radius: 18px;
+      padding: 14px 16px;
+      margin: 16px 0;
+      line-height: 1.6;
     }
 
-    #message {
-      margin-top: 16px;
-      font-size: 14px;
-      line-height: 1.5;
+    .notice.warning {
+      border-left-color: var(--warning);
+      background: #fff7ed;
+      color: #9a3412;
     }
 
-    .message-error {
-      color: #b42318;
+    .notice.danger {
+      border-left-color: var(--danger);
+      background: #fee4e2;
+      color: #912018;
     }
 
-    .message-success {
-      color: #0f5748;
+    .small {
+      font-size: 13px;
+      color: var(--muted);
     }
 
-    .message-info {
-      color: #667085;
+    .tips {
+      display: grid;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .tip {
+      padding: 13px 14px;
+      border-radius: 18px;
+      background: var(--green-soft);
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    @media (max-width: 860px) {
+      .auth-shell {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 
 <body>
-  <div class="login-card">
-    <div class="logo">EM</div>
+  <main class="auth-shell">
+    <section class="auth-hero">
+      <div>
+        <div class="brand-mark">EM</div>
+        <p class="eyebrow">Formation en ligne</p>
+        <h1>Étude de marché</h1>
+        <p class="muted">
+          Créez votre compte ou connectez-vous pour accéder aux cours, QCM, messages et examen final.
+        </p>
+      </div>
 
-    <h1>Connexion</h1>
-    <p>Accède à ta formation en ligne.</p>
+      <div class="tips">
+        <div class="tip">✅ Utilisez le même email pendant toute la formation</div>
+        <div class="tip">✅ Choisissez votre groupe correctement</div>
+        <div class="tip">✅ Gardez votre mot de passe en sécurité</div>
+      </div>
+    </section>
 
-    <form id="loginForm">
-      <label for="email">Email</label>
-      <input
-        id="email"
-        type="email"
-        placeholder="exemple@email.com"
-        autocomplete="email"
-      />
+    <section class="auth-card">
+      <div class="tabs">
+        <button id="loginTab" class="tab-btn active" type="button" onclick="showPanel('login')">Connexion</button>
+        <button id="signupTab" class="tab-btn" type="button" onclick="showPanel('signup')">Créer mon compte</button>
+      </div>
 
-      <label for="password">Mot de passe</label>
-      <input
-        id="password"
-        type="password"
-        placeholder="Mot de passe"
-        autocomplete="current-password"
-      />
+      <div id="authNotice" class="notice"></div>
 
-      <button id="loginButton" type="submit">
-        Se connecter
-      </button>
+      <form id="loginPanel" class="auth-panel active" onsubmit="loginUser(event)">
+        <h2>Connexion</h2>
+        <p class="muted">Entrez votre email et votre mot de passe.</p>
 
-      <div id="message"></div>
-    </form>
-  </div>
+        <label for="loginEmail">Email</label>
+        <input id="loginEmail" type="email" autocomplete="email" required placeholder="exemple@email.com">
+
+        <label for="loginPassword">Mot de passe</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Votre mot de passe">
+
+        <button class="btn" type="submit">Se connecter</button>
+
+        <button class="btn secondary" type="button" onclick="resetPassword()">
+          Mot de passe oublié
+        </button>
+      </form>
+
+      <form id="signupPanel" class="auth-panel" onsubmit="createAccount(event)">
+        <h2>Créer mon compte</h2>
+        <p class="muted">Remplissez vos informations pour accéder à la formation.</p>
+
+        <label for="signupName">Nom complet</label>
+        <input id="signupName" type="text" required placeholder="Votre nom complet">
+
+        <label for="signupEmail">Email</label>
+        <input id="signupEmail" type="email" autocomplete="email" required placeholder="exemple@email.com">
+
+        <label for="signupGroup">Groupe</label>
+        <select id="signupGroup" required>
+          <option value="">Sélectionner votre groupe</option>
+          <option value="1">Groupe 1</option>
+          <option value="2">Groupe 2</option>
+          <option value="3">Groupe 3</option>
+          <option value="4">Groupe 4</option>
+          <option value="5">Groupe 5</option>
+          <option value="6">Groupe 6</option>
+        </select>
+
+        <label for="signupPassword">Mot de passe</label>
+        <input id="signupPassword" type="password" autocomplete="new-password" required minlength="6" placeholder="Minimum 6 caractères">
+
+        <label for="signupPasswordConfirm">Confirmer le mot de passe</label>
+        <input id="signupPasswordConfirm" type="password" autocomplete="new-password" required minlength="6" placeholder="Retapez le mot de passe">
+
+        <button class="btn" type="submit">Créer mon compte</button>
+
+        <p class="small">
+          Après création du compte, vous serez redirigé automatiquement vers la formation.
+        </p>
+      </form>
+    </section>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <script>
     const SUPABASE_URL = "https://xlyhujiebervldzoxouk.supabase.co";
     const SUPABASE_KEY = "sb_publishable_IqLPvaAeDZoDlYKE-m_Fxw_29Zbnhh_";
+    const SITE_URL = "https://steci1813.github.io/Formation-en-ligne/";
 
-    const supabaseClient = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const loginForm = document.getElementById("loginForm");
-    const loginButton = document.getElementById("loginButton");
-    const message = document.getElementById("message");
+    function showPanel(panel) {
+      const loginPanel = document.getElementById("loginPanel");
+      const signupPanel = document.getElementById("signupPanel");
+      const loginTab = document.getElementById("loginTab");
+      const signupTab = document.getElementById("signupTab");
 
-    function showMessage(text, type) {
-      message.textContent = text;
-      message.className = "";
+      loginPanel.classList.toggle("active", panel === "login");
+      signupPanel.classList.toggle("active", panel === "signup");
+      loginTab.classList.toggle("active", panel === "login");
+      signupTab.classList.toggle("active", panel === "signup");
 
-      if (type === "error") {
-        message.classList.add("message-error");
-      }
+      hideNotice();
+    }
 
-      if (type === "success") {
-        message.classList.add("message-success");
-      }
+    function showNotice(message, type = "success") {
+      const notice = document.getElementById("authNotice");
+      notice.className = "notice" + (type === "danger" ? " danger" : type === "warning" ? " warning" : "");
+      notice.innerHTML = message;
+      notice.style.display = "block";
+    }
 
-      if (type === "info") {
-        message.classList.add("message-info");
+    function hideNotice() {
+      const notice = document.getElementById("authNotice");
+      notice.style.display = "none";
+      notice.innerHTML = "";
+    }
+
+    async function checkExistingSession() {
+      const { data } = await supabaseClient.auth.getSession();
+
+      if (data.session) {
+        window.location.href = "index.html";
       }
     }
 
-    function isValidEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
+    async function loginUser(event) {
+      event.preventDefault();
+      hideNotice();
 
-    async function login() {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-
-      showMessage("", "info");
-
-      if (!email || !password) {
-        showMessage("Entre ton email et ton mot de passe.", "error");
-        return;
-      }
-
-      if (!isValidEmail(email)) {
-        showMessage("Entre une adresse email valide.", "error");
-        return;
-      }
-
-      loginButton.disabled = true;
-      loginButton.textContent = "Connexion...";
-      showMessage("Vérification en cours...", "info");
+      const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+      const password = document.getElementById("loginPassword").value;
 
       const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password
+        email,
+        password
       });
 
       if (error) {
-        loginButton.disabled = false;
-        loginButton.textContent = "Se connecter";
+        console.error(error);
+        showNotice("Connexion impossible. Vérifiez votre email et votre mot de passe.", "danger");
+        return;
+      }
 
-        showMessage("Email ou mot de passe incorrect.", "error");
+      window.location.href = "index.html";
+    }
+
+    async function createAccount(event) {
+      event.preventDefault();
+      hideNotice();
+
+      const fullName = document.getElementById("signupName").value.trim();
+      const email = document.getElementById("signupEmail").value.trim().toLowerCase();
+      const groupNumber = Number(document.getElementById("signupGroup").value);
+      const password = document.getElementById("signupPassword").value;
+      const passwordConfirm = document.getElementById("signupPasswordConfirm").value;
+
+      if (password !== passwordConfirm) {
+        showNotice("Les deux mots de passe ne correspondent pas.", "danger");
+        return;
+      }
+
+      if (password.length < 6) {
+        showNotice("Le mot de passe doit contenir au moins 6 caractères.", "danger");
+        return;
+      }
+
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            group_number: groupNumber,
+            role: "student"
+          }
+        }
+      });
+
+      if (error) {
+        console.error(error);
+
+        if (String(error.message || "").toLowerCase().includes("already")) {
+          showNotice("Un compte existe déjà avec cet email. Essayez de vous connecter.", "warning");
+        } else {
+          showNotice("Création impossible : " + error.message, "danger");
+        }
+
         return;
       }
 
       if (!data.session) {
-        loginButton.disabled = false;
-        loginButton.textContent = "Se connecter";
-
-        showMessage("Connexion refusée. Réessaie.", "error");
+        showNotice(
+          "Compte créé, mais Supabase demande une confirmation email. Pour éviter la limite d’emails, désactivez la confirmation email dans Supabase, puis recommencez.",
+          "warning"
+        );
         return;
       }
 
-      showMessage("Connexion réussie. Redirection...", "success");
-
-      setTimeout(() => {
-        window.location.href = "./index.html";
-      }, 700);
+      await upsertProfile(data.user, fullName, groupNumber);
+      window.location.href = "index.html";
     }
 
-    loginForm.addEventListener("submit", function(event) {
-      event.preventDefault();
-      login();
-    });
+    async function upsertProfile(user, fullName, groupNumber) {
+      if (!user) return;
 
-    async function redirectIfAlreadyConnected() {
-      const { data } = await supabaseClient.auth.getSession();
+      const { error } = await supabaseClient
+        .from("profiles")
+        .upsert({
+          id: user.id,
+          email: user.email,
+          full_name: fullName,
+          group_number: groupNumber,
+          role: "student",
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: "id"
+        });
 
-      if (data.session) {
-        window.location.href = "./index.html";
+      if (error) {
+        console.error("Erreur profil :", error);
       }
     }
 
-    redirectIfAlreadyConnected();
+    async function resetPassword() {
+      hideNotice();
+
+      const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+
+      if (!email) {
+        showNotice("Entrez d’abord votre email dans le champ de connexion.", "warning");
+        return;
+      }
+
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: SITE_URL + "login.html"
+      });
+
+      if (error) {
+        console.error(error);
+        showNotice("Impossible d’envoyer l’email de réinitialisation. La limite d’emails Supabase est peut-être atteinte.", "danger");
+        return;
+      }
+
+      showNotice("Email de réinitialisation envoyé. Vérifiez votre boîte mail.");
+    }
+
+    checkExistingSession();
   </script>
 </body>
 </html>
