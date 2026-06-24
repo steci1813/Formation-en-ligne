@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Espace client | Community Management</title>
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Optionnel : si ton projet Formation-en-ligne a déjà un fichier de configuration, garde cette ligne. -->
+  <script src="assets/config.js"></script>
+
+  <style>
+    :root {
+      --bg: #f6f4ef;
+      --panel: #ffffff;
+      --panel-soft: #fbfaf7;
+      --text: #161616;
+      --muted: #6b7280;
+      --border: #e8e2d7;
+      --primary: #111827;
+      --primary-soft: #f0ede7;
+      --accent: #b88746;
+      --accent-2: #7a542f;
+      --danger: #b42318;
+      --danger-soft: #fee4e2;
+      --success: #067647;
+      --success-soft: #dcfae6;
+      --warning: #b54708;
+      --warning-soft: #fef0c7;
+      --info: #175cd3;
+      --info-soft: #d1e9ff;
+      --shadow: 0 18px 45px rgba(17, 24, 39, 0.08);
+      --radius: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(184, 135, 70, 0.14), transparent 34%),
+        linear-gradient(135deg, #f7f3eb 0%, #fbfaf8 45%, #f2eee8 100%);
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .page-shell {
+      width: min(1240px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 26px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .brand-logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 900;
+      background: linear-gradient(135deg, #111827, #3b2d20 55%, #b88746);
+      box-shadow: var(--shadow);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(20px, 3vw, 31px);
+      letter-spacing: -0.04em;
+    }
+
+    .brand p {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      border: 0;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 11px 15px;
+      font-weight: 800;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: 0.18s ease;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 12px 25px rgba(17, 24, 39, 0.18);
+    }
+
+    .btn-soft {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-danger {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .btn-success {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero {
+      grid-template-columns: 1.2fr 0.8fr;
+      align-items: stretch;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(232, 226, 215, 0.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .hero-main {
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-main::after {
+      content: "";
+      position: absolute;
+      width: 210px;
+      height: 210px;
+      right: -72px;
+      top: -90px;
+      border-radius: 50%;
+      background: rgba(184, 135, 70, 0.16);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      background: #f7efe3;
+      color: var(--accent-2);
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 16px;
+    }
+
+    .hero-main h2 {
+      margin: 0;
+      font-size: clamp(28px, 5vw, 48px);
+      line-height: 0.98;
+      letter-spacing: -0.055em;
+      max-width: 760px;
+    }
+
+    .hero-main p {
+      margin: 16px 0 0;
+      color: var(--muted);
+      max-width: 700px;
+      line-height: 1.65;
+    }
+
+    .profile-card {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .profile-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #111827, #b88746);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      font-weight: 900;
+      flex: 0 0 auto;
+    }
+
+    .profile-row h3,
+    .profile-row p {
+      margin: 0;
+    }
+
+    .profile-row p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 2px;
+      overflow-wrap: anywhere;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      width: fit-content;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .pill.success { background: var(--success-soft); color: var(--success); }
+    .pill.warning { background: var(--warning-soft); color: var(--warning); }
+    .pill.info { background: var(--info-soft); color: var(--info); }
+    .pill.danger { background: var(--danger-soft); color: var(--danger); }
+    .pill.neutral { background: #f2f4f7; color: #344054; }
+    .pill.gold { background: #f7efe3; color: var(--accent-2); }
+
+    .stats {
+      grid-template-columns: repeat(4, 1fr);
+      margin-bottom: 18px;
+    }
+
+    .stat-card {
+      padding: 18px;
+    }
+
+    .stat-card span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .stat-card strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 30px;
+      letter-spacing: -0.04em;
+    }
+
+    .toolbar {
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    .field,
+    .textarea,
+    .select {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      padding: 12px 13px;
+      outline: none;
+      color: var(--text);
+      transition: 0.18s ease;
+    }
+
+    .field:focus,
+    .textarea:focus,
+    .select:focus {
+      border-color: rgba(184, 135, 70, 0.8);
+      box-shadow: 0 0 0 4px rgba(184, 135, 70, 0.13);
+    }
+
+    .filters .field,
+    .filters .select {
+      max-width: 230px;
+      border-radius: 999px;
+      padding: 10px 13px;
+      font-size: 14px;
+    }
+
+    .content-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .section-card {
+      padding: 18px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .section-title h3 {
+      margin: 0;
+      font-size: 19px;
+      letter-spacing: -0.02em;
+    }
+
+    .section-title p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .posts {
+      display: grid;
+      gap: 14px;
+    }
+
+    .post-card {
+      border: 1px solid var(--border);
+      background: var(--panel-soft);
+      border-radius: 20px;
+      padding: 16px;
+    }
+
+    .post-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .post-title {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: -0.02em;
+    }
+
+    .post-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+    }
+
+    .post-body {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .caption-box {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 13px;
+      color: #2f2f2f;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      min-height: 92px;
+    }
+
+    .assets-box {
+      display: grid;
+      gap: 8px;
+    }
+
+    .asset-link {
+      display: block;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .validation-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .check-tile {
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 900;
+      font-size: 13px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .check-tile input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--success);
+    }
+
+    .comment-area {
+      display: grid;
+      gap: 9px;
+    }
+
+    .textarea {
+      min-height: 86px;
+      resize: vertical;
+      line-height: 1.55;
+    }
+
+    .post-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .calendar-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .calendar-day {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .calendar-date {
+      padding: 12px 14px;
+      background: #f7efe3;
+      color: var(--accent-2);
+      font-weight: 950;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .calendar-items {
+      display: grid;
+      gap: 0;
+    }
+
+    .calendar-item {
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+      display: grid;
+      gap: 6px;
+    }
+
+    .calendar-item strong {
+      font-size: 14px;
+    }
+
+    .calendar-item span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .admin-panel {
+      margin-bottom: 18px;
+      padding: 18px;
+      border: 1px solid rgba(184, 135, 70, 0.35);
+      background: rgba(255, 252, 247, 0.96);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .form-grid .full {
+      grid-column: 1 / -1;
+    }
+
+    .form-label {
+      display: grid;
+      gap: 7px;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .empty-state,
+    .state-screen {
+      text-align: center;
+      padding: 36px 18px;
+      color: var(--muted);
+    }
+
+    .empty-state strong,
+    .state-screen strong {
+      display: block;
+      color: var(--text);
+      font-size: 20px;
+      margin-bottom: 6px;
+      letter-spacing: -0.03em;
+    }
+
+    .state-screen {
+      max-width: 560px;
+      margin: 90px auto;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      max-width: 420px;
+      background: #111827;
+      color: #fff;
+      padding: 14px 16px;
+      border-radius: 18px;
+      box-shadow: 0 18px 35px rgba(17, 24, 39, 0.25);
+      z-index: 50;
+      transform: translateY(16px);
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.2s ease;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .small {
+      font-size: 13px;
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .content-layout,
+      .post-body {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 680px) {
+      .page-shell {
+        width: min(100% - 20px, 1240px);
+        padding-top: 18px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .top-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .hero-main,
+      .profile-card,
+      .section-card,
+      .admin-panel {
+        padding: 16px;
+      }
+
+      .stats,
+      .validation-grid,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filters .field,
+      .filters .select {
+        max-width: 100%;
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .filters {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main id="app" class="page-shell hidden">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-logo">CM</div>
+        <div>
+          <h1>Espace client</h1>
+          <p>Calendrier éditorial, fichiers, validations et retours.</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <a class="btn btn-soft" href="index.html">← Retour formation</a>
+        <button class="btn btn-outline" id="refreshBtn" type="button">Actualiser</button>
+        <button class="btn btn-primary" id="logoutBtn" type="button">Déconnexion</button>
+      </div>
+    </header>
+
+    <section class="grid hero">
+      <div class="card hero-main">
+        <span class="eyebrow">✦ Community Management</span>
+        <h2>Tout ton contenu à valider, au même endroit.</h2>
+        <p>
+          Retrouve les publications prévues, les textes, les visuels, les fichiers de production,
+          les dates de publication et les validations nécessaires avant programmation.
+        </p>
+      </div>
+
+      <aside class="card profile-card">
+        <div class="profile-row">
+          <div class="avatar" id="avatarInitials">C</div>
+          <div>
+            <h3 id="clientName">Client</h3>
+            <p id="clientEmail">email@client.com</p>
+          </div>
+        </div>
+        <div>
+          <span id="accessBadge" class="pill success">Accès actif</span>
+          <p class="muted small" style="margin: 12px 0 0;">
+            Les modifications sont enregistrées directement dans Supabase.
+          </p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="grid stats">
+      <article class="card stat-card">
+        <span>Publications</span>
+        <strong id="statTotal">0</strong>
+      </article>
+      <article class="card stat-card">
+        <span>À valider</span>
+        <strong id="statToValidate">0</strong>
+      </article>
+      <article class="card stat-card">
+        <span>Validées</span>
+        <strong id="statValidated">0</strong>
+      </article>
+      <article class="card stat-card">
+        <span>Programmées / publiées</span>
+        <strong id="statProgrammed">0</strong>
+      </article>
+    </section>
+
+    <section id="adminPanel" class="card admin-panel hidden">
+      <div class="section-title">
+        <div>
+          <h3>Créer une publication client</h3>
+          <p>Visible uniquement si ton accès est marqué admin / gestionnaire.</p>
+        </div>
+      </div>
+
+      <form id="postForm" class="form-grid">
+        <label class="form-label">
+          Email du client
+          <input class="field" id="formClientEmail" type="email" placeholder="client@email.com" required />
+        </label>
+
+        <label class="form-label">
+          Plateforme
+          <select class="select" id="formPlatform">
+            <option value="Instagram">Instagram</option>
+            <option value="Facebook">Facebook</option>
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="TikTok">TikTok</option>
+            <option value="Pinterest">Pinterest</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </label>
+
+        <label class="form-label full">
+          Titre de la publication
+          <input class="field" id="formTitle" type="text" placeholder="Ex : Post lancement offre spéciale" required />
+        </label>
+
+        <label class="form-label">
+          Date de publication
+          <input class="field" id="formDate" type="date" />
+        </label>
+
+        <label class="form-label">
+          Heure de publication
+          <input class="field" id="formTime" type="time" />
+        </label>
+
+        <label class="form-label full">
+          Texte de publication
+          <textarea class="textarea" id="formCaption" placeholder="Colle ici la production textuelle..."></textarea>
+        </label>
+
+        <label class="form-label">
+          Lien visuel / Canva / Drive
+          <input class="field" id="formVisualUrl" type="url" placeholder="https://drive.google.com/..." />
+        </label>
+
+        <label class="form-label">
+          Lien fichier Google Drive
+          <input class="field" id="formFileUrl" type="url" placeholder="https://drive.google.com/..." />
+          <span class="muted small">Colle ici le lien du fichier de production : texte, visuel, dossier Drive, Canva, PDF, etc.</span>
+        </label>
+
+        <label class="form-label full">
+          Note interne / information pour le client
+          <textarea class="textarea" id="formAdminNote" placeholder="Ex : visuel Canva à vérifier, date proposée selon les insights..."></textarea>
+        </label>
+
+        <div class="full post-actions">
+          <button class="btn btn-primary" type="submit">Ajouter au calendrier</button>
+          <button class="btn btn-outline" id="resetFormBtn" type="button">Réinitialiser</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card toolbar">
+      <div class="filters">
+        <input class="field" id="searchInput" type="search" placeholder="Rechercher une publication..." />
+        <select class="select" id="statusFilter">
+          <option value="all">Tous les statuts</option>
+          <option value="brouillon">Brouillon</option>
+          <option value="a_valider">À valider</option>
+          <option value="modification_demandee">Modification demandée</option>
+          <option value="valide">Validé</option>
+          <option value="programme">Programmé</option>
+          <option value="publie">Publié</option>
+        </select>
+        <select class="select" id="platformFilter">
+          <option value="all">Toutes les plateformes</option>
+          <option value="Instagram">Instagram</option>
+          <option value="Facebook">Facebook</option>
+          <option value="LinkedIn">LinkedIn</option>
+          <option value="TikTok">TikTok</option>
+          <option value="Pinterest">Pinterest</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
+      <span class="pill gold" id="visibleCount">0 élément</span>
+    </section>
+
+    <section class="content-layout">
+      <div class="card section-card">
+        <div class="section-title">
+          <div>
+            <h3>Productions à suivre</h3>
+            <p>Valide les textes, les visuels et les dates proposées.</p>
+          </div>
+        </div>
+        <div id="postsList" class="posts"></div>
+      </div>
+
+      <aside class="card section-card">
+        <div class="section-title">
+          <div>
+            <h3>Calendrier éditorial</h3>
+            <p>Vue rapide des publications prévues.</p>
+          </div>
+        </div>
+        <div id="calendarList" class="calendar-list"></div>
+      </aside>
+    </section>
+  </main>
+
+  <section id="stateScreen" class="state-screen">
+    <strong id="stateTitle">Chargement...</strong>
+    <p id="stateMessage">Vérification de ton accès à l’espace client.</p>
+    <div id="stateActions" class="post-actions" style="justify-content:center;"></div>
+  </section>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /************************************************************
+     * CONFIGURATION
+     * ----------------------------------------------------------
+     * 1) Si ton projet a déjà window.SUPABASE_URL et
+     *    window.SUPABASE_ANON_KEY dans assets/config.js,
+     *    tu n'as rien à changer ici.
+     *
+     * 2) Sinon, remplace les deux valeurs ci-dessous.
+     ************************************************************/
+    const FALLBACK_SUPABASE_URL = "REMPLACE_PAR_TON_SUPABASE_URL";
+    const FALLBACK_SUPABASE_ANON_KEY = "REMPLACE_PAR_TON_SUPABASE_ANON_KEY";
+
+    const STATUS_LABELS = {
+      brouillon: "Brouillon",
+      a_valider: "À valider",
+      modification_demandee: "Modification demandée",
+      valide: "Validé",
+      programme: "Programmé",
+      publie: "Publié"
+    };
+
+    const STATUS_CLASS = {
+      brouillon: "neutral",
+      a_valider: "warning",
+      modification_demandee: "danger",
+      valide: "success",
+      programme: "info",
+      publie: "success"
+    };
+
+    let supabaseClient = null;
+    let currentUser = null;
+    let currentAccess = null;
+    let allPosts = [];
+
+    const $ = (selector) => document.querySelector(selector);
+
+    document.addEventListener("DOMContentLoaded", initClientSpace);
+
+    async function initClientSpace() {
+      bindEvents();
+
+      try {
+        supabaseClient = getSupabaseClient();
+
+        if (!supabaseClient) {
+          showBlockedState(
+            "Configuration Supabase manquante",
+            "Ajoute les clés Supabase dans assets/config.js ou remplace les valeurs FALLBACK_SUPABASE_URL et FALLBACK_SUPABASE_ANON_KEY dans ce fichier.",
+            true
+          );
+          return;
+        }
+
+        const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+
+        if (sessionError) throw sessionError;
+
+        currentUser = sessionData?.session?.user || null;
+
+        if (!currentUser) {
+          showBlockedState(
+            "Connexion requise",
+            "Connecte-toi d’abord pour accéder à cet espace privé.",
+            true
+          );
+          return;
+        }
+
+        await verifyClientAccess();
+        await loadPosts();
+
+        $("#stateScreen").classList.add("hidden");
+        $("#app").classList.remove("hidden");
+      } catch (error) {
+        console.error(error);
+        showBlockedState(
+          "Erreur de chargement",
+          error?.message || "Impossible de charger l’espace client pour le moment.",
+          true
+        );
+      }
+    }
+
+    function getSupabaseClient() {
+      if (window.supabaseClient) return window.supabaseClient;
+      if (window.client) return window.client;
+      if (window.sb) return window.sb;
+
+      const supabaseUrl =
+        window.SUPABASE_URL ||
+        window.supabaseUrl ||
+        window.__SUPABASE_URL__ ||
+        FALLBACK_SUPABASE_URL;
+
+      const supabaseAnonKey =
+        window.SUPABASE_ANON_KEY ||
+        window.supabaseAnonKey ||
+        window.__SUPABASE_ANON_KEY__ ||
+        FALLBACK_SUPABASE_ANON_KEY;
+
+      const hasRealConfig =
+        supabaseUrl &&
+        supabaseAnonKey &&
+        !String(supabaseUrl).includes("REMPLACE_PAR") &&
+        !String(supabaseAnonKey).includes("REMPLACE_PAR");
+
+      if (!hasRealConfig || !window.supabase) return null;
+
+      return window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+    }
+
+    async function verifyClientAccess() {
+      const email = currentUser.email;
+
+      const { data, error } = await supabaseClient
+        .from("client_spaces")
+        .select("*")
+        .eq("client_email", email)
+        .eq("is_active", true)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!data) {
+        showBlockedState(
+          "Accès réservé",
+          "Ton email n’est pas autorisé à consulter cette page. Demande à l’administrateur de t’ajouter dans client_spaces.",
+          true
+        );
+        throw new Error("Accès non autorisé");
+      }
+
+      currentAccess = data;
+      updateProfile();
+      toggleAdminPanel();
+    }
+
+    function updateProfile() {
+      const name = currentAccess.client_name || currentUser.email || "Client";
+      const email = currentUser.email || currentAccess.client_email;
+      const initials = getInitials(name || email);
+
+      $("#clientName").textContent = name;
+      $("#clientEmail").textContent = email;
+      $("#avatarInitials").textContent = initials;
+
+      if (isManager()) {
+        $("#accessBadge").className = "pill gold";
+        $("#accessBadge").textContent = "Accès gestionnaire";
+      }
+    }
+
+    function isManager() {
+      return Boolean(
+        currentAccess?.can_manage === true ||
+        currentAccess?.is_admin === true ||
+        currentAccess?.role === "admin" ||
+        currentAccess?.role === "manager" ||
+        currentAccess?.type === "admin"
+      );
+    }
+
+    function toggleAdminPanel() {
+      const panel = $("#adminPanel");
+      if (isManager()) {
+        panel.classList.remove("hidden");
+        $("#formClientEmail").value = currentAccess.client_email || currentUser.email || "";
+      } else {
+        panel.classList.add("hidden");
+      }
+    }
+
+    async function loadPosts() {
+      const manager = isManager();
+      let query = supabaseClient
+        .from("editorial_posts")
+        .select("*")
+        .order("publication_date", { ascending: true, nullsFirst: false })
+        .order("publication_time", { ascending: true, nullsFirst: false })
+        .order("created_at", { ascending: false });
+
+      if (!manager) {
+        query = query.eq("client_email", currentUser.email);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      allPosts = data || [];
+      renderEverything();
+    }
+
+    function renderEverything() {
+      const filteredPosts = getFilteredPosts();
+      updateStats();
+      renderPosts(filteredPosts);
+      renderCalendar(filteredPosts);
+      updateVisibleCount(filteredPosts.length);
+    }
+
+    function getFilteredPosts() {
+      const search = $("#searchInput").value.trim().toLowerCase();
+      const status = $("#statusFilter").value;
+      const platform = $("#platformFilter").value;
+
+      return allPosts.filter((post) => {
+        const haystack = [
+          post.title,
+          post.platform,
+          post.caption_text,
+          post.admin_note,
+          post.client_comment,
+          post.client_email
+        ].join(" ").toLowerCase();
+
+        const matchesSearch = !search || haystack.includes(search);
+        const matchesStatus = status === "all" || post.status === status;
+        const matchesPlatform = platform === "all" || post.platform === platform;
+
+        return matchesSearch && matchesStatus && matchesPlatform;
+      });
+    }
+
+    function updateStats() {
+      const total = allPosts.length;
+      const toValidate = allPosts.filter((p) => ["a_valider", "modification_demandee", "brouillon"].includes(p.status)).length;
+      const validated = allPosts.filter((p) => p.status === "valide").length;
+      const programmed = allPosts.filter((p) => ["programme", "publie"].includes(p.status)).length;
+
+      $("#statTotal").textContent = total;
+      $("#statToValidate").textContent = toValidate;
+      $("#statValidated").textContent = validated;
+      $("#statProgrammed").textContent = programmed;
+    }
+
+    function updateVisibleCount(count) {
+      $("#visibleCount").textContent = `${count} ${count > 1 ? "éléments" : "élément"}`;
+    }
+
+    function renderPosts(posts) {
+      const container = $("#postsList");
+
+      if (!posts.length) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <strong>Aucune publication trouvée</strong>
+            <p>Le calendrier est vide ou aucun élément ne correspond aux filtres.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = posts.map((post) => postTemplate(post)).join("");
+
+      posts.forEach((post) => {
+        const card = document.querySelector(`[data-post-card="${post.id}"]`);
+        if (!card) return;
+
+        card.querySelectorAll("[data-validation]").forEach((checkbox) => {
+          checkbox.addEventListener("change", () => handleValidationChange(post.id, checkbox.dataset.validation, checkbox.checked));
+        });
+
+        const commentBtn = card.querySelector("[data-save-comment]");
+        commentBtn?.addEventListener("click", () => saveComment(post.id));
+
+        const validateBtn = card.querySelector("[data-validate-post]");
+        validateBtn?.addEventListener("click", () => validatePost(post.id));
+
+        const requestBtn = card.querySelector("[data-request-change]");
+        requestBtn?.addEventListener("click", () => requestChange(post.id));
+
+        const statusSelect = card.querySelector("[data-status-select]");
+        statusSelect?.addEventListener("change", () => updateStatus(post.id, statusSelect.value));
+
+        const deleteBtn = card.querySelector("[data-delete-post]");
+        deleteBtn?.addEventListener("click", () => deletePost(post.id));
+      });
+    }
+
+    function postTemplate(post) {
+      const status = post.status || "a_valider";
+      const statusLabel = STATUS_LABELS[status] || status;
+      const statusClass = STATUS_CLASS[status] || "neutral";
+      const dateLabel = formatDate(post.publication_date);
+      const timeLabel = post.publication_time ? post.publication_time.slice(0, 5) : "Heure à définir";
+      const platform = post.platform || "Plateforme à définir";
+      const caption = post.caption_text || "Aucun texte ajouté pour le moment.";
+      const comment = post.client_comment || "";
+      const adminNote = post.admin_note || "";
+      const managerControls = isManager()
+        ? `
+          <div class="post-actions">
+            <select class="select" data-status-select style="max-width:230px; border-radius:999px; padding:10px 13px;">
+              ${Object.keys(STATUS_LABELS).map((key) => `<option value="${key}" ${key === status ? "selected" : ""}>${STATUS_LABELS[key]}</option>`).join("")}
+            </select>
+            <button class="btn btn-danger" type="button" data-delete-post>Supprimer</button>
+          </div>
+        `
+        : "";
+
+      return `
+        <article class="post-card" data-post-card="${escapeHtml(post.id)}">
+          <div class="post-head">
+            <div>
+              <h4 class="post-title">${escapeHtml(post.title || "Publication sans titre")}</h4>
+              <div class="post-meta">
+                <span class="pill gold">${escapeHtml(platform)}</span>
+                <span class="pill neutral">${escapeHtml(dateLabel)} · ${escapeHtml(timeLabel)}</span>
+                <span class="pill ${statusClass}">${escapeHtml(statusLabel)}</span>
+                ${isManager() ? `<span class="pill info">${escapeHtml(post.client_email || "client non défini")}</span>` : ""}
+              </div>
+            </div>
+          </div>
+
+          <div class="post-body">
+            <div>
+              <div class="caption-box">${escapeHtml(caption)}</div>
+
+              ${adminNote ? `<p class="muted small"><strong>Note :</strong> ${escapeHtml(adminNote)}</p>` : ""}
+
+              <div class="validation-grid">
+                <label class="check-tile">
+                  <input type="checkbox" data-validation="text_validated" ${post.text_validated ? "checked" : ""}>
+                  Texte validé
+                </label>
+                <label class="check-tile">
+                  <input type="checkbox" data-validation="visual_validated" ${post.visual_validated ? "checked" : ""}>
+                  Visuel validé
+                </label>
+                <label class="check-tile">
+                  <input type="checkbox" data-validation="date_validated" ${post.date_validated ? "checked" : ""}>
+                  Date validée
+                </label>
+              </div>
+
+              <div class="comment-area">
+                <textarea class="textarea" data-comment-box="${escapeHtml(post.id)}" placeholder="Ajouter un commentaire ou une demande de modification...">${escapeHtml(comment)}</textarea>
+                <div class="post-actions">
+                  <button class="btn btn-outline" type="button" data-save-comment>Enregistrer commentaire</button>
+                  <button class="btn btn-danger" type="button" data-request-change>Demander une modification</button>
+                  <button class="btn btn-success" type="button" data-validate-post>Valider cette publication</button>
+                </div>
+              </div>
+
+              ${managerControls}
+            </div>
+
+            <div class="assets-box">
+              ${post.visual_url ? `<a class="asset-link" href="${escapeAttribute(post.visual_url)}" target="_blank" rel="noopener">Ouvrir le visuel ↗</a>` : `<span class="asset-link muted">Aucun visuel ajouté</span>`}
+              ${post.file_url ? `<a class="asset-link" href="${escapeAttribute(post.file_url)}" target="_blank" rel="noopener">Ouvrir le fichier ↗</a>` : `<span class="asset-link muted">Aucun fichier ajouté</span>`}
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderCalendar(posts) {
+      const container = $("#calendarList");
+      const datedPosts = posts
+        .filter((post) => post.publication_date)
+        .sort((a, b) => `${a.publication_date || "9999"} ${a.publication_time || "99:99"}`.localeCompare(`${b.publication_date || "9999"} ${b.publication_time || "99:99"}`));
+
+      if (!datedPosts.length) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <strong>Aucune date prévue</strong>
+            <p>Les publications datées apparaîtront ici.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const grouped = datedPosts.reduce((acc, post) => {
+        const date = post.publication_date;
+        if (!acc[date]) acc[date] = [];
+        acc[date].push(post);
+        return acc;
+      }, {});
+
+      container.innerHTML = Object.entries(grouped).map(([date, items]) => `
+        <div class="calendar-day">
+          <div class="calendar-date">
+            <span>${escapeHtml(formatDate(date))}</span>
+            <span>${items.length}</span>
+          </div>
+          <div class="calendar-items">
+            ${items.map((item) => `
+              <div class="calendar-item">
+                <strong>${escapeHtml(item.publication_time ? item.publication_time.slice(0, 5) : "Heure à définir")} · ${escapeHtml(item.title || "Sans titre")}</strong>
+                <span>${escapeHtml(item.platform || "Plateforme à définir")} · ${escapeHtml(STATUS_LABELS[item.status] || item.status || "À valider")}</span>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    async function handleValidationChange(postId, field, checked) {
+      const allowedFields = ["text_validated", "visual_validated", "date_validated"];
+      if (!allowedFields.includes(field)) return;
+
+      try {
+        const updates = { [field]: checked };
+
+        const post = allPosts.find((p) => p.id === postId);
+        if (post) {
+          const finalText = field === "text_validated" ? checked : post.text_validated;
+          const finalVisual = field === "visual_validated" ? checked : post.visual_validated;
+          const finalDate = field === "date_validated" ? checked : post.date_validated;
+
+          if (finalText && finalVisual && finalDate) {
+            updates.status = "valide";
+          } else if (post.status === "valide") {
+            updates.status = "a_valider";
+          }
+        }
+
+        await updatePost(postId, updates, "Validation mise à jour.");
+      } catch (error) {
+        toast(error.message || "Erreur lors de la validation.");
+      }
+    }
+
+    async function saveComment(postId) {
+      const box = document.querySelector(`[data-comment-box="${postId}"]`);
+      const comment = box ? box.value.trim() : "";
+      await updatePost(postId, { client_comment: comment }, "Commentaire enregistré.");
+    }
+
+    async function requestChange(postId) {
+      const box = document.querySelector(`[data-comment-box="${postId}"]`);
+      const comment = box ? box.value.trim() : "";
+
+      if (!comment) {
+        toast("Ajoute d’abord un commentaire pour expliquer la modification souhaitée.");
+        box?.focus();
+        return;
+      }
+
+      await updatePost(postId, {
+        client_comment: comment,
+        status: "modification_demandee"
+      }, "Demande de modification envoyée.");
+    }
+
+    async function validatePost(postId) {
+      await updatePost(postId, {
+        text_validated: true,
+        visual_validated: true,
+        date_validated: true,
+        status: "valide"
+      }, "Publication validée.");
+    }
+
+    async function updateStatus(postId, status) {
+      await updatePost(postId, { status }, "Statut mis à jour.");
+    }
+
+    async function updatePost(postId, updates, successMessage) {
+      const { error } = await supabaseClient
+        .from("editorial_posts")
+        .update(updates)
+        .eq("id", postId);
+
+      if (error) throw error;
+
+      allPosts = allPosts.map((post) => post.id === postId ? { ...post, ...updates } : post);
+      renderEverything();
+      toast(successMessage || "Mise à jour enregistrée.");
+    }
+
+    async function deletePost(postId) {
+      if (!isManager()) return;
+
+      const ok = confirm("Supprimer cette publication du calendrier ?");
+      if (!ok) return;
+
+      const { error } = await supabaseClient
+        .from("editorial_posts")
+        .delete()
+        .eq("id", postId);
+
+      if (error) {
+        toast(error.message || "Suppression impossible.");
+        return;
+      }
+
+      allPosts = allPosts.filter((post) => post.id !== postId);
+      renderEverything();
+      toast("Publication supprimée.");
+    }
+
+    async function handlePostFormSubmit(event) {
+      event.preventDefault();
+
+      if (!isManager()) {
+        toast("Action réservée au gestionnaire.");
+        return;
+      }
+
+      const clientEmail = $("#formClientEmail").value.trim().toLowerCase();
+      const title = $("#formTitle").value.trim();
+
+      if (!clientEmail || !title) {
+        toast("L’email du client et le titre sont obligatoires.");
+        return;
+      }
+
+      try {
+        const payload = {
+          client_email: clientEmail,
+          title,
+          platform: $("#formPlatform").value,
+          publication_date: $("#formDate").value || null,
+          publication_time: $("#formTime").value || null,
+          caption_text: $("#formCaption").value.trim() || null,
+          visual_url: $("#formVisualUrl").value.trim() || null,
+          file_url: $("#formFileUrl").value.trim() || null,
+          admin_note: $("#formAdminNote").value.trim() || null,
+          status: "a_valider",
+          text_validated: false,
+          visual_validated: false,
+          date_validated: false
+        };
+
+        const { data, error } = await supabaseClient
+          .from("editorial_posts")
+          .insert(payload)
+          .select("*")
+          .single();
+
+        if (error) throw error;
+
+        allPosts = [data, ...allPosts];
+        $("#postForm").reset();
+        $("#formClientEmail").value = clientEmail;
+        renderEverything();
+        toast("Publication ajoutée au calendrier.");
+      } catch (error) {
+        console.error(error);
+        toast(error.message || "Impossible d’ajouter la publication.");
+      }
+    }
+
+    function bindEvents() {
+      $("#refreshBtn")?.addEventListener("click", async () => {
+        try {
+          await loadPosts();
+          toast("Données actualisées.");
+        } catch (error) {
+          toast(error.message || "Actualisation impossible.");
+        }
+      });
+
+      $("#logoutBtn")?.addEventListener("click", logout);
+      $("#postForm")?.addEventListener("submit", handlePostFormSubmit);
+      $("#resetFormBtn")?.addEventListener("click", () => $("#postForm").reset());
+
+      ["#searchInput", "#statusFilter", "#platformFilter"].forEach((selector) => {
+        $(selector)?.addEventListener("input", renderEverything);
+        $(selector)?.addEventListener("change", renderEverything);
+      });
+    }
+
+    async function logout() {
+      try {
+        await supabaseClient?.auth?.signOut();
+      } catch (error) {
+        console.warn(error);
+      }
+      window.location.href = "login.html";
+    }
+
+    function showBlockedState(title, message, showButtons = false) {
+      $("#app").classList.add("hidden");
+      $("#stateScreen").classList.remove("hidden");
+      $("#stateTitle").textContent = title;
+      $("#stateMessage").textContent = message;
+
+      if (showButtons) {
+        $("#stateActions").innerHTML = `
+          <a class="btn btn-primary" href="login.html">Se connecter</a>
+          <a class="btn btn-soft" href="index.html">Retour au site</a>
+        `;
+      }
+    }
+
+    function toast(message) {
+      const box = $("#toast");
+      box.textContent = message;
+      box.classList.add("show");
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => box.classList.remove("show"), 3200);
+    }
+
+    function formatDate(value) {
+      if (!value) return "Date à définir";
+      const date = new Date(`${value}T00:00:00`);
+      if (Number.isNaN(date.getTime())) return value;
+      return date.toLocaleDateString("fr-FR", {
+        weekday: "short",
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      });
+    }
+
+    function getInitials(value) {
+      return String(value || "C")
+        .split(/[\s@._-]+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase())
+        .join("") || "C";
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeAttribute(value) {
+      return escapeHtml(value).replaceAll("`", "&#096;");
+    }
+  </script>
+</body>
+</html>
