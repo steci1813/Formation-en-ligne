@@ -2404,22 +2404,23 @@
   <div class="fullscreen-header">
     <div class="fullscreen-actions">
       <div>
-        <p class="eyebrow">Examen final — Étude de marché</p>
-        <h2>🧾 Examen final</h2>
+        <p class="eyebrow">Examen final — Nouvelle version</p>
+        <h2>🧾 Examen final — Étude de marché</h2>
       </div>
       <button class="btn secondary" type="button" onclick="closeCoursePages()">← Fermer la page</button>
     </div>
   </div>
 
   <div id="finalExamIntro" class="callout">
-    <p><strong>📅 Date de l’examen</strong></p>
+    <p><strong>🟢 Examen disponible</strong></p>
     <p>
-      L’examen final est programmé le <strong>30 juin 2026 à 10h00 précise</strong>,
-      heure Madagascar.
+      L’examen final est maintenant accessible librement. Il n’y a plus de restriction de date,
+      plus de mode plein écran obligatoire, plus d’avertissement anti-sortie et plus d’expulsion automatique
+      liée au changement d’onglet.
     </p>
     <p>
-      Le bouton de démarrage sera actif uniquement pendant la minute de 10h00.
-      Dès que vous cliquez sur “Commencer l’examen”, le compte à rebours démarre.
+      Le temps reste limité à <strong>1 heure</strong>. Le compte à rebours démarre dès que vous cliquez sur
+      “Commencer l’examen”. Vous pouvez refaire l’examen si nécessaire ; chaque envoi sera enregistré séparément.
     </p>
 
     <div style="margin-top:16px;">
@@ -2428,10 +2429,10 @@
     </div>
 
     <div id="finalExamGateMessage" class="callout" style="margin-top:16px;">
-      Vérification de l’heure d’ouverture...
+      ✅ L’examen est ouvert. Renseignez votre nom complet, puis commencez.
     </div>
 
-    <button id="finalExamStartBtn" class="btn" type="button" onclick="startFinalExam()" disabled>
+    <button id="finalExamStartBtn" class="btn" type="button" onclick="startFinalExam()">
       Commencer l’examen
     </button>
   </div>
@@ -2469,7 +2470,7 @@
       <div class="callout" style="margin-top:28px;">
         <p><strong>✅ Envoi final</strong></p>
         <p>
-          Une seule tentative est autorisée. Après validation, votre résultat sera envoyé à l’enseignant.
+          Après validation, votre copie sera envoyée à l’enseignant. Le résultat ne s’affiche pas ici.
         </p>
         <button class="btn" type="submit">
           Envoyer mon examen
@@ -2483,42 +2484,9 @@
     <p>
       Votre copie a bien été envoyée à l’enseignant. Le résultat ne s’affiche pas ici.
     </p>
-  </div>
-
-  <div id="finalExamSecurityWarning" class="final-exam-security-warning" role="dialog" aria-modal="true">
-    <div class="final-exam-security-card">
-      <div class="final-exam-security-head">
-        <span id="finalExamSecurityBadge" class="final-exam-security-badge">Avertissement</span>
-        <h3 id="finalExamSecurityTitle">Sortie détectée</h3>
-        <p id="finalExamSecurityMessage">
-          Vous avez quitté l’environnement de l’examen.
-        </p>
-      </div>
-
-      <div class="final-exam-security-body">
-        <p>
-          Pendant l’examen, vous devez rester sur cette page et garder le mode plein écran.
-          À la cinquième sortie, l’examen est envoyé automatiquement.
-        </p>
-
-        <div class="final-exam-security-count">
-          <div id="finalExamSecurityStep1" class="final-exam-security-step">1/5<br>Avertissement</div>
-          <div id="finalExamSecurityStep2" class="final-exam-security-step">2/5<br>Avertissement</div>
-          <div id="finalExamSecurityStep3" class="final-exam-security-step">3/5<br>Attention</div>
-          <div id="finalExamSecurityStep4" class="final-exam-security-step">4/5<br>Dernier rappel</div>
-          <div id="finalExamSecurityStep5" class="final-exam-security-step">5/5<br>Envoi auto</div>
-        </div>
-
-        <div id="finalExamSecurityLog" class="final-exam-security-log">
-          Événement détecté : changement d’onglet, réduction de fenêtre ou sortie du plein écran.
-        </div>
-
-        <div class="final-exam-security-actions">
-          <button class="btn" type="button" onclick="resumeFinalExamSecureMode()">
-            Revenir à l’examen
-          </button>
-        </div>
-      </div>
+    <div class="page-actions">
+      <button class="btn" type="button" onclick="resetFinalExamForNewAttempt()">Refaire l’examen</button>
+      <button class="btn secondary" type="button" onclick="closeCoursePages()">Fermer</button>
     </div>
   </div>
 </article>
@@ -3466,15 +3434,11 @@
 
 /* ======================================================
    EXAMEN FINAL — Étude de marché
-   Ouverture : 30 juin 2026 à 10h00, Madagascar UTC+3
+   Nouvelle version sans restriction d’accès
+   Durée : 1 heure
    ====================================================== */
 
-const FINAL_EXAM_START_AT = new Date("2026-06-30T10:00:00+03:00");
-
-// Ici, l’examen est cliquable seulement pendant la minute de 10h00.
-// Si tu veux donner 5 minutes de tolérance, remplace 10:01 par 10:05.
-const FINAL_EXAM_LATEST_START_AT = new Date("2026-06-30T10:01:00+03:00");
-
+const FINAL_EXAM_VERSION = "v2_panier_frais_sans_restriction";
 const FINAL_EXAM_DURATION_MINUTES = 60;
 
 let finalExamInterval = null;
@@ -3483,234 +3447,234 @@ let finalExamIsAdmin = false;
 let finalExamSecurityWarningCount = 0;
 let finalExamSecurityEvents = [];
 let finalExamSecurityAutoSubmitting = false;
-const FINAL_EXAM_MAX_SECURITY_WARNINGS = 5;
+const FINAL_EXAM_MAX_SECURITY_WARNINGS = 9999;
 
 const FINAL_EXAM_QUESTIONS = [
   {
     type: "multi",
-    question: "1. Quels éléments doit contenir un brief d’étude de marché de qualité ?",
+    question: "1. Une start-up veut lancer un abonnement de paniers de fruits frais pour étudiants à Antananarivo. Quelles informations faut-il clarifier en priorité avant de lancer l’étude ?",
     options: [
-      "Un constat préalable",
-      "Des objectifs clairs",
-      "Les décisions ou actions attendues après l’étude",
-      "Uniquement le logo de l’entreprise"
+      "La cible exacte à interroger",
+      "Les décisions que l’étude doit aider à prendre",
+      "Les contraintes de prix, de livraison et d’usage",
+      "La couleur définitive du logo"
     ],
     answer: [0, 1, 2]
   },
   {
     type: "single",
-    question: "2. Quelle est la bonne succession des grandes étapes d’une étude de marché ?",
+    question: "2. Le marché est encore mal connu et l’équipe veut comprendre les freins, les motivations et les habitudes réelles des étudiants. Quelle approche est la plus pertinente au départ ?",
     options: [
-      "Analyse, terrain, questionnaire, restitution, échantillon",
-      "Questionnaire, échantillon, terrain, analyse, restitution",
-      "Échantillon, restitution, terrain, questionnaire, analyse",
-      "Budget, design, publicité, vente, reporting"
-    ],
-    answer: [1]
-  },
-  {
-    type: "multi",
-    question: "3. Dans quels cas utilise-t-on surtout une étude qualitative ?",
-    options: [
-      "Comprendre des motivations",
-      "Explorer des perceptions",
-      "Illustrer des comportements",
-      "Mesurer statistiquement une fréquence d’achat"
-    ],
-    answer: [0, 1, 2]
-  },
-  {
-    type: "multi",
-    question: "4. Dans quels cas utilise-t-on surtout une étude quantitative ?",
-    options: [
-      "Mesurer une intention d’achat",
-      "Comparer des profils de consommateurs",
-      "Évaluer une fréquence ou un taux",
-      "Recueillir uniquement des récits très détaillés"
-    ],
-    answer: [0, 1, 2]
-  },
-  {
-    type: "single",
-    question: "5. À quoi servent les questions de screening dans un questionnaire ?",
-    options: [
-      "À décorer le questionnaire",
-      "À vérifier que le répondant correspond bien à la cible",
-      "À remplacer l’analyse statistique",
-      "À présenter les résultats"
-    ],
-    answer: [1]
-  },
-  {
-    type: "single",
-    question: "6. Que permet la méthode des quotas ?",
-    options: [
-      "Répliquer certaines caractéristiques de la population cible dans l’échantillon",
-      "Supprimer toutes les questions ouvertes",
-      "Garantir que tous les répondants pensent pareil",
-      "Éviter de définir une cible"
+      "Une étude qualitative exploratoire",
+      "Un concours sur Facebook uniquement",
+      "Une analyse de logo",
+      "Un tableau de bord financier sans terrain"
     ],
     answer: [0]
   },
   {
     type: "single",
-    question: "7. Quel risque apparaît si l’échantillon provient d’une source trop spécifique ou non représentative ?",
+    question: "3. Quel objectif d’étude est le mieux formulé ?",
     options: [
-      "Un risque de biais",
-      "Un gain automatique de fiabilité",
-      "Une absence totale d’erreur",
-      "Une meilleure neutralité"
+      "Faire une étude pour voir un peu le marché",
+      "Savoir si les étudiants aiment les fruits",
+      "Mesurer l’intérêt des étudiants pour un abonnement hebdomadaire de fruits frais et identifier le prix acceptable",
+      "Demander aux gens ce qu’ils pensent"
+    ],
+    answer: [2]
+  },
+  {
+    type: "multi",
+    question: "4. Avant de rédiger le questionnaire, quelles hypothèses peut-on formuler pour guider l’étude ?",
+    options: [
+      "Le prix peut être un frein majeur",
+      "La livraison sur campus peut augmenter l’intérêt",
+      "Les étudiants qui vivent seuls peuvent avoir des besoins différents",
+      "Tous les étudiants auront exactement le même comportement"
+    ],
+    answer: [0, 1, 2]
+  },
+  {
+    type: "multi",
+    question: "5. Pour évaluer le potentiel commercial du projet, quelles données sont utiles ?",
+    options: [
+      "La fréquence actuelle d’achat de fruits",
+      "Le budget alimentaire moyen disponible",
+      "L’intention d’achat pour l’abonnement proposé",
+      "Le nombre de likes sur une publication sans questionnaire"
+    ],
+    answer: [0, 1, 2]
+  },
+  {
+    type: "single",
+    question: "6. Quelle formulation est la plus neutre pour mesurer l’intérêt envers l’offre ?",
+    options: [
+      "Vous êtes forcément intéressé par notre excellente offre, n’est-ce pas ?",
+      "Aimez-vous les fruits frais et les bonnes choses ?",
+      "Seriez-vous intéressé par un abonnement hebdomadaire de fruits frais livré sur campus ?",
+      "Pourquoi notre offre est-elle meilleure que les autres ?"
+    ],
+    answer: [2]
+  },
+  {
+    type: "single",
+    question: "7. Une question demande : “Achetez-vous souvent des fruits et mangez-vous équilibré ?”. Quel est le problème principal ?",
+    options: [
+      "Elle mélange deux idées dans une seule question",
+      "Elle est trop courte",
+      "Elle ne contient aucun mot compliqué",
+      "Elle est automatiquement qualitative"
     ],
     answer: [0]
   },
   {
     type: "single",
-    question: "8. Une marge d’erreur de 5 % signifie que :",
+    question: "8. Pour obtenir un échantillon plus équilibré d’étudiants, quelle méthode est la plus adaptée ?",
     options: [
-      "Les résultats sont toujours faux",
-      "Le résultat observé peut varier autour de la valeur réelle estimée",
-      "L’étude est qualitative",
-      "Il faut interroger exactement 5 personnes"
+      "Prévoir des quotas par université, niveau d’étude ou profil pertinent",
+      "Interroger uniquement ses amis proches",
+      "Publier le questionnaire une seule fois dans son propre groupe WhatsApp",
+      "Choisir uniquement les personnes qui répondent le plus vite"
+    ],
+    answer: [0]
+  },
+  {
+    type: "single",
+    question: "9. Si l’enquête est diffusée uniquement sur la page Instagram de la marque, quel risque apparaît ?",
+    options: [
+      "Un risque de biais de sélection",
+      "Une représentativité parfaite",
+      "Une suppression automatique de la marge d’erreur",
+      "Une impossibilité de collecter des réponses"
+    ],
+    answer: [0]
+  },
+  {
+    type: "single",
+    question: "10. Un résultat indique 62 % d’intention d’achat avec une marge d’erreur de ±6 %. Quelle lecture est correcte ?",
+    options: [
+      "Le vrai résultat est obligatoirement 62 %",
+      "Le résultat peut être interprété comme environ 56 % à 68 %",
+      "La marge d’erreur indique le nombre de personnes interrogées",
+      "L’étude devient qualitative"
     ],
     answer: [1]
   },
   {
-    type: "multi",
-    question: "9. Quels critères permettent de décider si l’on peut réaliser l’étude en interne ?",
+    type: "single",
+    question: "11. Pour comparer l’intention d’achat selon le niveau d’étude des répondants, quelle analyse est la plus adaptée ?",
     options: [
-      "Le contexte",
-      "Les compétences disponibles",
-      "La capacité en temps et ressources",
-      "La couleur du logo"
+      "Un tri croisé",
+      "Une simple lecture du logo",
+      "Une suppression des réponses",
+      "Une question ouverte uniquement"
     ],
-    answer: [0, 1, 2]
+    answer: [0]
   },
   {
     type: "single",
-    question: "10. Si l’étude est nominative et repose sur une base de contacts, quelle règle devient importante ?",
+    question: "12. Lors d’un focus group sur l’offre de paniers de fruits, quel est le rôle principal du modérateur ?",
     options: [
-      "Le RGPD",
-      "La règle des 4P uniquement",
-      "La typographie",
-      "Le choix d’un slogan"
+      "Guider la discussion sans imposer ses réponses",
+      "Vendre immédiatement l’offre aux participants",
+      "Empêcher les participants d’exprimer des critiques",
+      "Transformer toutes les réponses en pourcentages"
+    ],
+    answer: [0]
+  },
+  {
+    type: "single",
+    question: "13. Pour analyser des réponses ouvertes comme “Pourquoi cette offre ne vous intéresse pas ?”, quelle méthode est pertinente ?",
+    options: [
+      "Classer les verbatims par thèmes récurrents",
+      "Supprimer toutes les réponses négatives",
+      "Ne garder que les réponses les plus longues",
+      "Changer les mots des répondants pour les rendre plus positifs"
+    ],
+    answer: [0]
+  },
+  {
+    type: "single",
+    question: "14. Pour comparer clairement quatre formules d’abonnement selon leur préférence, quel visuel est généralement le plus lisible ?",
+    options: [
+      "Un graphique en barres simple",
+      "Un graphique 3D décoratif",
+      "Une image sans chiffres",
+      "Un paragraphe de 30 lignes"
     ],
     answer: [0]
   },
   {
     type: "multi",
-    question: "11. Quels principes renforcent la déontologie des études ?",
+    question: "15. Quelles pratiques évitent de manipuler ou brouiller la lecture d’un graphique ?",
     options: [
-      "La transparence",
-      "La protection des données personnelles",
-      "L’éthique",
-      "La manipulation volontaire des réponses"
+      "Garder des axes cohérents",
+      "Afficher les effectifs ou la base de répondants quand c’est utile",
+      "Choisir un graphique adapté au message",
+      "Modifier l’échelle pour exagérer artificiellement les écarts"
     ],
     answer: [0, 1, 2]
   },
   {
     type: "multi",
-    question: "12. Quelles sont les règles d’or pour crédibiliser des résultats ?",
+    question: "16. Si les résultats sont présentés à des investisseurs qui connaissent peu le marché étudiant, que faut-il privilégier ?",
     options: [
-      "Être transparent",
-      "Assurer la traçabilité des données",
-      "Être rigoureux",
-      "Rester objectif"
+      "Commencer par les conclusions clés",
+      "Relier les chiffres aux décisions business",
+      "Expliquer simplement la méthode utilisée",
+      "Afficher toutes les données brutes sans synthèse"
+    ],
+    answer: [0, 1, 2]
+  },
+  {
+    type: "multi",
+    question: "17. Si l’enquête collecte des emails ou numéros de téléphone, quelles précautions sont nécessaires ?",
+    options: [
+      "Informer les répondants de l’usage des données",
+      "Limiter l’accès aux données personnelles",
+      "Collecter uniquement les informations utiles",
+      "Partager publiquement la base complète"
+    ],
+    answer: [0, 1, 2]
+  },
+  {
+    type: "multi",
+    question: "18. Pour formuler une recommandation de lancement, quels éléments faut-il croiser ?",
+    options: [
+      "L’attractivité de l’offre",
+      "Le prix acceptable",
+      "La faisabilité opérationnelle",
+      "Les risques ou limites de l’étude"
     ],
     answer: [0, 1, 2, 3]
   },
   {
-    type: "single",
-    question: "13. Face à des décideurs externes qui connaissent peu le marché, l’objectif principal est souvent de :",
-    options: [
-      "Convaincre en allant à l’essentiel",
-      "Montrer tous les détails techniques",
-      "Éviter toute conclusion",
-      "Changer la méthodologie pendant la présentation"
-    ],
-    answer: [0]
-  },
-  {
-    type: "single",
-    question: "14. Face à des décideurs internes, l’objectif principal est souvent de :",
-    options: [
-      "Obtenir une prise de décision",
-      "Faire un cours magistral",
-      "Masquer les limites de l’étude",
-      "Éviter les recommandations"
-    ],
-    answer: [0]
-  },
-  {
-    type: "single",
-    question: "15. Face à des spécialistes, l’attitude recommandée est de :",
-    options: [
-      "Challenger ses résultats et démontrer leur pertinence",
-      "Rester très vague",
-      "Ne montrer aucun chiffre",
-      "Supprimer les détails techniques"
-    ],
-    answer: [0]
-  },
-  {
     type: "multi",
-    question: "16. Quelles pratiques améliorent la visualisation des résultats ?",
+    question: "19. Pour analyser la concurrence des paniers de fruits ou snacks sains, quelles actions sont pertinentes ?",
     options: [
-      "Éviter la 3D inutile",
-      "Garder des axes équilibrés",
-      "Limiter la gymnastique oculaire",
-      "Multiplier les effets graphiques complexes"
+      "Identifier les offres existantes et leurs prix",
+      "Comparer les canaux de distribution",
+      "Observer les arguments utilisés par les concurrents",
+      "Se baser uniquement sur une rumeur"
     ],
     answer: [0, 1, 2]
   },
   {
     type: "single",
-    question: "17. À quoi sert le test du Trifecta ?",
+    question: "20. Deux formules obtiennent des scores très proches et l’écart n’est pas significatif. Quelle conclusion est la plus rigoureuse ?",
     options: [
-      "À évaluer la qualité d’une représentation graphique",
-      "À choisir un nom de marque",
-      "À remplacer une étude terrain",
-      "À calculer automatiquement un budget"
+      "Choisir quand même la formule préférée du responsable",
+      "Dire que les données ne permettent pas de trancher clairement entre les deux formules",
+      "Inventer un écart plus grand pour faciliter la décision",
+      "Supprimer la formule la moins jolie"
     ],
-    answer: [0]
-  },
-  {
-    type: "multi",
-    question: "18. Pour présenter une analyse qualitative, il est utile de :",
-    options: [
-      "Structurer le storytelling",
-      "Rappeler les sources",
-      "Utiliser des verbatims ou illustrations pertinentes",
-      "Inventer des citations plus convaincantes"
-    ],
-    answer: [0, 1, 2]
-  },
-  {
-    type: "single",
-    question: "19. Pourquoi faut-il distinguer rapport et présentation ?",
-    options: [
-      "La présentation doit être plus synthétique et orientée vers les messages clés",
-      "Le rapport doit toujours être oral",
-      "La présentation doit contenir toutes les données brutes",
-      "Il n’y a aucune différence"
-    ],
-    answer: [0]
-  },
-  {
-    type: "multi",
-    question: "20. Pendant une présentation de résultats, à quels marqueurs faut-il être attentif ?",
-    options: [
-      "Rythme",
-      "Compréhension",
-      "Feedback et interrogations",
-      "Confusion volontaire"
-    ],
-    answer: [0, 1, 2]
+    answer: [1]
   }
 ];
 
 function finalExamUserKey(suffix) {
   const id = finalExamCurrentUser && finalExamCurrentUser.id ? finalExamCurrentUser.id : "guest";
-  return "finalExam_" + suffix + "_" + id;
+  return "finalExam_" + FINAL_EXAM_VERSION + "_" + suffix + "_" + id;
 }
 
 function formatFinalExamTime(ms) {
@@ -4071,8 +4035,6 @@ async function initFinalExam() {
     const { data } = await supabaseClient.auth.getUser();
     finalExamCurrentUser = data && data.user ? data.user : null;
     await refreshFinalExamAdminStatus();
-    loadFinalExamSecurityState();
-    setupFinalExamSecurityWatchers();
   } catch (e) {
     finalExamCurrentUser = null;
     finalExamIsAdmin = false;
@@ -4081,15 +4043,7 @@ async function initFinalExam() {
   renderFinalExamQuestions();
   refreshFinalExamGate();
 
-  setInterval(refreshFinalExamGate, 1000);
-
-  const submitted = localStorage.getItem(finalExamUserKey("submitted"));
   const startedAt = localStorage.getItem(finalExamUserKey("startedAt"));
-
-  if (submitted === "true" && !finalExamIsAdmin) {
-    showFinalExamDone();
-    return;
-  }
 
   if (startedAt) {
     showFinalExamRunning();
@@ -4103,59 +4057,18 @@ function refreshFinalExamGate() {
 
   if (!message || !button) return;
 
-  const now = new Date();
-  const submitted = localStorage.getItem(finalExamUserKey("submitted"));
   const startedAt = localStorage.getItem(finalExamUserKey("startedAt"));
 
   if (startedAt) {
     message.innerHTML = "⏱ Examen en cours. Le compte à rebours continue.";
     button.disabled = true;
+    button.textContent = "Examen en cours";
     return;
   }
 
-  if (finalExamIsAdmin) {
-    message.innerHTML = `
-      <span class="final-exam-admin-badge">🧪 Mode test admin activé</span><br>
-      Vous pouvez commencer l’examen maintenant pour tester le site, même avant le 30 juin à 10h00.
-      <br><strong>Important :</strong> en mode test admin hors créneau officiel, le résultat ne sera pas enregistré dans Supabase.
-    `;
-    button.disabled = false;
-    button.textContent = "🧪 Commencer le test admin";
-    return;
-  }
-
-  if (submitted === "true") {
-    message.innerHTML = "✅ Vous avez déjà envoyé cet examen.";
-    button.disabled = true;
-    return;
-  }
-
-  if (now < FINAL_EXAM_START_AT) {
-    const remaining = FINAL_EXAM_START_AT - now;
-    message.innerHTML = renderFinalExamClosedGate(remaining);
-    button.disabled = true;
-    button.textContent = "🔒 Examen fermé";
-    return;
-  }
-
-  if (now >= FINAL_EXAM_START_AT && now < FINAL_EXAM_LATEST_START_AT) {
-    message.innerHTML = "✅ L’examen est ouvert. Cliquez maintenant pour commencer.";
-    button.disabled = false;
-    button.textContent = "Commencer l’examen";
-    return;
-  }
-
-  message.innerHTML = `
-    <div class="final-exam-gate-card">
-      <span class="final-exam-gate-kicker">⛔ Créneau dépassé</span>
-      <h3 class="final-exam-gate-title">L’accès à l’examen est fermé</h3>
-      <p class="final-exam-gate-subtitle">
-        L’examen était cliquable uniquement le <strong>30 juin 2026 à 10h00 précise</strong>.
-      </p>
-    </div>
-  `;
-  button.disabled = true;
-  button.textContent = "⛔ Créneau dépassé";
+  message.innerHTML = "✅ L’examen est ouvert. Aucune restriction de date ou de plein écran n’est appliquée.";
+  button.disabled = false;
+  button.textContent = "Commencer l’examen";
 }
 
 function renderFinalExamQuestions() {
@@ -4196,14 +4109,6 @@ async function startFinalExam() {
 
   await refreshFinalExamAdminStatus();
 
-  const isAdminTest = finalExamIsAdmin && !isFinalExamOfficialStartWindow();
-
-  if (!finalExamIsAdmin && (now < FINAL_EXAM_START_AT || now >= FINAL_EXAM_LATEST_START_AT)) {
-    alert("L’examen ne peut être démarré que le 30 juin à 10h00 précise.");
-    refreshFinalExamGate();
-    return;
-  }
-
   const nameInput = document.getElementById("finalExamStudentName");
   const fullName = nameInput ? nameInput.value.trim() : "";
 
@@ -4212,21 +4117,19 @@ async function startFinalExam() {
     return;
   }
 
-  if (finalExamIsAdmin) {
-    localStorage.removeItem(finalExamUserKey("submitted"));
-  }
+  localStorage.removeItem(finalExamUserKey("submitted"));
+  localStorage.removeItem(finalExamUserKey("securityWarnings"));
+  localStorage.removeItem(finalExamUserKey("securityEvents"));
 
   localStorage.setItem(finalExamUserKey("startedAt"), now.toISOString());
   localStorage.setItem(finalExamUserKey("fullName"), fullName);
-  localStorage.setItem(finalExamUserKey("adminTestMode"), isAdminTest ? "true" : "false");
+  localStorage.setItem(finalExamUserKey("adminTestMode"), "false");
 
   finalExamSecurityWarningCount = 0;
   finalExamSecurityEvents = [];
   finalExamSecurityAutoSubmitting = false;
-  saveFinalExamSecurityState();
 
   showFinalExamRunning();
-  await requestFinalExamFullscreen();
   startFinalExamCountdown();
 }
 
@@ -4244,8 +4147,6 @@ function showFinalExamDone() {
   const intro = document.getElementById("finalExamIntro");
   const running = document.getElementById("finalExamRunning");
   const done = document.getElementById("finalExamDone");
-
-  hideFinalExamSecurityWarning();
 
   if (intro) intro.style.display = "none";
   if (running) running.style.display = "none";
@@ -4308,26 +4209,49 @@ function collectFinalExamAnswers() {
 async function submitFinalExam(event) {
   if (event) event.preventDefault();
 
-  const confirmation = confirm("Confirmer l’envoi de votre examen ? Une seule tentative est autorisée.");
+  const confirmation = confirm("Confirmer l’envoi de votre examen ? Votre copie sera transmise à l’enseignant.");
   if (!confirmation) return;
 
   await sendFinalExamResult(false);
 }
+
 
 async function autoSubmitFinalExam() {
   alert("Temps écoulé. Votre examen va être envoyé automatiquement à l’enseignant.");
   await sendFinalExamResult(true);
 }
 
-async function sendFinalExamResult(autoSubmitted) {
-  const submitted = localStorage.getItem(finalExamUserKey("submitted"));
-  const adminTestMode = localStorage.getItem(finalExamUserKey("adminTestMode")) === "true";
+function resetFinalExamForNewAttempt() {
+  localStorage.removeItem(finalExamUserKey("submitted"));
+  localStorage.removeItem(finalExamUserKey("startedAt"));
+  localStorage.removeItem(finalExamUserKey("securityWarnings"));
+  localStorage.removeItem(finalExamUserKey("securityEvents"));
+  localStorage.removeItem(finalExamUserKey("adminTestMode"));
 
-  if (submitted === "true" && !adminTestMode) {
-    showFinalExamDone();
-    return;
+  finalExamSecurityWarningCount = 0;
+  finalExamSecurityEvents = [];
+  finalExamSecurityAutoSubmitting = false;
+
+  const form = document.getElementById("finalExamForm");
+  if (form) {
+    form.reset();
   }
 
+  renderFinalExamQuestions();
+
+  const intro = document.getElementById("finalExamIntro");
+  const running = document.getElementById("finalExamRunning");
+  const done = document.getElementById("finalExamDone");
+
+  if (intro) intro.style.display = "block";
+  if (running) running.style.display = "none";
+  if (done) done.style.display = "none";
+
+  refreshFinalExamGate();
+}
+
+
+async function sendFinalExamResult(autoSubmitted) {
   const { data } = await supabaseClient.auth.getUser();
   finalExamCurrentUser = data && data.user ? data.user : null;
 
@@ -4351,33 +4275,9 @@ async function sendFinalExamResult(autoSubmitted) {
   const result = collectFinalExamAnswers();
   const fullName = localStorage.getItem(finalExamUserKey("fullName")) || "";
 
-  if (adminTestMode && finalExamIsAdmin) {
-    localStorage.removeItem(finalExamUserKey("startedAt"));
-    localStorage.removeItem(finalExamUserKey("adminTestMode"));
-    localStorage.removeItem(finalExamUserKey("securityWarnings"));
-    localStorage.removeItem(finalExamUserKey("securityEvents"));
-
-    alert(
-      "Mode test admin terminé.\n\n" +
-      "La copie test a bien été envoyée localement.\n" +
-      "Aucune note ne s’affiche après l’envoi, même en mode admin.\n" +
-      "Avertissements sécurité : " + finalExamSecurityWarningCount + "/" + FINAL_EXAM_MAX_SECURITY_WARNINGS + ".\n\n" +
-      "Aucun résultat n’a été enregistré dans Supabase."
-    );
-
-    const intro = document.getElementById("finalExamIntro");
-    const running = document.getElementById("finalExamRunning");
-    const done = document.getElementById("finalExamDone");
-
-    if (intro) intro.style.display = "block";
-    if (running) running.style.display = "none";
-    if (done) done.style.display = "none";
-
-    refreshFinalExamGate();
-    return;
-  }
-
   const payload = {
+    exam_version: FINAL_EXAM_VERSION,
+    attempt_number: null,
     user_id: finalExamCurrentUser.id,
     email: finalExamCurrentUser.email,
     full_name: fullName,
@@ -4388,10 +4288,12 @@ async function sendFinalExamResult(autoSubmitted) {
     percentage: result.percentage,
     duration_seconds: durationSeconds,
     answers: {
+      exam_version: FINAL_EXAM_VERSION,
+      exam_title: "Examen final — nouvelle version sans restriction",
       auto_submitted: autoSubmitted,
-      security_warning_count: finalExamSecurityWarningCount,
-      security_events: finalExamSecurityEvents,
-      security_status: finalExamSecurityWarningCount >= FINAL_EXAM_MAX_SECURITY_WARNINGS ? "auto_submitted_after_security_warnings" : "normal",
+      security_warning_count: 0,
+      security_events: [],
+      security_status: "disabled",
       items: result.answers
     },
     user_agent: navigator.userAgent
@@ -4405,9 +4307,7 @@ async function sendFinalExamResult(autoSubmitted) {
     console.error(error);
 
     if (String(error.message || "").includes("duplicate")) {
-      alert("Une copie a déjà été envoyée avec ce compte. Une seule tentative est autorisée.");
-      localStorage.setItem(finalExamUserKey("submitted"), "true");
-      showFinalExamDone();
+      alert("L’envoi est bloqué par une ancienne contrainte Supabase. Exécutez le SQL fourni pour autoriser plusieurs essais.");
       return;
     }
 
@@ -4415,10 +4315,10 @@ async function sendFinalExamResult(autoSubmitted) {
     return;
   }
 
-  localStorage.setItem(finalExamUserKey("submitted"), "true");
+  localStorage.removeItem(finalExamUserKey("submitted"));
   localStorage.removeItem(finalExamUserKey("startedAt"));
   localStorage.removeItem(finalExamUserKey("adminTestMode"));
-  alert("Examen envoyé. Votre copie a bien été transmise à l’enseignant.");
+  alert("Examen envoyé. Votre copie a bien été transmise à l’enseignant. Aucun score ne s’affiche ici.");
   showFinalExamDone();
 }
 
